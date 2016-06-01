@@ -18,14 +18,21 @@ set(HSE_CRYSTAL_HZ 25000000)
 if ((${CMAKE_SYSTEM_NAME} MATCHES Generic) AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal))
     set(BUILD_UT OFF)
 
-    set(COMMON_FLAGS -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -gdwarf-2 -fdata-sections -ffunction-sections)
+    set(COMMON_FLAGS -mcpu=cortex-m0plus -mthumb -gdwarf-2 -fdata-sections -ffunction-sections)
     add_compile_options(${COMMON_FLAGS})
-    add_definitions(-D__FPU_PRESENT -DARM_MATH_CM4 -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=${HSE_CRYSTAL_HZ})
+    add_definitions(-DUSE_STDPERIPH_DRIVER)
+    add_definitions(-DHSE_VALUE=${HSE_CRYSTAL_HZ})
+    add_definitions(-DSTM32L052xx)
+
+    include_directories(Drivers/CMSIS/Device/ST/STM32L0xx/Include/)
+    include_directories(Drivers/STM32L0xx_HAL_Driver/Inc/)
+    include_directories(Drivers/CMSIS/Include/)
+    include_directories(Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/)
+    include_directories(Middlewares/ST/STM32_USB_Device_Library/Core/Inc/)
 
     set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fno-rtti -fno-exceptions")
 
-    SET(CMAKE_EXE_LINKER_FLAGS "-Xlinker --gc-sections -fno-rtti -fno-exceptions -mfloat-abi=hard")
-
+    SET(CMAKE_EXE_LINKER_FLAGS "-Xlinker --gc-sections -fno-rtti -fno-exceptions)
 
     # List all of the sub directories you want to build here
     add_subdirectory(POVBase)

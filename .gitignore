@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+#Ignore the decompressed compiler
+toolchain/*
+
+#Ignore sublime workspace file
+POVDisplay.sublime-workspace
