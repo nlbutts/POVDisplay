@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <sys/unistd.h>
-#include <stm32f4xx.h>
 
 
 #ifndef STDOUT_USART

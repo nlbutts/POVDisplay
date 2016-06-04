@@ -28,7 +28,7 @@ add_executable(${THIS}.elf ${CPPSRC} ${CSRC} ${ASRC})
 ####
 # Add libraries, linker flags, etc.
 ####
-#target_link_libraries(${THIS}.elf utility stm32f4)
+target_link_libraries(${THIS}.elf StringUI stm32l0)
 target_link_libraries(${THIS}.elf "-T ${CMAKE_CURRENT_LIST_DIR}/linker/stm32_flash.ld -L${CMAKE_HOME_DIRECTORY}")
 
 ####
