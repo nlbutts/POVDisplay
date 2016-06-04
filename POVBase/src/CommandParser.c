@@ -16,10 +16,10 @@
  */
 
 #include <stdlib.h>
-#include "usbd_def.h"
+//#include "usbd_def.h"
 #include "CommandParser.h"
 #include "string.h"
-#include "usbd_cdc_if.h"
+//#include "usbd_cdc_if.h"
 #include "ee_printf.h"
 
 #define LOCAL_STR_SIZE  20
