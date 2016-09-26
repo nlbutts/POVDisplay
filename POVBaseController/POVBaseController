@@ -1,0 +1,6 @@
+Reference, Value, Footprint, Datasheet
+R2,1K,Discret:R1,
+R1,100,Discret:R1,
+IC1,PIC12C508A-I/SN,Housings_DIP:DIP-8_W7.62mm,
+D1,LED,LEDs:LED-5MM,
+J1,MYCONN3,Connect:Banana_Jack_3Pin,
