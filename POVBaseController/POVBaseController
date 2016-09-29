@@ -1,6 +1,15 @@
-Reference, Value, Footprint, Datasheet
-R2,1K,Discret:R1,
-R1,100,Discret:R1,
-IC1,PIC12C508A-I/SN,Housings_DIP:DIP-8_W7.62mm,
-D1,LED,LEDs:LED-5MM,
-J1,MYCONN3,Connect:Banana_Jack_3Pin,
+Qty,partname,description,lib
+0,"A5970AD","","mylib"
+0,"C","Unpolarized capacitor","device"
+0,"CONN_01X02","Connector, single row, 01x02","conn"
+0,"CONN_01X05","Connector, single row, 01x05","conn"
+0,"CP","Polarised capacitor","device"
+0,"CP1","Polarised capacitor","device"
+0,"CY8C4014LQI-412","","mylib"
+0,"D","Diode","device"
+0,"INDUCTOR","","device"
+0,"LD1117S33TR","800mA Fixed Low Drop Positive Voltage Regulator, Fixed Output 3.3V, SOT223","regul"
+0,"LED","","device"
+0,"R","Resistor","device"
+0,"TEST_1P","point","conn"
+0,"TVS","Transient voltage suppressor diode (bi-directional)","device"
