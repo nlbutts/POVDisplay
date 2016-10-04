@@ -1,9 +1,9 @@
-(kicad_pcb (version 4) (host pcbnew 4.0.3-stable)
+(kicad_pcb (version 4) (host pcbnew 4.0.2-stable)
 
   (general
     (links 68)
-    (no_connects 1)
-    (area 110.225 70.323 165.175001 101.965)
+    (no_connects 0)
+    (area 111.684999 71.044999 165.175001 100.405001)
     (thickness 1.6)
     (drawings 10)
     (tracks 147)
@@ -778,6 +778,11 @@
       (net 28 "Net-(U2-Pad23)"))
     (pad 24 smd rect (at -1.25 -2 90) (size 0.25 0.8) (layers F.Cu F.Paste F.Mask)
       (net 9 /XRES))
+    (model SMD_Packages.3dshapes/QFN_24-1EP.wrl
+      (at (xyz 0 0 0))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (module Measurement_Points:Measurement_Point_Round-SMD-Pad_Small (layer F.Cu) (tedit 57ED67E5) (tstamp 57EB9690)
@@ -1224,6 +1229,11 @@
       (net 2 VCC))
     (pad 1 smd rect (at -3.685 0 180) (size 2.92 2.79) (layers F.Cu F.Paste F.Mask)
       (net 31 "Net-(D3-Pad1)"))
+    (model Inductors.3dshapes/self_cms_we-pd3.wrl
+      (at (xyz 0 0 0))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (module myfootprint:SO-8 (layer F.Cu) (tedit 57ED4FA7) (tstamp 57ED539B)
