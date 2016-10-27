@@ -30,6 +30,7 @@ LIBS:contrib
 LIBS:valves
 LIBS:microchip_pic12mcu
 LIBS:mylib
+LIBS:POVBaseController-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -445,6 +446,7 @@ F 0 "D2" H 750 3400 50  0000 C CNN
 F 1 "TVS" H 750 3100 50  0000 C CNN
 F 2 "Diodes_SMD:SMB_Handsoldering" H 750 3250 50  0001 C CNN
 F 3 "" H 750 3250 50  0000 C CNN
+F 4 "732-9779-1-ND" H 750 3250 60  0001 C CNN "DIGIKEY"
 	1    750  3250
 	0    1    1    0   
 $EndComp
@@ -596,6 +598,7 @@ F 0 "U2" H 6450 2050 60  0000 C CNN
 F 1 "CY8C4014LQI-412" H 6850 3750 60  0000 C CNN
 F 2 "myfootprint:QFN_24" H 6450 3750 60  0001 C CNN
 F 3 "" H 6450 3750 60  0000 C CNN
+F 4 "CY8C4014LQI-412-ND" H 6900 2900 60  0001 C CNN "DIGIKEY"
 	1    6900 2900
 	1    0    0    -1  
 $EndComp
@@ -709,8 +712,6 @@ Wire Wire Line
 	5750 5500 7500 5500
 Wire Wire Line
 	7100 5500 7100 5400
-Wire Wire Line
-	6400 4900 6400 5600
 Connection ~ 6400 5500
 Wire Wire Line
 	7100 5000 7100 5100
@@ -726,7 +727,6 @@ Wire Wire Line
 Connection ~ 7100 5500
 Wire Wire Line
 	7100 5050 6400 5050
-Connection ~ 6400 5050
 Connection ~ 7100 5050
 $Comp
 L A5970AD U1
@@ -736,6 +736,7 @@ F 0 "U1" H 1750 1850 60  0000 C CNN
 F 1 "A5970AD" H 2000 2650 60  0000 C CNN
 F 2 "myfootprint:SO-8" H 2150 2350 60  0001 C CNN
 F 3 "" H 2150 2350 60  0000 C CNN
+F 4 "497-10183-1-ND" H 2150 2350 60  0001 C CNN "DIGIKEY"
 	1    2150 2350
 	1    0    0    -1  
 $EndComp
@@ -905,4 +906,8 @@ F 3 "" H 4450 1800 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Connection ~ 4250 2250
+Wire Wire Line
+	6400 5050 6400 4900
+Wire Wire Line
+	6400 5500 6400 5600
 $EndSCHEMATC

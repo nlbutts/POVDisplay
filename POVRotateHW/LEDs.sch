@@ -1,0 +1,136 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:Nickslib
+LIBS:mylib
+LIBS:POVRotateHW-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 4 4
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L APA102C U?
+U 1 1 58127307
+P 3250 1900
+F 0 "U?" H 3200 1700 60  0000 C CNN
+F 1 "APA102C" H 3250 2100 60  0000 C CNN
+F 2 "" H 3300 1850 60  0001 C CNN
+F 3 "" H 3300 1850 60  0001 C CNN
+	1    3250 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 58127369
+P 4600 1900
+F 0 "U?" H 4550 1700 60  0000 C CNN
+F 1 "APA102C" H 4600 2100 60  0000 C CNN
+F 2 "" H 4650 1850 60  0001 C CNN
+F 3 "" H 4650 1850 60  0001 C CNN
+	1    4600 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 581273A7
+P 6000 1900
+F 0 "U?" H 5950 1700 60  0000 C CNN
+F 1 "APA102C" H 6000 2100 60  0000 C CNN
+F 2 "" H 6050 1850 60  0001 C CNN
+F 3 "" H 6050 1850 60  0001 C CNN
+	1    6000 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 581273F0
+P 7450 1900
+F 0 "U?" H 7400 1700 60  0000 C CNN
+F 1 "APA102C" H 7450 2100 60  0000 C CNN
+F 2 "" H 7500 1850 60  0001 C CNN
+F 3 "" H 7500 1850 60  0001 C CNN
+	1    7450 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 58127436
+P 3250 2700
+F 0 "U?" H 3200 2500 60  0000 C CNN
+F 1 "APA102C" H 3250 2900 60  0000 C CNN
+F 2 "" H 3300 2650 60  0001 C CNN
+F 3 "" H 3300 2650 60  0001 C CNN
+	1    3250 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 581274C5
+P 4600 2700
+F 0 "U?" H 4550 2500 60  0000 C CNN
+F 1 "APA102C" H 4600 2900 60  0000 C CNN
+F 2 "" H 4650 2650 60  0001 C CNN
+F 3 "" H 4650 2650 60  0001 C CNN
+	1    4600 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 5812751F
+P 6000 2700
+F 0 "U?" H 5950 2500 60  0000 C CNN
+F 1 "APA102C" H 6000 2900 60  0000 C CNN
+F 2 "" H 6050 2650 60  0001 C CNN
+F 3 "" H 6050 2650 60  0001 C CNN
+	1    6000 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L APA102C U?
+U 1 1 58127568
+P 7450 2700
+F 0 "U?" H 7400 2500 60  0000 C CNN
+F 1 "APA102C" H 7450 2900 60  0000 C CNN
+F 2 "" H 7500 2650 60  0001 C CNN
+F 3 "" H 7500 2650 60  0001 C CNN
+	1    7450 2700
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
