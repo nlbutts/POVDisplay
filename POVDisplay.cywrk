@@ -3,13 +3,14 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWrkspc" version="5" xml_contents_version="3" name="POVDisplay" persistent="" platform="NOT_USED">
-<current_project name=".\POVBase2.cydsn\POVBase2.cyprj" />
+<current_project name=".\iPixelTest.cydsn\iPixelTest.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
 <v>.\POVRotate.cydsn\POVRotate.cyprj</v>
 <v>.\POVBase2.cydsn\POVBase2.cyprj</v>
 <v>.\POVBase.cydsn\POVBase.cyprj</v>
+<v>.\iPixelTest.cydsn\iPixelTest.cyprj</v>
 </projects>
 <workspace_id v="1be81ebb-8ddb-4949-ac76-fcfd36b8e892" />
 <WriteAppVersionLastSavedWith v="3.3.0.9604" />
