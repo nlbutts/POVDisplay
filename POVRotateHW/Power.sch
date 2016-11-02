@@ -490,7 +490,7 @@ Wire Wire Line
 	7800 2150 7800 2700
 Connection ~ 7800 2600
 Wire Wire Line
-	2550 6350 2550 6050
+	2550 6050 2550 6900
 Wire Wire Line
 	1200 1450 1200 1600
 Wire Wire Line
@@ -633,4 +633,9 @@ F 4 "497-10183-1-ND" H 5700 2700 60  0001 C CNN "DIGIKEY"
 	1    5700 2700
 	1    0    0    -1  
 $EndComp
+Text GLabel 2700 6900 2    60   Input ~ 0
+PWR
+Wire Wire Line
+	2550 6900 2700 6900
+Connection ~ 2550 6350
 $EndSCHEMATC
