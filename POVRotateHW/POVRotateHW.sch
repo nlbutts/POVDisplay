@@ -28,8 +28,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Nickslib
-LIBS:mylib
+LIBS:General
 LIBS:POVRotateHW-cache
 EELAYER 25 0
 EELAYER END

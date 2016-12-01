@@ -1,4 +1,4 @@
-update=11/1/2016 1:37:09 PM
+update=11/28/2016 6:32:51 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -58,5 +58,4 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=Nickslib
-LibName31=C:/projects/POVDisplay/POVBaseController/library/mylib
+LibName30=C:/projects/KicadLib/General
