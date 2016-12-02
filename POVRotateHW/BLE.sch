@@ -423,28 +423,6 @@ F 3 "" H 7300 3000 50  0000 C CNN
 	1    7100 3000
 	1    0    0    -1  
 $EndComp
-$Comp
-L TEST_1P W8
-U 1 1 5817A60A
-P 7350 3000
-F 0 "W8" H 7350 3270 50  0000 C CNN
-F 1 "P5.0" H 7350 3200 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 7550 3000 50  0001 C CNN
-F 3 "" H 7550 3000 50  0000 C CNN
-	1    7350 3000
-	1    0    0    -1  
-$EndComp
-$Comp
-L TEST_1P W9
-U 1 1 5817A645
-P 7600 3000
-F 0 "W9" H 7600 3270 50  0000 C CNN
-F 1 "P5.1" H 7600 3200 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 7800 3000 50  0001 C CNN
-F 3 "" H 7800 3000 50  0000 C CNN
-	1    7600 3000
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6600 3100 6850 3100
 Wire Wire Line
@@ -456,11 +434,7 @@ Wire Wire Line
 Wire Wire Line
 	6600 3350 7350 3350
 Wire Wire Line
-	7350 3350 7350 3000
-Wire Wire Line
-	6600 3450 7600 3450
-Wire Wire Line
-	7600 3450 7600 3000
+	6600 3450 7850 3450
 $Comp
 L R R7
 U 1 1 5817AB59
@@ -764,4 +738,12 @@ F 3 "" H 4300 4200 50  0000 C CNN
 $EndComp
 Wire Wire Line
 	4100 4300 4100 4200
+Text GLabel 7850 3300 2    60   Input ~ 0
+LE
+Text GLabel 7850 3450 2    60   Input ~ 0
+OE
+Wire Wire Line
+	7850 3300 7350 3300
+Wire Wire Line
+	7350 3300 7350 3350
 $EndSCHEMATC
