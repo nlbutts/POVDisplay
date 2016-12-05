@@ -1,0 +1,6 @@
+POV Rotate issues
+The AP102 LED suck ass. I can't get the them to work with a shit.
+I think switching to the STP24DP05 part would be a better option.
+Need to put labels on P1 and the SWD connector.
+Move parts closer together and make the board smaller.
+Make the photodiode a top mount, with a hole through the PCB

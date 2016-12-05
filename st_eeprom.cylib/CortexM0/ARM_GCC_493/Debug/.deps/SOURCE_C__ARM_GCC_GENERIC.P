@@ -1,0 +1,6 @@
+C:/projects/POVDisplay/st_eeprom.cylib/CortexM0/ARM_GCC_493/Debug/EEProm.o : C:/projects/POVDisplay/st_eeprom.cylib/EEProm.c C:/projects/POVDisplay/st_eeprom.cylib/EEProm.h 
+
+C:/projects/POVDisplay/st_eeprom.cylib/EEProm.c : 
+
+C:/projects/POVDisplay/st_eeprom.cylib/EEProm.h : 
+
