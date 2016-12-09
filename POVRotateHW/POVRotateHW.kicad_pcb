@@ -1,7 +1,7 @@
 (kicad_pcb (version 4) (host pcbnew 4.0.4-stable)
 
   (general
-    (links 0)
+    (links 167)
     (no_connects 3)
     (area 164.609524 79.825 211.075001 238.075001)
     (thickness 1.6)
@@ -2480,11 +2480,11 @@
   )
 
   (module KicadFootprint:qrcode (layer B.Cu) (tedit 0) (tstamp 584AD76F)
-    (at 187.5 141)
-    (fp_text reference G*** (at 0 0) (layer B.SilkS) hide
+    (at 188.1 141 180)
+    (fp_text reference G*** (at 0 0 180) (layer B.SilkS) hide
       (effects (font (thickness 0.3)) (justify mirror))
     )
-    (fp_text value LOGO (at 0.75 0) (layer B.SilkS) hide
+    (fp_text value LOGO (at 0.75 0 180) (layer B.SilkS) hide
       (effects (font (thickness 0.3)) (justify mirror))
     )
     (fp_poly (pts (xy 5.418667 -5.418667) (xy -5.418666 -5.418667) (xy -5.418666 -4.214615) (xy -5.03051 -4.214615)
