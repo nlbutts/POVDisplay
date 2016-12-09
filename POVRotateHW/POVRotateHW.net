@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:/projects/POVDisplay/POVRotateHW/POVRotateHW.sch)
-    (date "12/7/2016 12:41:34 PM")
+    (date "12/9/2016 9:34:00 AM")
     (tool "Eeschema 4.0.4-stable")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -254,7 +254,7 @@
       (value M24M01)
       (footprint SMD_Packages:SOIC-8-N)
       (fields
-        (field (name DIGIKEY) 497-14359-1-ND))
+        (field (name DIGIKEY) 497-6351-1-ND))
       (libsource (lib General) (part M24M01))
       (sheetpath (names /BLE/) (tstamps /5812723F/))
       (tstamp 58177CC2))
@@ -322,9 +322,9 @@
       (tstamp 5817CFA8))
     (comp (ref D7)
       (value PD15-21B/TR8)
-      (footprint Capacitors_SMD:C_1206_HandSoldering)
+      (footprint KicadFootprint:2-SMD_Z-Bend)
       (fields
-        (field (name DIGIKEY) 1080-1365-1-ND))
+        (field (name DIGIKEY) 475-1346-1-ND))
       (libsource (lib device) (part D))
       (sheetpath (names /BLE/) (tstamps /5812723F/))
       (tstamp 5817D009))
@@ -367,6 +367,8 @@
     (comp (ref U5)
       (value STP24DP05)
       (footprint Housings_QFP:TQFP-48_7x7mm_Pitch0.5mm)
+      (fields
+        (field (name DIGIKEY) 497-8283-1-ND))
       (libsource (lib General) (part STP24DP05))
       (sheetpath (names /LEDs/) (tstamps /58127254/))
       (tstamp 58482E44))
@@ -421,6 +423,8 @@
     (comp (ref D9)
       (value LED_RABG)
       (footprint KicadFootprint:CREE_PLCC4)
+      (fields
+        (field (name DIGIKEY) CLV1A-FKB-CHMKPEHBB7A363CT-ND))
       (libsource (lib device) (part LED_RABG))
       (sheetpath (names /LEDs/) (tstamps /58127254/))
       (tstamp 58485395))
@@ -734,12 +738,12 @@
         (pin (num 1) (name ~) (type passive))
         (pin (num 2) (name ~) (type passive)))))
   (libraries
-    (library (logical device)
-      (uri "C:\\Program Files\\KiCad\\share\\kicad\\library\\device.lib"))
     (library (logical conn)
       (uri "C:\\Program Files\\KiCad\\share\\kicad\\library\\conn.lib"))
     (library (logical linear)
       (uri "C:\\Program Files\\KiCad\\share\\kicad\\library\\linear.lib"))
+    (library (logical device)
+      (uri "C:\\Program Files\\KiCad\\share\\kicad\\library\\device.lib"))
     (library (logical General)
       (uri C:\projects\KicadLib\General.lib)))
   (nets
