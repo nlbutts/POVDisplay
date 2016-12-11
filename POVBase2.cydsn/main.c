@@ -15,6 +15,7 @@
 
 int main()
 {
+    uint32_t delay = 0;
     uint32_t currentCoilIndex = 0;
     const uint32_t pwmFreq = 48000000;
     const uint32_t coilFreq[] =
@@ -37,15 +38,23 @@ int main()
     CyGlobalIntEnable; /* Enable global interrupts. */
     
     PWM_Start();
-    uint32_t period = pwmFreq / coilFreq[currentCoilIndex];
-    PWM_WritePeriod(period);
-    PWM_WriteCompare(period/2);
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
 
     for(;;)
     {
-        /* Place your application code here. */
+        if (delay == 0)
+        {            
+            uint32_t period = pwmFreq / coilFreq[currentCoilIndex++];
+            PWM_WritePeriod(period);
+            PWM_WriteCompare(period/2);
+            delay = 20;
+        }
+        else
+        {
+            delay--;
+        }
+
         LED_Write(!LED_Read());
         CyDelay(100);
     }

@@ -11,14 +11,28 @@
 */
 #include <project.h>
 
-#define PWM_CLOCK 24000000
+#define PWM_CLOCK 48000000
 //#define STARTING_FREQ 267000
-#define STARTING_FREQ 100000
-//#define STARTING_FREQ 55000
+//#define STARTING_FREQ 100000
+#define STARTING_FREQ 59000
 #define ELEMENTS(x)    (sizeof(x) / sizeof(x[0]))
 
 uint8_t buttonPressed = 0;
-uint32_t currentFrequency = 1000;
+uint32_t currentFrequency = STARTING_FREQ;
+
+uint32_t freqTableIndex = 0;
+uint32_t freqTable[] = 
+{
+    50000,
+    55000,
+    70000,
+    89000,
+    100000,
+    150000,
+    200000,
+    300000,
+    500000
+};
 
 void setFrequency(uint32_t freq)
 {
@@ -27,6 +41,16 @@ void setFrequency(uint32_t freq)
     PWM_WritePeriod(period);
     PWM_WriteCompare1(period/2);
 
+}
+
+uint32_t stepFrequencyTable()
+{
+    uint32_t currentFrequency = freqTable[freqTableIndex++];
+    if (freqTableIndex > sizeof(freqTable)/sizeof(freqTable[0]))
+    {
+        freqTableIndex = 0;
+    }
+    return currentFrequency;
 }
 
 uint32_t stepFrequency()
@@ -84,6 +108,7 @@ int main()
     }
     
     setFrequency(currentFrequency);
+    buttonPressed = 0;
     
     for(;;)
     {

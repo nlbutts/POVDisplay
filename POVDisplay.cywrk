@@ -3,13 +3,14 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="POVDisplay" persistent="POVDisplay.cywrk" platform="NOT_USED">
-<current_project name=".\POVRotate.cydsn\POVRotate.cyprj" />
+<current_project name=".\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
 <v>.\POVRotate.cydsn\POVRotate.cyprj</v>
 <v>.\POVBase2.cydsn\POVBase2.cyprj</v>
 <v>.\POVBase.cydsn\POVBase.cyprj</v>
+<v>.\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj</v>
 </projects>
 <workspace_id v="1be81ebb-8ddb-4949-ac76-fcfd36b8e892" />
 <WriteAppVersionLastSavedWith v="4.0.0.432" />
