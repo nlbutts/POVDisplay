@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>C:/projects/POVDisplay/POVRotateHW/POVRotateHW.sch</source>
-    <date>12/9/2016 6:50:28 AM</date>
+    <date>12/27/2016 1:57:24 PM</date>
     <tool>Eeschema 4.0.4-stable</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -894,14 +894,14 @@
     <library logical="device">
       <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
     </library>
-    <library logical="General">
-      <uri>C:\projects\KicadLib\General.lib</uri>
+    <library logical="conn">
+      <uri>C:\Program Files\KiCad\share\kicad\library\conn.lib</uri>
     </library>
     <library logical="linear">
       <uri>C:\Program Files\KiCad\share\kicad\library\linear.lib</uri>
     </library>
-    <library logical="conn">
-      <uri>C:\Program Files\KiCad\share\kicad\library\conn.lib</uri>
+    <library logical="General">
+      <uri>C:\projects\KicadLib\General.lib</uri>
     </library>
   </libraries>
   <nets>
