@@ -38,9 +38,18 @@
         <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
           <File BuildType="BUILD" Toolchain="">main.c</File>
           <File BuildType="BUILD" Toolchain="">LED.c</File>
+          <File BuildType="BUILD" Toolchain="">app_Ble.c</File>
+          <File BuildType="BUILD" Toolchain="">app_LED.c</File>
+          <File BuildType="BUILD" Toolchain="">app_UART.c</File>
+          <File BuildType="BUILD" Toolchain="">uartBuf.c</File>
           <File BuildType="BUILD" Toolchain="">cyapicallbacks.h</File>
           <File BuildType="BUILD" Toolchain="">LED.h</File>
           <File BuildType="BUILD" Toolchain="">types.h</File>
+          <File BuildType="BUILD" Toolchain="">uartBuf.h</File>
+          <File BuildType="BUILD" Toolchain="">app_Ble.h</File>
+          <File BuildType="BUILD" Toolchain="">app_LED.h</File>
+          <File BuildType="BUILD" Toolchain="">app_UART.h</File>
+          <File BuildType="BUILD" Toolchain="">main.h</File>
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4">
@@ -185,6 +194,28 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_aliases.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_gatt.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_gatt.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_eventHandler.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_INT.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_PVT.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_PVT.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_STACK_PVT.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGap.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGatt.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattDb.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackHostMain.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackL2cap.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattServer.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattClient.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_Stack.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_eventHandler.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.h</File>
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic">
@@ -193,9 +224,24 @@
           <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\CyComponentLibrary.a</File>
         </Files>
       </Folder>
+      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic\BLE_v3_20">
+        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
+          <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\BLE_v3_20\gccCyBLEStack_BLE_SOC_CENTRAL.a</File>
+        </Files>
+      </Folder>
+      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_MDK_Generic\BLE_v3_20">
+        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
+          <File BuildType="BUILD" Toolchain="ARM MDK Generic">.\Export\ARM_MDK_Generic\BLE_v3_20\mdkCyBLEStack_BLE_SOC_CENTRAL.a</File>
+        </Files>
+      </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_MDK_Generic">
         <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
           <File BuildType="BUILD" Toolchain="ARM MDK Generic">.\Export\ARM_MDK_Generic\CyComponentLibrary.a</File>
+        </Files>
+      </Folder>
+      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_IAR_Generic\BLE_v3_20">
+        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
+          <File BuildType="BUILD" Toolchain="ARM IAR Generic">.\Export\ARM_IAR_Generic\BLE_v3_20\mdkCyBLEStack_BLE_SOC_CENTRAL.a</File>
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_IAR_Generic">

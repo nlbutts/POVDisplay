@@ -12,6 +12,10 @@
 #include <project.h>
 #include "LED.h"
 #include "EEPROM.h"
+#include "app_Ble.h"
+#include "app_LED.h"
+#include "uartBuf.h"
+#include "stdbool.h"
 
 void testEEPROM(uint8_t xor)
 {
@@ -27,14 +31,27 @@ void testEEPROM(uint8_t xor)
     }
     status = EEPROM_write(0, wrData, testLen);
     CyDelay(100);
-    status = EEPROM_read(0, rdData, testLen);    
+    status = EEPROM_read(0, rdData, testLen);
     rdData[0]++;
 }
 
 int main()
 {
-    uint8_t ledState = 0;
+    uint32_t loopCounter = 0;
+    CYBLE_API_RESULT_T      bleApiResult;
+
     CyGlobalIntEnable; /* Enable global interrupts. */
+
+    /* Start UART and BLE component and display project information */
+    bleApiResult = CyBle_Start(AppCallBack);
+
+    if(bleApiResult != CYBLE_ERROR_OK)
+    {
+        StatusLEDError();
+    }
+
+    CyBle_ProcessEvents();
+
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     SPI_LED_Start();
@@ -58,25 +75,21 @@ int main()
     i2cCfg.completeTransferMask     = I2C_EEPROM_I2C_MODE_COMPLETE_XFER;
     i2cCfg.deviceAddress            = 0x50;
     EEPROM_init_i2c(i2cCfg);
-    
+
     WP_Write(0);
 
     for(;;)
     {
-        /* Place your application code here. */
-        STATUS_LED_Write(ledState);
-        ledState = !ledState;
-        CyDelay(1000);
-        testEEPROM(0);
-        led_setColor(OFF);
-        CyDelay(1000);
-        led_setColor(RED);
-        CyDelay(1000);
-        led_setColor(GREEN);
-        CyDelay(1000);
-        led_setColor(BLUE);
-        CyDelay(1000);
-        led_setColor(WHITE);
+        HandleLeds();
+        HandleBleProcessing();
+        CyBle_ProcessEvents();
+
+        loopCounter++;
+        if (loopCounter > 65000)
+        {
+            loopCounter = 0;
+            UartBuffer_putString("Hello POV\n");
+        }
     }
 }
 
