@@ -1,0 +1,3905 @@
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"EEProm.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.waitForIdle,"ax",%progbits
+  18              		.align	2
+  19              		.code	16
+  20              		.thumb_func
+  21              		.type	waitForIdle, %function
+  22              	waitForIdle:
+  23              	.LFB0:
+  24              		.file 1 "EEProm.c"
+   1:EEProm.c      **** /**
+   2:EEProm.c      ****  * Copyright (c) 2015 Appareo Systems, LLC.
+   3:EEProm.c      ****  * 1810 NDSU Research Park Circle North
+   4:EEProm.c      ****  * Fargo ND, 58102
+   5:EEProm.c      ****  * All rights reserved.
+   6:EEProm.c      ****  *
+   7:EEProm.c      ****  * This is the confidential and proprietary information of Appareo Systems, LLC. You shall not
+   8:EEProm.c      ****  * disclose such confidential information and shall use it only in accordance with the terms
+   9:EEProm.c      **** 
+  10:EEProm.c      ****  * of the license agreement you entered into with Appareo.
+  11:EEProm.c      ****  *
+  12:EEProm.c      ****  * File: EEProm.c
+  13:EEProm.c      ****  * Creator: Nick Butts
+  14:EEProm.c      ****  * Date: August 15, 2016
+  15:EEProm.c      ****  *
+  16:EEProm.c      ****  * Copyright Version 1.0
+  17:EEProm.c      ****  */
+  18:EEProm.c      **** 
+  19:EEProm.c      **** #include <string.h>
+  20:EEProm.c      **** #include "EEProm.h"
+  21:EEProm.c      **** 
+  22:EEProm.c      **** #define EEP_CMD_WE                      0x06
+  23:EEProm.c      **** #define EEP_CMD_WD                      0x04
+  24:EEProm.c      **** #define EEP_CMD_READ_STATUS             0x05
+  25:EEProm.c      **** #define EEP_CMD_WRITE_STATUS            0x01
+  26:EEProm.c      **** #define EEP_CMD_READ_MEMORY             0x03
+  27:EEProm.c      **** #define EEP_CMD_WRITE_MEMORY            0x02
+  28:EEProm.c      **** #define EEP_CMD_READ_ID                 0x83
+  29:EEProm.c      **** #define EEP_CMD_WRITE_ID                0x82
+  30:EEProm.c      **** #define EEP_CMD_ID_PAGE_LOCK_STATUS     0x83
+  31:EEProm.c      **** 
+  32:EEProm.c      **** #define EEP_INITIALIZED_MASK            0x01
+  33:EEProm.c      **** #define EEP_INITIALIZED_AS_SPI_MASK     0x02
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 2
+
+
+  34:EEProm.c      **** 
+  35:EEProm.c      **** static struct SPIInterface _spi;
+  36:EEProm.c      **** static struct I2CInterface _i2c;
+  37:EEProm.c      **** static uint8_t _initialized = 0;
+  38:EEProm.c      **** 
+  39:EEProm.c      **** static void waitForIdle()
+  40:EEProm.c      **** {
+  25              		.loc 1 40 0
+  26              		.cfi_startproc
+  27 0000 10B5     		push	{r4, lr}
+  28              		.cfi_def_cfa_offset 8
+  29              		.cfi_offset 4, -8
+  30              		.cfi_offset 14, -4
+  41:EEProm.c      ****     _spi.delayUs(5);
+  31              		.loc 1 41 0
+  32 0002 054B     		ldr	r3, .L3
+  33 0004 DB68     		ldr	r3, [r3, #12]
+  34 0006 0520     		mov	r0, #5
+  35 0008 9847     		blx	r3
+  36              	.LVL0:
+  37              	.L2:
+  42:EEProm.c      ****     while ((_spi.getTxStatus() & _spi.spiIdleMask) == 0) {};
+  38              		.loc 1 42 0 discriminator 1
+  39 000a 034C     		ldr	r4, .L3
+  40 000c A368     		ldr	r3, [r4, #8]
+  41 000e 9847     		blx	r3
+  42              	.LVL1:
+  43 0010 237C     		ldrb	r3, [r4, #16]
+  44 0012 0342     		tst	r3, r0
+  45 0014 F9D0     		beq	.L2
+  43:EEProm.c      **** }
+  46              		.loc 1 43 0
+  47              		@ sp needed
+  48 0016 10BD     		pop	{r4, pc}
+  49              	.L4:
+  50              		.align	2
+  51              	.L3:
+  52 0018 00000000 		.word	.LANCHOR0
+  53              		.cfi_endproc
+  54              	.LFE0:
+  55              		.size	waitForIdle, .-waitForIdle
+  56              		.section	.text.isInitializedAndSPI,"ax",%progbits
+  57              		.align	2
+  58              		.code	16
+  59              		.thumb_func
+  60              		.type	isInitializedAndSPI, %function
+  61              	isInitializedAndSPI:
+  62              	.LFB1:
+  44:EEProm.c      **** 
+  45:EEProm.c      **** static uint8_t isInitializedAndSPI()
+  46:EEProm.c      **** {
+  63              		.loc 1 46 0
+  64              		.cfi_startproc
+  47:EEProm.c      ****     uint8_t temp = _initialized & (EEP_INITIALIZED_MASK | EEP_INITIALIZED_AS_SPI_MASK);
+  65              		.loc 1 47 0
+  66 0000 044B     		ldr	r3, .L6
+  67 0002 1B7D     		ldrb	r3, [r3, #20]
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 3
+
+
+  68 0004 0320     		mov	r0, #3
+  69 0006 1840     		and	r0, r3
+  70              	.LVL2:
+  48:EEProm.c      ****     return temp == (EEP_INITIALIZED_MASK | EEP_INITIALIZED_AS_SPI_MASK) ? 1 : 0;
+  71              		.loc 1 48 0
+  72 0008 0338     		sub	r0, r0, #3
+  73              	.LVL3:
+  74 000a 4342     		neg	r3, r0
+  75 000c 5841     		adc	r0, r0, r3
+  76              	.LVL4:
+  77 000e C0B2     		uxtb	r0, r0
+  49:EEProm.c      **** }
+  78              		.loc 1 49 0
+  79              		@ sp needed
+  80 0010 7047     		bx	lr
+  81              	.L7:
+  82 0012 C046     		.align	2
+  83              	.L6:
+  84 0014 00000000 		.word	.LANCHOR0
+  85              		.cfi_endproc
+  86              	.LFE1:
+  87              		.size	isInitializedAndSPI, .-isInitializedAndSPI
+  88              		.section	.text.isInitializedAndI2C,"ax",%progbits
+  89              		.align	2
+  90              		.code	16
+  91              		.thumb_func
+  92              		.type	isInitializedAndI2C, %function
+  93              	isInitializedAndI2C:
+  94              	.LFB2:
+  50:EEProm.c      **** 
+  51:EEProm.c      **** static uint8_t isInitializedAndI2C()
+  52:EEProm.c      **** {
+  95              		.loc 1 52 0
+  96              		.cfi_startproc
+  53:EEProm.c      ****     uint8_t temp = _initialized & (EEP_INITIALIZED_MASK);
+  97              		.loc 1 53 0
+  98 0000 024B     		ldr	r3, .L9
+  99 0002 1B7D     		ldrb	r3, [r3, #20]
+ 100              	.LVL5:
+  54:EEProm.c      ****     return (temp == EEP_INITIALIZED_MASK) ? 1 : 0;
+ 101              		.loc 1 54 0
+ 102 0004 0120     		mov	r0, #1
+ 103 0006 1840     		and	r0, r3
+  55:EEProm.c      **** }
+ 104              		.loc 1 55 0
+ 105              		@ sp needed
+ 106 0008 7047     		bx	lr
+ 107              	.L10:
+ 108 000a C046     		.align	2
+ 109              	.L9:
+ 110 000c 00000000 		.word	.LANCHOR0
+ 111              		.cfi_endproc
+ 112              	.LFE2:
+ 113              		.size	isInitializedAndI2C, .-isInitializedAndI2C
+ 114              		.section	.text.spiGetStatus,"ax",%progbits
+ 115              		.align	2
+ 116              		.code	16
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 4
+
+
+ 117              		.thumb_func
+ 118              		.type	spiGetStatus, %function
+ 119              	spiGetStatus:
+ 120              	.LFB3:
+  56:EEProm.c      **** 
+  57:EEProm.c      **** static uint8_t spiGetStatus()
+  58:EEProm.c      **** {
+ 121              		.loc 1 58 0
+ 122              		.cfi_startproc
+ 123 0000 10B5     		push	{r4, lr}
+ 124              		.cfi_def_cfa_offset 8
+ 125              		.cfi_offset 4, -8
+ 126              		.cfi_offset 14, -4
+  59:EEProm.c      ****     uint8_t status;
+  60:EEProm.c      **** 
+  61:EEProm.c      ****     _spi.write(EEP_CMD_READ_STATUS);
+ 127              		.loc 1 61 0
+ 128 0002 074C     		ldr	r4, .L12
+ 129 0004 0520     		mov	r0, #5
+ 130 0006 2368     		ldr	r3, [r4]
+ 131 0008 9847     		blx	r3
+ 132              	.LVL6:
+  62:EEProm.c      ****     _spi.write(0);
+ 133              		.loc 1 62 0
+ 134 000a 0020     		mov	r0, #0
+ 135 000c 2368     		ldr	r3, [r4]
+ 136 000e 9847     		blx	r3
+ 137              	.LVL7:
+  63:EEProm.c      ****     waitForIdle();
+ 138              		.loc 1 63 0
+ 139 0010 FFF7FEFF 		bl	waitForIdle
+ 140              	.LVL8:
+  64:EEProm.c      ****     (void)_spi.read();
+ 141              		.loc 1 64 0
+ 142 0014 6368     		ldr	r3, [r4, #4]
+ 143 0016 9847     		blx	r3
+ 144              	.LVL9:
+  65:EEProm.c      ****     status = _spi.read();
+ 145              		.loc 1 65 0
+ 146 0018 6368     		ldr	r3, [r4, #4]
+ 147 001a 9847     		blx	r3
+ 148              	.LVL10:
+  66:EEProm.c      ****     return status;
+  67:EEProm.c      **** }
+ 149              		.loc 1 67 0
+ 150              		@ sp needed
+ 151 001c 10BD     		pop	{r4, pc}
+ 152              	.L13:
+ 153 001e C046     		.align	2
+ 154              	.L12:
+ 155 0020 00000000 		.word	.LANCHOR0
+ 156              		.cfi_endproc
+ 157              	.LFE3:
+ 158              		.size	spiGetStatus, .-spiGetStatus
+ 159              		.section	.text.spiRead,"ax",%progbits
+ 160              		.align	2
+ 161              		.code	16
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 5
+
+
+ 162              		.thumb_func
+ 163              		.type	spiRead, %function
+ 164              	spiRead:
+ 165              	.LFB4:
+  68:EEProm.c      **** 
+  69:EEProm.c      **** static uint8_t spiRead(uint32_t address, uint8_t * data, uint32_t dataLength)
+  70:EEProm.c      **** {
+ 166              		.loc 1 70 0
+ 167              		.cfi_startproc
+ 168              	.LVL11:
+ 169 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 170              		.cfi_def_cfa_offset 24
+ 171              		.cfi_offset 3, -24
+ 172              		.cfi_offset 4, -20
+ 173              		.cfi_offset 5, -16
+ 174              		.cfi_offset 6, -12
+ 175              		.cfi_offset 7, -8
+ 176              		.cfi_offset 14, -4
+ 177 0002 041C     		mov	r4, r0
+ 178 0004 0F1C     		mov	r7, r1
+ 179 0006 151C     		mov	r5, r2
+  71:EEProm.c      ****     uint32_t i;
+  72:EEProm.c      ****     _spi.write(EEP_CMD_READ_MEMORY);
+ 180              		.loc 1 72 0
+ 181 0008 174E     		ldr	r6, .L19
+ 182 000a 0320     		mov	r0, #3
+ 183              	.LVL12:
+ 184 000c 3368     		ldr	r3, [r6]
+ 185 000e 9847     		blx	r3
+ 186              	.LVL13:
+  73:EEProm.c      ****     _spi.write((address >> 16) & 0xFF);
+ 187              		.loc 1 73 0
+ 188 0010 200C     		lsr	r0, r4, #16
+ 189 0012 C0B2     		uxtb	r0, r0
+ 190 0014 3368     		ldr	r3, [r6]
+ 191 0016 9847     		blx	r3
+ 192              	.LVL14:
+  74:EEProm.c      ****     _spi.write((address >>  8) & 0xFF);
+ 193              		.loc 1 74 0
+ 194 0018 200A     		lsr	r0, r4, #8
+ 195 001a C0B2     		uxtb	r0, r0
+ 196 001c 3368     		ldr	r3, [r6]
+ 197 001e 9847     		blx	r3
+ 198              	.LVL15:
+  75:EEProm.c      ****     _spi.write((address      ) & 0xFF);
+ 199              		.loc 1 75 0
+ 200 0020 3368     		ldr	r3, [r6]
+ 201 0022 E0B2     		uxtb	r0, r4
+ 202 0024 9847     		blx	r3
+ 203              	.LVL16:
+  76:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 204              		.loc 1 76 0
+ 205 0026 0024     		mov	r4, #0
+ 206              	.LVL17:
+ 207 0028 04E0     		b	.L15
+ 208              	.LVL18:
+ 209              	.L16:
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 6
+
+
+  77:EEProm.c      ****     {
+  78:EEProm.c      ****         _spi.write(0);
+ 210              		.loc 1 78 0 discriminator 3
+ 211 002a 0F4B     		ldr	r3, .L19
+ 212 002c 1B68     		ldr	r3, [r3]
+ 213 002e 0020     		mov	r0, #0
+ 214 0030 9847     		blx	r3
+ 215              	.LVL19:
+  76:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 216              		.loc 1 76 0 discriminator 3
+ 217 0032 0134     		add	r4, r4, #1
+ 218              	.LVL20:
+ 219              	.L15:
+  76:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 220              		.loc 1 76 0 is_stmt 0 discriminator 1
+ 221 0034 AC42     		cmp	r4, r5
+ 222 0036 F8D3     		bcc	.L16
+  79:EEProm.c      ****     }
+  80:EEProm.c      **** 
+  81:EEProm.c      ****     waitForIdle();
+ 223              		.loc 1 81 0 is_stmt 1
+ 224 0038 FFF7FEFF 		bl	waitForIdle
+ 225              	.LVL21:
+  82:EEProm.c      ****     (void)_spi.read();
+ 226              		.loc 1 82 0
+ 227 003c 0A4C     		ldr	r4, .L19
+ 228              	.LVL22:
+ 229 003e 6368     		ldr	r3, [r4, #4]
+ 230 0040 9847     		blx	r3
+ 231              	.LVL23:
+  83:EEProm.c      ****     (void)_spi.read();
+ 232              		.loc 1 83 0
+ 233 0042 6368     		ldr	r3, [r4, #4]
+ 234 0044 9847     		blx	r3
+ 235              	.LVL24:
+  84:EEProm.c      ****     (void)_spi.read();
+ 236              		.loc 1 84 0
+ 237 0046 6368     		ldr	r3, [r4, #4]
+ 238 0048 9847     		blx	r3
+ 239              	.LVL25:
+  85:EEProm.c      ****     (void)_spi.read();
+ 240              		.loc 1 85 0
+ 241 004a 6368     		ldr	r3, [r4, #4]
+ 242 004c 9847     		blx	r3
+ 243              	.LVL26:
+  86:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 244              		.loc 1 86 0
+ 245 004e 0024     		mov	r4, #0
+ 246 0050 05E0     		b	.L17
+ 247              	.LVL27:
+ 248              	.L18:
+  87:EEProm.c      ****     {
+  88:EEProm.c      ****         data[i] = _spi.read();
+ 249              		.loc 1 88 0 discriminator 3
+ 250 0052 3E19     		add	r6, r7, r4
+ 251 0054 044B     		ldr	r3, .L19
+ 252 0056 5B68     		ldr	r3, [r3, #4]
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 7
+
+
+ 253 0058 9847     		blx	r3
+ 254              	.LVL28:
+ 255 005a 3070     		strb	r0, [r6]
+  86:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 256              		.loc 1 86 0 discriminator 3
+ 257 005c 0134     		add	r4, r4, #1
+ 258              	.LVL29:
+ 259              	.L17:
+  86:EEProm.c      ****     for (i = 0; i < dataLength; i++)
+ 260              		.loc 1 86 0 is_stmt 0 discriminator 1
+ 261 005e AC42     		cmp	r4, r5
+ 262 0060 F7D3     		bcc	.L18
+  89:EEProm.c      ****     }
+  90:EEProm.c      **** 
+  91:EEProm.c      ****     return dataLength;
+ 263              		.loc 1 91 0 is_stmt 1
+ 264 0062 E8B2     		uxtb	r0, r5
+  92:EEProm.c      **** }
+ 265              		.loc 1 92 0
+ 266              		@ sp needed
+ 267              	.LVL30:
+ 268              	.LVL31:
+ 269              	.LVL32:
+ 270 0064 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 271              	.L20:
+ 272 0066 C046     		.align	2
+ 273              	.L19:
+ 274 0068 00000000 		.word	.LANCHOR0
+ 275              		.cfi_endproc
+ 276              	.LFE4:
+ 277              		.size	spiRead, .-spiRead
+ 278              		.section	.text.spiWrite,"ax",%progbits
+ 279              		.align	2
+ 280              		.code	16
+ 281              		.thumb_func
+ 282              		.type	spiWrite, %function
+ 283              	spiWrite:
+ 284              	.LFB5:
+  93:EEProm.c      **** 
+  94:EEProm.c      **** static uint8_t spiWrite(uint32_t address, uint8_t * data, uint32_t dataLength)
+  95:EEProm.c      **** {
+ 285              		.loc 1 95 0
+ 286              		.cfi_startproc
+ 287              	.LVL33:
+ 288 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 289              		.cfi_def_cfa_offset 24
+ 290              		.cfi_offset 3, -24
+ 291              		.cfi_offset 4, -20
+ 292              		.cfi_offset 5, -16
+ 293              		.cfi_offset 6, -12
+ 294              		.cfi_offset 7, -8
+ 295              		.cfi_offset 14, -4
+ 296 0002 071C     		mov	r7, r0
+ 297 0004 0E1C     		mov	r6, r1
+ 298 0006 151C     		mov	r5, r2
+  96:EEProm.c      ****     // Unlock the memory
+  97:EEProm.c      ****     _spi.write(EEP_CMD_WE);
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 8
+
+
+ 299              		.loc 1 97 0
+ 300 0008 174C     		ldr	r4, .L26
+ 301 000a 0620     		mov	r0, #6
+ 302              	.LVL34:
+ 303 000c 2368     		ldr	r3, [r4]
+ 304 000e 9847     		blx	r3
+ 305              	.LVL35:
+  98:EEProm.c      ****     waitForIdle();
+ 306              		.loc 1 98 0
+ 307 0010 FFF7FEFF 		bl	waitForIdle
+ 308              	.LVL36:
+  99:EEProm.c      ****     (void)_spi.read();
+ 309              		.loc 1 99 0
+ 310 0014 6368     		ldr	r3, [r4, #4]
+ 311 0016 9847     		blx	r3
+ 312              	.LVL37:
+ 100:EEProm.c      ****     _spi.delayUs(10);
+ 313              		.loc 1 100 0
+ 314 0018 0A20     		mov	r0, #10
+ 315 001a E368     		ldr	r3, [r4, #12]
+ 316 001c 9847     		blx	r3
+ 317              	.LVL38:
+ 101:EEProm.c      **** 
+ 102:EEProm.c      ****     // Write data
+ 103:EEProm.c      ****     _spi.write(EEP_CMD_WRITE_MEMORY);
+ 318              		.loc 1 103 0
+ 319 001e 0220     		mov	r0, #2
+ 320 0020 2368     		ldr	r3, [r4]
+ 321 0022 9847     		blx	r3
+ 322              	.LVL39:
+ 104:EEProm.c      ****     _spi.write((address >> 16) & 0xFF);
+ 323              		.loc 1 104 0
+ 324 0024 380C     		lsr	r0, r7, #16
+ 325 0026 C0B2     		uxtb	r0, r0
+ 326 0028 2368     		ldr	r3, [r4]
+ 327 002a 9847     		blx	r3
+ 328              	.LVL40:
+ 105:EEProm.c      ****     _spi.write((address >>  8) & 0xFF);
+ 329              		.loc 1 105 0
+ 330 002c 380A     		lsr	r0, r7, #8
+ 331 002e C0B2     		uxtb	r0, r0
+ 332 0030 2368     		ldr	r3, [r4]
+ 333 0032 9847     		blx	r3
+ 334              	.LVL41:
+ 106:EEProm.c      ****     _spi.write((address      ) & 0xFF);
+ 335              		.loc 1 106 0
+ 336 0034 2368     		ldr	r3, [r4]
+ 337 0036 F8B2     		uxtb	r0, r7
+ 338 0038 9847     		blx	r3
+ 339              	.LVL42:
+ 340              	.LBB2:
+ 107:EEProm.c      ****     for (uint32_t i = 0; i < dataLength; i++)
+ 341              		.loc 1 107 0
+ 342 003a 0024     		mov	r4, #0
+ 343 003c 04E0     		b	.L22
+ 344              	.LVL43:
+ 345              	.L23:
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 9
+
+
+ 108:EEProm.c      ****     {
+ 109:EEProm.c      ****         _spi.write(data[i]);
+ 346              		.loc 1 109 0 discriminator 3
+ 347 003e 0A4B     		ldr	r3, .L26
+ 348 0040 1B68     		ldr	r3, [r3]
+ 349 0042 305D     		ldrb	r0, [r6, r4]
+ 350 0044 9847     		blx	r3
+ 351              	.LVL44:
+ 107:EEProm.c      ****     for (uint32_t i = 0; i < dataLength; i++)
+ 352              		.loc 1 107 0 discriminator 3
+ 353 0046 0134     		add	r4, r4, #1
+ 354              	.LVL45:
+ 355              	.L22:
+ 107:EEProm.c      ****     for (uint32_t i = 0; i < dataLength; i++)
+ 356              		.loc 1 107 0 is_stmt 0 discriminator 1
+ 357 0048 AC42     		cmp	r4, r5
+ 358 004a F8D3     		bcc	.L23
+ 359              	.LBE2:
+ 110:EEProm.c      ****     }
+ 111:EEProm.c      **** 
+ 112:EEProm.c      ****     waitForIdle();
+ 360              		.loc 1 112 0 is_stmt 1
+ 361 004c FFF7FEFF 		bl	waitForIdle
+ 362              	.LVL46:
+ 363              	.LBB3:
+ 113:EEProm.c      **** 
+ 114:EEProm.c      ****     for (uint32_t i = 0; i < dataLength + 4; i++)
+ 364              		.loc 1 114 0
+ 365 0050 0024     		mov	r4, #0
+ 366              	.LVL47:
+ 367 0052 03E0     		b	.L24
+ 368              	.LVL48:
+ 369              	.L25:
+ 115:EEProm.c      ****     {
+ 116:EEProm.c      ****         (void)_spi.read();
+ 370              		.loc 1 116 0 discriminator 3
+ 371 0054 044B     		ldr	r3, .L26
+ 372 0056 5B68     		ldr	r3, [r3, #4]
+ 373 0058 9847     		blx	r3
+ 374              	.LVL49:
+ 114:EEProm.c      ****     {
+ 375              		.loc 1 114 0 discriminator 3
+ 376 005a 0134     		add	r4, r4, #1
+ 377              	.LVL50:
+ 378              	.L24:
+ 114:EEProm.c      ****     {
+ 379              		.loc 1 114 0 is_stmt 0 discriminator 1
+ 380 005c 2B1D     		add	r3, r5, #4
+ 381 005e A342     		cmp	r3, r4
+ 382 0060 F8D8     		bhi	.L25
+ 383              	.LBE3:
+ 117:EEProm.c      ****     }
+ 118:EEProm.c      ****     return dataLength;
+ 384              		.loc 1 118 0 is_stmt 1
+ 385 0062 E8B2     		uxtb	r0, r5
+ 119:EEProm.c      **** }
+ 386              		.loc 1 119 0
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 10
+
+
+ 387              		@ sp needed
+ 388              	.LVL51:
+ 389              	.LVL52:
+ 390              	.LVL53:
+ 391              	.LVL54:
+ 392 0064 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 393              	.L27:
+ 394 0066 C046     		.align	2
+ 395              	.L26:
+ 396 0068 00000000 		.word	.LANCHOR0
+ 397              		.cfi_endproc
+ 398              	.LFE5:
+ 399              		.size	spiWrite, .-spiWrite
+ 400              		.section	.text.i2cWaitForIdle,"ax",%progbits
+ 401              		.align	2
+ 402              		.code	16
+ 403              		.thumb_func
+ 404              		.type	i2cWaitForIdle, %function
+ 405              	i2cWaitForIdle:
+ 406              	.LFB6:
+ 120:EEProm.c      **** 
+ 121:EEProm.c      **** static uint8_t i2cWaitForIdle()
+ 122:EEProm.c      **** {
+ 407              		.loc 1 122 0
+ 408              		.cfi_startproc
+ 409 0000 10B5     		push	{r4, lr}
+ 410              		.cfi_def_cfa_offset 8
+ 411              		.cfi_offset 4, -8
+ 412              		.cfi_offset 14, -4
+ 413              	.L29:
+ 123:EEProm.c      ****     uint32_t status;
+ 124:EEProm.c      **** 
+ 125:EEProm.c      ****     do
+ 126:EEProm.c      ****     {
+ 127:EEProm.c      ****         status = _i2c.getStatus();
+ 414              		.loc 1 127 0 discriminator 1
+ 415 0002 054C     		ldr	r4, .L30
+ 416 0004 236A     		ldr	r3, [r4, #32]
+ 417 0006 9847     		blx	r3
+ 418              	.LVL55:
+ 128:EEProm.c      ****     }
+ 129:EEProm.c      ****     while (status & _i2c.transferInProgressMask);
+ 419              		.loc 1 129 0 discriminator 1
+ 420 0008 E36A     		ldr	r3, [r4, #44]
+ 421 000a 1842     		tst	r0, r3
+ 422 000c F9D1     		bne	.L29
+ 130:EEProm.c      ****     return status & _i2c.errorMask;
+ 423              		.loc 1 130 0
+ 424 000e 024B     		ldr	r3, .L30
+ 425 0010 1B6B     		ldr	r3, [r3, #48]
+ 426 0012 1840     		and	r0, r3
+ 427              	.LVL56:
+ 428 0014 C0B2     		uxtb	r0, r0
+ 131:EEProm.c      **** }
+ 429              		.loc 1 131 0
+ 430              		@ sp needed
+ 431 0016 10BD     		pop	{r4, pc}
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 11
+
+
+ 432              	.L31:
+ 433              		.align	2
+ 434              	.L30:
+ 435 0018 00000000 		.word	.LANCHOR0
+ 436              		.cfi_endproc
+ 437              	.LFE6:
+ 438              		.size	i2cWaitForIdle, .-i2cWaitForIdle
+ 439              		.section	.text.i2cRead,"ax",%progbits
+ 440              		.align	2
+ 441              		.code	16
+ 442              		.thumb_func
+ 443              		.type	i2cRead, %function
+ 444              	i2cRead:
+ 445              	.LFB7:
+ 132:EEProm.c      **** 
+ 133:EEProm.c      **** static uint8_t i2cRead(uint32_t address, uint8_t * data, uint32_t dataLength)
+ 134:EEProm.c      **** {
+ 446              		.loc 1 134 0
+ 447              		.cfi_startproc
+ 448              	.LVL57:
+ 449 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 450              		.cfi_def_cfa_offset 20
+ 451              		.cfi_offset 4, -20
+ 452              		.cfi_offset 5, -16
+ 453              		.cfi_offset 6, -12
+ 454              		.cfi_offset 7, -8
+ 455              		.cfi_offset 14, -4
+ 456 0002 87B0     		sub	sp, sp, #28
+ 457              		.cfi_def_cfa_offset 48
+ 458 0004 0391     		str	r1, [sp, #12]
+ 459 0006 0192     		str	r2, [sp, #4]
+ 135:EEProm.c      ****     uint8_t buffer[2];
+ 136:EEProm.c      ****     uint32_t status;
+ 137:EEProm.c      ****     uint8_t devAddress = _i2c.deviceAddress;
+ 460              		.loc 1 137 0
+ 461 0008 3823     		mov	r3, #56
+ 462 000a 194A     		ldr	r2, .L37
+ 463              	.LVL58:
+ 464 000c D75C     		ldrb	r7, [r2, r3]
+ 465              	.LVL59:
+ 138:EEProm.c      **** 
+ 139:EEProm.c      ****     if (address > 0xFFFF)
+ 466              		.loc 1 139 0
+ 467 000e 194B     		ldr	r3, .L37+4
+ 468 0010 9842     		cmp	r0, r3
+ 469 0012 01D9     		bls	.L33
+ 140:EEProm.c      ****     {
+ 141:EEProm.c      ****         devAddress++;
+ 470              		.loc 1 141 0
+ 471 0014 7B1C     		add	r3, r7, #1
+ 472 0016 DFB2     		uxtb	r7, r3
+ 473              	.LVL60:
+ 474              	.L33:
+ 142:EEProm.c      ****     }
+ 143:EEProm.c      ****     buffer[0] = address >> 8;
+ 475              		.loc 1 143 0
+ 476 0018 030A     		lsr	r3, r0, #8
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 12
+
+
+ 477 001a 05AC     		add	r4, sp, #20
+ 478 001c 2370     		strb	r3, [r4]
+ 144:EEProm.c      ****     buffer[1] = address;
+ 479              		.loc 1 144 0
+ 480 001e 6070     		strb	r0, [r4, #1]
+ 145:EEProm.c      **** 
+ 146:EEProm.c      ****     _i2c.clearStatus();
+ 481              		.loc 1 146 0
+ 482 0020 134D     		ldr	r5, .L37
+ 483 0022 AB6A     		ldr	r3, [r5, #40]
+ 484 0024 9847     		blx	r3
+ 485              	.LVL61:
+ 147:EEProm.c      ****     status = _i2c.write(devAddress, buffer, 2, _i2c.completeTransferMask);
+ 486              		.loc 1 147 0
+ 487 0026 AE69     		ldr	r6, [r5, #24]
+ 488 0028 0297     		str	r7, [sp, #8]
+ 489 002a 6B6B     		ldr	r3, [r5, #52]
+ 490 002c 381C     		mov	r0, r7
+ 491 002e 211C     		mov	r1, r4
+ 492 0030 0222     		mov	r2, #2
+ 493 0032 B047     		blx	r6
+ 494              	.LVL62:
+ 148:EEProm.c      ****     if (status != 0)
+ 495              		.loc 1 148 0
+ 496 0034 0028     		cmp	r0, #0
+ 497 0036 15D1     		bne	.L35
+ 149:EEProm.c      ****     {
+ 150:EEProm.c      ****         return 0;
+ 151:EEProm.c      ****     }
+ 152:EEProm.c      **** 
+ 153:EEProm.c      ****     if (i2cWaitForIdle())
+ 498              		.loc 1 153 0
+ 499 0038 FFF7FEFF 		bl	i2cWaitForIdle
+ 500              	.LVL63:
+ 501 003c 041E     		sub	r4, r0, #0
+ 502 003e 13D1     		bne	.L36
+ 154:EEProm.c      ****     {
+ 155:EEProm.c      ****         return 0;
+ 156:EEProm.c      ****     }
+ 157:EEProm.c      **** 
+ 158:EEProm.c      ****     _i2c.clearStatus();
+ 503              		.loc 1 158 0
+ 504 0040 0B4F     		ldr	r7, .L37
+ 505              	.LVL64:
+ 506 0042 BB6A     		ldr	r3, [r7, #40]
+ 507 0044 9847     		blx	r3
+ 508              	.LVL65:
+ 159:EEProm.c      ****     status = _i2c.read(devAddress, data, dataLength, _i2c.completeTransferMask);
+ 509              		.loc 1 159 0
+ 510 0046 FE69     		ldr	r6, [r7, #28]
+ 511 0048 7B6B     		ldr	r3, [r7, #52]
+ 512 004a 0298     		ldr	r0, [sp, #8]
+ 513 004c 0399     		ldr	r1, [sp, #12]
+ 514 004e 019A     		ldr	r2, [sp, #4]
+ 515 0050 B047     		blx	r6
+ 516              	.LVL66:
+ 160:EEProm.c      ****     if (status != 0)
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 13
+
+
+ 517              		.loc 1 160 0
+ 518 0052 0028     		cmp	r0, #0
+ 519 0054 09D1     		bne	.L34
+ 161:EEProm.c      ****     {
+ 162:EEProm.c      ****         return 0;
+ 163:EEProm.c      ****     }
+ 164:EEProm.c      ****     if (i2cWaitForIdle())
+ 520              		.loc 1 164 0
+ 521 0056 FFF7FEFF 		bl	i2cWaitForIdle
+ 522              	.LVL67:
+ 523 005a 0028     		cmp	r0, #0
+ 524 005c 05D1     		bne	.L34
+ 165:EEProm.c      ****     {
+ 166:EEProm.c      ****         return 0;
+ 167:EEProm.c      ****     }
+ 168:EEProm.c      ****     return dataLength;
+ 525              		.loc 1 168 0
+ 526 005e 6B46     		mov	r3, sp
+ 527 0060 1C79     		ldrb	r4, [r3, #4]
+ 528 0062 02E0     		b	.L34
+ 529              	.LVL68:
+ 530              	.L35:
+ 150:EEProm.c      ****     }
+ 531              		.loc 1 150 0
+ 532 0064 0024     		mov	r4, #0
+ 533 0066 00E0     		b	.L34
+ 534              	.LVL69:
+ 535              	.L36:
+ 155:EEProm.c      ****     }
+ 536              		.loc 1 155 0
+ 537 0068 0024     		mov	r4, #0
+ 538              	.LVL70:
+ 539              	.L34:
+ 169:EEProm.c      **** }
+ 540              		.loc 1 169 0
+ 541 006a 201C     		mov	r0, r4
+ 542 006c 07B0     		add	sp, sp, #28
+ 543              		@ sp needed
+ 544 006e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 545              	.L38:
+ 546              		.align	2
+ 547              	.L37:
+ 548 0070 00000000 		.word	.LANCHOR0
+ 549 0074 FFFF0000 		.word	65535
+ 550              		.cfi_endproc
+ 551              	.LFE7:
+ 552              		.size	i2cRead, .-i2cRead
+ 553              		.section	.text.i2cGetStatus,"ax",%progbits
+ 554              		.align	2
+ 555              		.code	16
+ 556              		.thumb_func
+ 557              		.type	i2cGetStatus, %function
+ 558              	i2cGetStatus:
+ 559              	.LFB9:
+ 170:EEProm.c      **** 
+ 171:EEProm.c      **** static uint8_t i2cWrite(uint32_t address, uint8_t * data, uint32_t dataLength)
+ 172:EEProm.c      **** {
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 14
+
+
+ 173:EEProm.c      ****     uint8_t buffer[130];
+ 174:EEProm.c      ****     uint32_t status;
+ 175:EEProm.c      ****     uint8_t devAddress = _i2c.deviceAddress;
+ 176:EEProm.c      **** 
+ 177:EEProm.c      ****     if (dataLength > sizeof(buffer))
+ 178:EEProm.c      ****     {
+ 179:EEProm.c      ****         return 0;
+ 180:EEProm.c      ****     }
+ 181:EEProm.c      **** 
+ 182:EEProm.c      ****     if (address > 0xFFFF)
+ 183:EEProm.c      ****     {
+ 184:EEProm.c      ****         devAddress++;
+ 185:EEProm.c      ****     }
+ 186:EEProm.c      ****     buffer[0] = address >> 8;
+ 187:EEProm.c      ****     buffer[1] = address;
+ 188:EEProm.c      ****     memcpy(&buffer[2], data, dataLength);
+ 189:EEProm.c      ****     _i2c.clearStatus();
+ 190:EEProm.c      ****     status = _i2c.write(devAddress, buffer, dataLength + 2, _i2c.completeTransferMask);
+ 191:EEProm.c      ****     if (status != 0)
+ 192:EEProm.c      ****     {
+ 193:EEProm.c      ****         return 0;
+ 194:EEProm.c      ****     }
+ 195:EEProm.c      **** 
+ 196:EEProm.c      ****     do
+ 197:EEProm.c      ****     {
+ 198:EEProm.c      ****         status = _i2c.getStatus();
+ 199:EEProm.c      ****     }
+ 200:EEProm.c      ****     while (status & _i2c.transferInProgressMask);
+ 201:EEProm.c      ****     if (status & _i2c.errorMask)
+ 202:EEProm.c      ****     {
+ 203:EEProm.c      ****         return 0;
+ 204:EEProm.c      ****     }
+ 205:EEProm.c      **** 
+ 206:EEProm.c      ****     return dataLength;
+ 207:EEProm.c      **** }
+ 208:EEProm.c      **** 
+ 209:EEProm.c      **** static uint8_t i2cGetStatus()
+ 210:EEProm.c      **** {
+ 560              		.loc 1 210 0
+ 561              		.cfi_startproc
+ 562 0000 00B5     		push	{lr}
+ 563              		.cfi_def_cfa_offset 4
+ 564              		.cfi_offset 14, -4
+ 565 0002 83B0     		sub	sp, sp, #12
+ 566              		.cfi_def_cfa_offset 16
+ 211:EEProm.c      ****     uint8_t data;
+ 212:EEProm.c      ****     return i2cRead(0, &data, 1);
+ 567              		.loc 1 212 0
+ 568 0004 0020     		mov	r0, #0
+ 569 0006 6B46     		mov	r3, sp
+ 570 0008 D91D     		add	r1, r3, #7
+ 571 000a 0122     		mov	r2, #1
+ 572 000c FFF7FEFF 		bl	i2cRead
+ 573              	.LVL71:
+ 213:EEProm.c      **** }
+ 574              		.loc 1 213 0
+ 575 0010 03B0     		add	sp, sp, #12
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 15
+
+
+ 576              		@ sp needed
+ 577 0012 00BD     		pop	{pc}
+ 578              		.cfi_endproc
+ 579              	.LFE9:
+ 580              		.size	i2cGetStatus, .-i2cGetStatus
+ 581              		.section	.text.i2cWrite,"ax",%progbits
+ 582              		.align	2
+ 583              		.code	16
+ 584              		.thumb_func
+ 585              		.type	i2cWrite, %function
+ 586              	i2cWrite:
+ 587              	.LFB8:
+ 172:EEProm.c      ****     uint8_t buffer[130];
+ 588              		.loc 1 172 0
+ 589              		.cfi_startproc
+ 590              	.LVL72:
+ 591 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 592              		.cfi_def_cfa_offset 20
+ 593              		.cfi_offset 4, -20
+ 594              		.cfi_offset 5, -16
+ 595              		.cfi_offset 6, -12
+ 596              		.cfi_offset 7, -8
+ 597              		.cfi_offset 14, -4
+ 598 0002 A3B0     		sub	sp, sp, #140
+ 599              		.cfi_def_cfa_offset 160
+ 600 0004 151C     		mov	r5, r2
+ 175:EEProm.c      **** 
+ 601              		.loc 1 175 0
+ 602 0006 3823     		mov	r3, #56
+ 603 0008 184A     		ldr	r2, .L47
+ 604              	.LVL73:
+ 605 000a D45C     		ldrb	r4, [r2, r3]
+ 606              	.LVL74:
+ 177:EEProm.c      ****     {
+ 607              		.loc 1 177 0
+ 608 000c 822D     		cmp	r5, #130
+ 609 000e 25D8     		bhi	.L44
+ 182:EEProm.c      ****     {
+ 610              		.loc 1 182 0
+ 611 0010 174B     		ldr	r3, .L47+4
+ 612 0012 9842     		cmp	r0, r3
+ 613 0014 01D9     		bls	.L42
+ 184:EEProm.c      ****     }
+ 614              		.loc 1 184 0
+ 615 0016 0134     		add	r4, r4, #1
+ 616              	.LVL75:
+ 617 0018 E4B2     		uxtb	r4, r4
+ 618              	.LVL76:
+ 619              	.L42:
+ 186:EEProm.c      ****     buffer[1] = address;
+ 620              		.loc 1 186 0
+ 621 001a 030A     		lsr	r3, r0, #8
+ 622 001c 01AE     		add	r6, sp, #4
+ 623 001e 3370     		strb	r3, [r6]
+ 187:EEProm.c      ****     memcpy(&buffer[2], data, dataLength);
+ 624              		.loc 1 187 0
+ 625 0020 7070     		strb	r0, [r6, #1]
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 16
+
+
+ 188:EEProm.c      ****     _i2c.clearStatus();
+ 626              		.loc 1 188 0
+ 627 0022 6B46     		mov	r3, sp
+ 628 0024 981D     		add	r0, r3, #6
+ 629              	.LVL77:
+ 630 0026 2A1C     		mov	r2, r5
+ 631 0028 FFF7FEFF 		bl	memcpy
+ 632              	.LVL78:
+ 189:EEProm.c      ****     status = _i2c.write(devAddress, buffer, dataLength + 2, _i2c.completeTransferMask);
+ 633              		.loc 1 189 0
+ 634 002c 0F4F     		ldr	r7, .L47
+ 635 002e BB6A     		ldr	r3, [r7, #40]
+ 636 0030 9847     		blx	r3
+ 637              	.LVL79:
+ 190:EEProm.c      ****     if (status != 0)
+ 638              		.loc 1 190 0
+ 639 0032 BB69     		ldr	r3, [r7, #24]
+ 640 0034 9C46     		mov	ip, r3
+ 641 0036 AA1C     		add	r2, r5, #2
+ 642 0038 7B6B     		ldr	r3, [r7, #52]
+ 643 003a 201C     		mov	r0, r4
+ 644 003c 311C     		mov	r1, r6
+ 645 003e E047     		blx	ip
+ 646              	.LVL80:
+ 191:EEProm.c      ****     {
+ 647              		.loc 1 191 0
+ 648 0040 0028     		cmp	r0, #0
+ 649 0042 0DD1     		bne	.L45
+ 650              	.LVL81:
+ 651              	.L43:
+ 198:EEProm.c      ****     }
+ 652              		.loc 1 198 0 discriminator 1
+ 653 0044 094C     		ldr	r4, .L47
+ 654 0046 236A     		ldr	r3, [r4, #32]
+ 655 0048 9847     		blx	r3
+ 656              	.LVL82:
+ 200:EEProm.c      ****     if (status & _i2c.errorMask)
+ 657              		.loc 1 200 0 discriminator 1
+ 658 004a E36A     		ldr	r3, [r4, #44]
+ 659 004c 1842     		tst	r0, r3
+ 660 004e F9D1     		bne	.L43
+ 201:EEProm.c      ****     {
+ 661              		.loc 1 201 0
+ 662 0050 064B     		ldr	r3, .L47
+ 663 0052 1B6B     		ldr	r3, [r3, #48]
+ 664 0054 1842     		tst	r0, r3
+ 665 0056 05D1     		bne	.L46
+ 206:EEProm.c      **** }
+ 666              		.loc 1 206 0
+ 667 0058 E8B2     		uxtb	r0, r5
+ 668              	.LVL83:
+ 669 005a 04E0     		b	.L41
+ 670              	.LVL84:
+ 671              	.L44:
+ 179:EEProm.c      ****     }
+ 672              		.loc 1 179 0
+ 673 005c 0020     		mov	r0, #0
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 17
+
+
+ 674              	.LVL85:
+ 675 005e 02E0     		b	.L41
+ 676              	.LVL86:
+ 677              	.L45:
+ 193:EEProm.c      ****     }
+ 678              		.loc 1 193 0
+ 679 0060 0020     		mov	r0, #0
+ 680              	.LVL87:
+ 681 0062 00E0     		b	.L41
+ 682              	.LVL88:
+ 683              	.L46:
+ 203:EEProm.c      ****     }
+ 684              		.loc 1 203 0
+ 685 0064 0020     		mov	r0, #0
+ 686              	.LVL89:
+ 687              	.L41:
+ 207:EEProm.c      **** 
+ 688              		.loc 1 207 0
+ 689 0066 23B0     		add	sp, sp, #140
+ 690              		@ sp needed
+ 691              	.LVL90:
+ 692 0068 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 693              	.L48:
+ 694 006a C046     		.align	2
+ 695              	.L47:
+ 696 006c 00000000 		.word	.LANCHOR0
+ 697 0070 FFFF0000 		.word	65535
+ 698              		.cfi_endproc
+ 699              	.LFE8:
+ 700              		.size	i2cWrite, .-i2cWrite
+ 701              		.section	.text.EEPROM_init_spi,"ax",%progbits
+ 702              		.align	2
+ 703              		.global	EEPROM_init_spi
+ 704              		.code	16
+ 705              		.thumb_func
+ 706              		.type	EEPROM_init_spi, %function
+ 707              	EEPROM_init_spi:
+ 708              	.LFB10:
+ 214:EEProm.c      **** 
+ 215:EEProm.c      **** 
+ 216:EEProm.c      **** void EEPROM_init_spi(struct SPIInterface spiInterface)
+ 217:EEProm.c      **** {
+ 709              		.loc 1 217 0
+ 710              		.cfi_startproc
+ 711 0000 84B0     		sub	sp, sp, #16
+ 712              		.cfi_def_cfa_offset 16
+ 713 0002 30B5     		push	{r4, r5, lr}
+ 714              		.cfi_def_cfa_offset 28
+ 715              		.cfi_offset 4, -28
+ 716              		.cfi_offset 5, -24
+ 717              		.cfi_offset 14, -20
+ 718 0004 0390     		str	r0, [sp, #12]
+ 719 0006 0491     		str	r1, [sp, #16]
+ 720 0008 0592     		str	r2, [sp, #20]
+ 721 000a 0693     		str	r3, [sp, #24]
+ 218:EEProm.c      ****     _spi = spiInterface;
+ 722              		.loc 1 218 0
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 18
+
+
+ 723 000c 064B     		ldr	r3, .L50
+ 724 000e 1A1C     		mov	r2, r3
+ 725 0010 03A9     		add	r1, sp, #12
+ 726 0012 31C9     		ldmia	r1!, {r0, r4, r5}
+ 727 0014 31C2     		stmia	r2!, {r0, r4, r5}
+ 728 0016 11C9     		ldmia	r1!, {r0, r4}
+ 729 0018 11C2     		stmia	r2!, {r0, r4}
+ 219:EEProm.c      ****     _initialized = EEP_INITIALIZED_MASK | EEP_INITIALIZED_AS_SPI_MASK;
+ 730              		.loc 1 219 0
+ 731 001a 0322     		mov	r2, #3
+ 732 001c 1A75     		strb	r2, [r3, #20]
+ 220:EEProm.c      **** }
+ 733              		.loc 1 220 0
+ 734              		@ sp needed
+ 735 001e 30BC     		pop	{r4, r5}
+ 736 0020 08BC     		pop	{r3}
+ 737 0022 04B0     		add	sp, sp, #16
+ 738 0024 1847     		bx	r3
+ 739              	.L51:
+ 740 0026 C046     		.align	2
+ 741              	.L50:
+ 742 0028 00000000 		.word	.LANCHOR0
+ 743              		.cfi_endproc
+ 744              	.LFE10:
+ 745              		.size	EEPROM_init_spi, .-EEPROM_init_spi
+ 746              		.section	.text.EEPROM_init_i2c,"ax",%progbits
+ 747              		.align	2
+ 748              		.global	EEPROM_init_i2c
+ 749              		.code	16
+ 750              		.thumb_func
+ 751              		.type	EEPROM_init_i2c, %function
+ 752              	EEPROM_init_i2c:
+ 753              	.LFB11:
+ 221:EEProm.c      **** 
+ 222:EEProm.c      **** void EEPROM_init_i2c(struct I2CInterface i2cInterface)
+ 223:EEProm.c      **** {
+ 754              		.loc 1 223 0
+ 755              		.cfi_startproc
+ 756 0000 84B0     		sub	sp, sp, #16
+ 757              		.cfi_def_cfa_offset 16
+ 758 0002 30B5     		push	{r4, r5, lr}
+ 759              		.cfi_def_cfa_offset 28
+ 760              		.cfi_offset 4, -28
+ 761              		.cfi_offset 5, -24
+ 762              		.cfi_offset 14, -20
+ 763 0004 0390     		str	r0, [sp, #12]
+ 764 0006 0491     		str	r1, [sp, #16]
+ 765 0008 0592     		str	r2, [sp, #20]
+ 766 000a 0693     		str	r3, [sp, #24]
+ 224:EEProm.c      ****     _i2c = i2cInterface;
+ 767              		.loc 1 224 0
+ 768 000c 0749     		ldr	r1, .L53
+ 769 000e 0B1C     		mov	r3, r1
+ 770 0010 1833     		add	r3, r3, #24
+ 771 0012 03AA     		add	r2, sp, #12
+ 772 0014 31CA     		ldmia	r2!, {r0, r4, r5}
+ 773 0016 31C3     		stmia	r3!, {r0, r4, r5}
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 19
+
+
+ 774 0018 31CA     		ldmia	r2!, {r0, r4, r5}
+ 775 001a 31C3     		stmia	r3!, {r0, r4, r5}
+ 776 001c 31CA     		ldmia	r2!, {r0, r4, r5}
+ 777 001e 31C3     		stmia	r3!, {r0, r4, r5}
+ 225:EEProm.c      ****     _initialized = EEP_INITIALIZED_MASK;
+ 778              		.loc 1 225 0
+ 779 0020 0123     		mov	r3, #1
+ 780 0022 0B75     		strb	r3, [r1, #20]
+ 226:EEProm.c      **** }
+ 781              		.loc 1 226 0
+ 782              		@ sp needed
+ 783 0024 30BC     		pop	{r4, r5}
+ 784 0026 08BC     		pop	{r3}
+ 785 0028 04B0     		add	sp, sp, #16
+ 786 002a 1847     		bx	r3
+ 787              	.L54:
+ 788              		.align	2
+ 789              	.L53:
+ 790 002c 00000000 		.word	.LANCHOR0
+ 791              		.cfi_endproc
+ 792              	.LFE11:
+ 793              		.size	EEPROM_init_i2c, .-EEPROM_init_i2c
+ 794              		.section	.text.EEPROM_clearBuffers,"ax",%progbits
+ 795              		.align	2
+ 796              		.global	EEPROM_clearBuffers
+ 797              		.code	16
+ 798              		.thumb_func
+ 799              		.type	EEPROM_clearBuffers, %function
+ 800              	EEPROM_clearBuffers:
+ 801              	.LFB12:
+ 227:EEProm.c      **** 
+ 228:EEProm.c      **** void EEPROM_clearBuffers()
+ 229:EEProm.c      **** {
+ 802              		.loc 1 229 0
+ 803              		.cfi_startproc
+ 230:EEProm.c      **** 
+ 231:EEProm.c      **** }
+ 804              		.loc 1 231 0
+ 805              		@ sp needed
+ 806 0000 7047     		bx	lr
+ 807              		.cfi_endproc
+ 808              	.LFE12:
+ 809              		.size	EEPROM_clearBuffers, .-EEPROM_clearBuffers
+ 810 0002 C046     		.section	.text.EEPROM_getStatus,"ax",%progbits
+ 811              		.align	2
+ 812              		.global	EEPROM_getStatus
+ 813              		.code	16
+ 814              		.thumb_func
+ 815              		.type	EEPROM_getStatus, %function
+ 816              	EEPROM_getStatus:
+ 817              	.LFB13:
+ 232:EEProm.c      **** 
+ 233:EEProm.c      **** uint8_t EEPROM_getStatus()
+ 234:EEProm.c      **** {
+ 818              		.loc 1 234 0
+ 819              		.cfi_startproc
+ 820 0000 08B5     		push	{r3, lr}
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 20
+
+
+ 821              		.cfi_def_cfa_offset 8
+ 822              		.cfi_offset 3, -8
+ 823              		.cfi_offset 14, -4
+ 235:EEProm.c      ****     if (isInitializedAndSPI())
+ 824              		.loc 1 235 0
+ 825 0002 FFF7FEFF 		bl	isInitializedAndSPI
+ 826              	.LVL91:
+ 827 0006 0028     		cmp	r0, #0
+ 828 0008 02D0     		beq	.L57
+ 236:EEProm.c      ****         return spiGetStatus();
+ 829              		.loc 1 236 0
+ 830 000a FFF7FEFF 		bl	spiGetStatus
+ 831              	.LVL92:
+ 832 000e 05E0     		b	.L58
+ 833              	.L57:
+ 237:EEProm.c      ****     else if (isInitializedAndI2C())
+ 834              		.loc 1 237 0
+ 835 0010 FFF7FEFF 		bl	isInitializedAndI2C
+ 836              	.LVL93:
+ 837 0014 0028     		cmp	r0, #0
+ 838 0016 01D0     		beq	.L58
+ 238:EEProm.c      ****         return i2cGetStatus();
+ 839              		.loc 1 238 0
+ 840 0018 FFF7FEFF 		bl	i2cGetStatus
+ 841              	.LVL94:
+ 842              	.L58:
+ 239:EEProm.c      **** 
+ 240:EEProm.c      ****     return 0;
+ 241:EEProm.c      **** }
+ 843              		.loc 1 241 0
+ 844              		@ sp needed
+ 845 001c 08BD     		pop	{r3, pc}
+ 846              		.cfi_endproc
+ 847              	.LFE13:
+ 848              		.size	EEPROM_getStatus, .-EEPROM_getStatus
+ 849 001e C046     		.section	.text.EEPROM_read,"ax",%progbits
+ 850              		.align	2
+ 851              		.global	EEPROM_read
+ 852              		.code	16
+ 853              		.thumb_func
+ 854              		.type	EEPROM_read, %function
+ 855              	EEPROM_read:
+ 856              	.LFB14:
+ 242:EEProm.c      **** 
+ 243:EEProm.c      **** uint8_t EEPROM_read(uint32_t address, uint8_t * data, uint32_t dataLength)
+ 244:EEProm.c      **** {
+ 857              		.loc 1 244 0
+ 858              		.cfi_startproc
+ 859              	.LVL95:
+ 860 0000 70B5     		push	{r4, r5, r6, lr}
+ 861              		.cfi_def_cfa_offset 16
+ 862              		.cfi_offset 4, -16
+ 863              		.cfi_offset 5, -12
+ 864              		.cfi_offset 6, -8
+ 865              		.cfi_offset 14, -4
+ 866 0002 061C     		mov	r6, r0
+ 867 0004 0D1C     		mov	r5, r1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 21
+
+
+ 868 0006 141C     		mov	r4, r2
+ 245:EEProm.c      ****     if (isInitializedAndSPI())
+ 869              		.loc 1 245 0
+ 870 0008 FFF7FEFF 		bl	isInitializedAndSPI
+ 871              	.LVL96:
+ 872 000c 0028     		cmp	r0, #0
+ 873 000e 05D0     		beq	.L60
+ 246:EEProm.c      ****         return spiRead(address, data, dataLength);
+ 874              		.loc 1 246 0
+ 875 0010 301C     		mov	r0, r6
+ 876 0012 291C     		mov	r1, r5
+ 877 0014 221C     		mov	r2, r4
+ 878 0016 FFF7FEFF 		bl	spiRead
+ 879              	.LVL97:
+ 880 001a 08E0     		b	.L61
+ 881              	.L60:
+ 247:EEProm.c      ****     else if (isInitializedAndI2C())
+ 882              		.loc 1 247 0
+ 883 001c FFF7FEFF 		bl	isInitializedAndI2C
+ 884              	.LVL98:
+ 885 0020 0028     		cmp	r0, #0
+ 886 0022 04D0     		beq	.L61
+ 248:EEProm.c      ****         return i2cRead(address, data, dataLength);
+ 887              		.loc 1 248 0
+ 888 0024 301C     		mov	r0, r6
+ 889 0026 291C     		mov	r1, r5
+ 890 0028 221C     		mov	r2, r4
+ 891 002a FFF7FEFF 		bl	i2cRead
+ 892              	.LVL99:
+ 893              	.L61:
+ 249:EEProm.c      **** 
+ 250:EEProm.c      ****     return 0;
+ 251:EEProm.c      **** 
+ 252:EEProm.c      **** }
+ 894              		.loc 1 252 0
+ 895              		@ sp needed
+ 896              	.LVL100:
+ 897              	.LVL101:
+ 898              	.LVL102:
+ 899 002e 70BD     		pop	{r4, r5, r6, pc}
+ 900              		.cfi_endproc
+ 901              	.LFE14:
+ 902              		.size	EEPROM_read, .-EEPROM_read
+ 903              		.section	.text.EEPROM_write,"ax",%progbits
+ 904              		.align	2
+ 905              		.global	EEPROM_write
+ 906              		.code	16
+ 907              		.thumb_func
+ 908              		.type	EEPROM_write, %function
+ 909              	EEPROM_write:
+ 910              	.LFB15:
+ 253:EEProm.c      **** 
+ 254:EEProm.c      **** uint8_t EEPROM_write(uint32_t address, uint8_t * data, uint32_t dataLength)
+ 255:EEProm.c      **** {
+ 911              		.loc 1 255 0
+ 912              		.cfi_startproc
+ 913              	.LVL103:
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 22
+
+
+ 914 0000 70B5     		push	{r4, r5, r6, lr}
+ 915              		.cfi_def_cfa_offset 16
+ 916              		.cfi_offset 4, -16
+ 917              		.cfi_offset 5, -12
+ 918              		.cfi_offset 6, -8
+ 919              		.cfi_offset 14, -4
+ 920 0002 061C     		mov	r6, r0
+ 921 0004 0D1C     		mov	r5, r1
+ 922 0006 141C     		mov	r4, r2
+ 256:EEProm.c      ****     if (isInitializedAndSPI())
+ 923              		.loc 1 256 0
+ 924 0008 FFF7FEFF 		bl	isInitializedAndSPI
+ 925              	.LVL104:
+ 926 000c 0028     		cmp	r0, #0
+ 927 000e 05D0     		beq	.L63
+ 257:EEProm.c      ****         return spiWrite(address, data, dataLength);
+ 928              		.loc 1 257 0
+ 929 0010 301C     		mov	r0, r6
+ 930 0012 291C     		mov	r1, r5
+ 931 0014 221C     		mov	r2, r4
+ 932 0016 FFF7FEFF 		bl	spiWrite
+ 933              	.LVL105:
+ 934 001a 08E0     		b	.L64
+ 935              	.L63:
+ 258:EEProm.c      ****     else if (isInitializedAndI2C())
+ 936              		.loc 1 258 0
+ 937 001c FFF7FEFF 		bl	isInitializedAndI2C
+ 938              	.LVL106:
+ 939 0020 0028     		cmp	r0, #0
+ 940 0022 04D0     		beq	.L64
+ 259:EEProm.c      ****         return i2cWrite(address, data, dataLength);
+ 941              		.loc 1 259 0
+ 942 0024 301C     		mov	r0, r6
+ 943 0026 291C     		mov	r1, r5
+ 944 0028 221C     		mov	r2, r4
+ 945 002a FFF7FEFF 		bl	i2cWrite
+ 946              	.LVL107:
+ 947              	.L64:
+ 260:EEProm.c      **** 
+ 261:EEProm.c      ****     return 0;
+ 262:EEProm.c      **** }
+ 948              		.loc 1 262 0
+ 949              		@ sp needed
+ 950              	.LVL108:
+ 951              	.LVL109:
+ 952              	.LVL110:
+ 953 002e 70BD     		pop	{r4, r5, r6, pc}
+ 954              		.cfi_endproc
+ 955              	.LFE15:
+ 956              		.size	EEPROM_write, .-EEPROM_write
+ 957              		.bss
+ 958              		.align	2
+ 959              		.set	.LANCHOR0,. + 0
+ 960              		.type	_spi, %object
+ 961              		.size	_spi, 20
+ 962              	_spi:
+ 963 0000 00000000 		.space	20
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 23
+
+
+ 963      00000000 
+ 963      00000000 
+ 963      00000000 
+ 963      00000000 
+ 964              		.type	_initialized, %object
+ 965              		.size	_initialized, 1
+ 966              	_initialized:
+ 967 0014 00       		.space	1
+ 968 0015 000000   		.space	3
+ 969              		.type	_i2c, %object
+ 970              		.size	_i2c, 36
+ 971              	_i2c:
+ 972 0018 00000000 		.space	36
+ 972      00000000 
+ 972      00000000 
+ 972      00000000 
+ 972      00000000 
+ 973              		.text
+ 974              	.Letext0:
+ 975              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 976              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 977              		.file 4 "EEProm.h"
+ 978              		.section	.debug_info,"",%progbits
+ 979              	.Ldebug_info0:
+ 980 0000 55080000 		.4byte	0x855
+ 981 0004 0400     		.2byte	0x4
+ 982 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 983 000a 04       		.byte	0x4
+ 984 000b 01       		.uleb128 0x1
+ 985 000c BE010000 		.4byte	.LASF57
+ 986 0010 01       		.byte	0x1
+ 987 0011 55020000 		.4byte	.LASF58
+ 988 0015 96020000 		.4byte	.LASF59
+ 989 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 990 001d 00000000 		.4byte	0
+ 991 0021 00000000 		.4byte	.Ldebug_line0
+ 992 0025 02       		.uleb128 0x2
+ 993 0026 04       		.byte	0x4
+ 994 0027 05       		.byte	0x5
+ 995 0028 696E7400 		.ascii	"int\000"
+ 996 002c 03       		.uleb128 0x3
+ 997 002d 04       		.byte	0x4
+ 998 002e 07       		.byte	0x7
+ 999 002f D1000000 		.4byte	.LASF0
+ 1000 0033 03       		.uleb128 0x3
+ 1001 0034 08       		.byte	0x8
+ 1002 0035 05       		.byte	0x5
+ 1003 0036 29000000 		.4byte	.LASF1
+ 1004 003a 03       		.uleb128 0x3
+ 1005 003b 08       		.byte	0x8
+ 1006 003c 04       		.byte	0x4
+ 1007 003d 91010000 		.4byte	.LASF2
+ 1008 0041 03       		.uleb128 0x3
+ 1009 0042 01       		.byte	0x1
+ 1010 0043 06       		.byte	0x6
+ 1011 0044 37000000 		.4byte	.LASF3
+ 1012 0048 04       		.uleb128 0x4
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 24
+
+
+ 1013 0049 08000000 		.4byte	.LASF6
+ 1014 004d 02       		.byte	0x2
+ 1015 004e 1D       		.byte	0x1d
+ 1016 004f 53000000 		.4byte	0x53
+ 1017 0053 03       		.uleb128 0x3
+ 1018 0054 01       		.byte	0x1
+ 1019 0055 08       		.byte	0x8
+ 1020 0056 67020000 		.4byte	.LASF4
+ 1021 005a 03       		.uleb128 0x3
+ 1022 005b 02       		.byte	0x2
+ 1023 005c 05       		.byte	0x5
+ 1024 005d 8C020000 		.4byte	.LASF5
+ 1025 0061 04       		.uleb128 0x4
+ 1026 0062 F2020000 		.4byte	.LASF7
+ 1027 0066 02       		.byte	0x2
+ 1028 0067 2B       		.byte	0x2b
+ 1029 0068 6C000000 		.4byte	0x6c
+ 1030 006c 03       		.uleb128 0x3
+ 1031 006d 02       		.byte	0x2
+ 1032 006e 07       		.byte	0x7
+ 1033 006f 25010000 		.4byte	.LASF8
+ 1034 0073 03       		.uleb128 0x3
+ 1035 0074 04       		.byte	0x4
+ 1036 0075 05       		.byte	0x5
+ 1037 0076 54000000 		.4byte	.LASF9
+ 1038 007a 04       		.uleb128 0x4
+ 1039 007b B3000000 		.4byte	.LASF10
+ 1040 007f 02       		.byte	0x2
+ 1041 0080 41       		.byte	0x41
+ 1042 0081 85000000 		.4byte	0x85
+ 1043 0085 03       		.uleb128 0x3
+ 1044 0086 04       		.byte	0x4
+ 1045 0087 07       		.byte	0x7
+ 1046 0088 05010000 		.4byte	.LASF11
+ 1047 008c 03       		.uleb128 0x3
+ 1048 008d 08       		.byte	0x8
+ 1049 008e 07       		.byte	0x7
+ 1050 008f 12000000 		.4byte	.LASF12
+ 1051 0093 03       		.uleb128 0x3
+ 1052 0094 04       		.byte	0x4
+ 1053 0095 07       		.byte	0x7
+ 1054 0096 88010000 		.4byte	.LASF13
+ 1055 009a 05       		.uleb128 0x5
+ 1056 009b 04       		.byte	0x4
+ 1057 009c 03       		.uleb128 0x3
+ 1058 009d 01       		.byte	0x1
+ 1059 009e 08       		.byte	0x8
+ 1060 009f ED020000 		.4byte	.LASF14
+ 1061 00a3 04       		.uleb128 0x4
+ 1062 00a4 42030000 		.4byte	.LASF15
+ 1063 00a8 03       		.byte	0x3
+ 1064 00a9 15       		.byte	0x15
+ 1065 00aa 48000000 		.4byte	0x48
+ 1066 00ae 04       		.uleb128 0x4
+ 1067 00af 71000000 		.4byte	.LASF16
+ 1068 00b3 03       		.byte	0x3
+ 1069 00b4 21       		.byte	0x21
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 25
+
+
+ 1070 00b5 61000000 		.4byte	0x61
+ 1071 00b9 04       		.uleb128 0x4
+ 1072 00ba D8020000 		.4byte	.LASF17
+ 1073 00be 03       		.byte	0x3
+ 1074 00bf 2D       		.byte	0x2d
+ 1075 00c0 7A000000 		.4byte	0x7a
+ 1076 00c4 06       		.uleb128 0x6
+ 1077 00c5 6D010000 		.4byte	.LASF23
+ 1078 00c9 14       		.byte	0x14
+ 1079 00ca 04       		.byte	0x4
+ 1080 00cb 1E       		.byte	0x1e
+ 1081 00cc 0D010000 		.4byte	0x10d
+ 1082 00d0 07       		.uleb128 0x7
+ 1083 00d1 7A010000 		.4byte	.LASF18
+ 1084 00d5 04       		.byte	0x4
+ 1085 00d6 20       		.byte	0x20
+ 1086 00d7 18010000 		.4byte	0x118
+ 1087 00db 00       		.byte	0
+ 1088 00dc 07       		.uleb128 0x7
+ 1089 00dd 57030000 		.4byte	.LASF19
+ 1090 00e1 04       		.byte	0x4
+ 1091 00e2 21       		.byte	0x21
+ 1092 00e3 23010000 		.4byte	0x123
+ 1093 00e7 04       		.byte	0x4
+ 1094 00e8 07       		.uleb128 0x7
+ 1095 00e9 E1020000 		.4byte	.LASF20
+ 1096 00ed 04       		.byte	0x4
+ 1097 00ee 22       		.byte	0x22
+ 1098 00ef 23010000 		.4byte	0x123
+ 1099 00f3 08       		.byte	0x8
+ 1100 00f4 07       		.uleb128 0x7
+ 1101 00f5 16030000 		.4byte	.LASF21
+ 1102 00f9 04       		.byte	0x4
+ 1103 00fa 23       		.byte	0x23
+ 1104 00fb 34010000 		.4byte	0x134
+ 1105 00ff 0C       		.byte	0xc
+ 1106 0100 07       		.uleb128 0x7
+ 1107 0101 5C030000 		.4byte	.LASF22
+ 1108 0105 04       		.byte	0x4
+ 1109 0106 24       		.byte	0x24
+ 1110 0107 A3000000 		.4byte	0xa3
+ 1111 010b 10       		.byte	0x10
+ 1112 010c 00       		.byte	0
+ 1113 010d 08       		.uleb128 0x8
+ 1114 010e 18010000 		.4byte	0x118
+ 1115 0112 09       		.uleb128 0x9
+ 1116 0113 A3000000 		.4byte	0xa3
+ 1117 0117 00       		.byte	0
+ 1118 0118 0A       		.uleb128 0xa
+ 1119 0119 04       		.byte	0x4
+ 1120 011a 0D010000 		.4byte	0x10d
+ 1121 011e 0B       		.uleb128 0xb
+ 1122 011f A3000000 		.4byte	0xa3
+ 1123 0123 0A       		.uleb128 0xa
+ 1124 0124 04       		.byte	0x4
+ 1125 0125 1E010000 		.4byte	0x11e
+ 1126 0129 08       		.uleb128 0x8
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 26
+
+
+ 1127 012a 34010000 		.4byte	0x134
+ 1128 012e 09       		.uleb128 0x9
+ 1129 012f AE000000 		.4byte	0xae
+ 1130 0133 00       		.byte	0
+ 1131 0134 0A       		.uleb128 0xa
+ 1132 0135 04       		.byte	0x4
+ 1133 0136 29010000 		.4byte	0x129
+ 1134 013a 06       		.uleb128 0x6
+ 1135 013b 7A000000 		.4byte	.LASF24
+ 1136 013f 24       		.byte	0x24
+ 1137 0140 04       		.byte	0x4
+ 1138 0141 2B       		.byte	0x2b
+ 1139 0142 B3010000 		.4byte	0x1b3
+ 1140 0146 07       		.uleb128 0x7
+ 1141 0147 7A010000 		.4byte	.LASF18
+ 1142 014b 04       		.byte	0x4
+ 1143 014c 2D       		.byte	0x2d
+ 1144 014d D7010000 		.4byte	0x1d7
+ 1145 0151 00       		.byte	0
+ 1146 0152 07       		.uleb128 0x7
+ 1147 0153 57030000 		.4byte	.LASF19
+ 1148 0157 04       		.byte	0x4
+ 1149 0158 2E       		.byte	0x2e
+ 1150 0159 D7010000 		.4byte	0x1d7
+ 1151 015d 04       		.byte	0x4
+ 1152 015e 07       		.uleb128 0x7
+ 1153 015f EB000000 		.4byte	.LASF25
+ 1154 0163 04       		.byte	0x4
+ 1155 0164 2F       		.byte	0x2f
+ 1156 0165 E2010000 		.4byte	0x1e2
+ 1157 0169 08       		.byte	0x8
+ 1158 016a 07       		.uleb128 0x7
+ 1159 016b 16030000 		.4byte	.LASF21
+ 1160 016f 04       		.byte	0x4
+ 1161 0170 30       		.byte	0x30
+ 1162 0171 34010000 		.4byte	0x134
+ 1163 0175 0C       		.byte	0xc
+ 1164 0176 07       		.uleb128 0x7
+ 1165 0177 4C010000 		.4byte	.LASF26
+ 1166 017b 04       		.byte	0x4
+ 1167 017c 31       		.byte	0x31
+ 1168 017d E2010000 		.4byte	0x1e2
+ 1169 0181 10       		.byte	0x10
+ 1170 0182 07       		.uleb128 0x7
+ 1171 0183 75020000 		.4byte	.LASF27
+ 1172 0187 04       		.byte	0x4
+ 1173 0188 33       		.byte	0x33
+ 1174 0189 B9000000 		.4byte	0xb9
+ 1175 018d 14       		.byte	0x14
+ 1176 018e 07       		.uleb128 0x7
+ 1177 018f B4010000 		.4byte	.LASF28
+ 1178 0193 04       		.byte	0x4
+ 1179 0194 34       		.byte	0x34
+ 1180 0195 B9000000 		.4byte	0xb9
+ 1181 0199 18       		.byte	0x18
+ 1182 019a 07       		.uleb128 0x7
+ 1183 019b 58010000 		.4byte	.LASF29
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 27
+
+
+ 1184 019f 04       		.byte	0x4
+ 1185 01a0 35       		.byte	0x35
+ 1186 01a1 B9000000 		.4byte	0xb9
+ 1187 01a5 1C       		.byte	0x1c
+ 1188 01a6 07       		.uleb128 0x7
+ 1189 01a7 BE000000 		.4byte	.LASF30
+ 1190 01ab 04       		.byte	0x4
+ 1191 01ac 36       		.byte	0x36
+ 1192 01ad A3000000 		.4byte	0xa3
+ 1193 01b1 20       		.byte	0x20
+ 1194 01b2 00       		.byte	0
+ 1195 01b3 0C       		.uleb128 0xc
+ 1196 01b4 B9000000 		.4byte	0xb9
+ 1197 01b8 D1010000 		.4byte	0x1d1
+ 1198 01bc 09       		.uleb128 0x9
+ 1199 01bd B9000000 		.4byte	0xb9
+ 1200 01c1 09       		.uleb128 0x9
+ 1201 01c2 D1010000 		.4byte	0x1d1
+ 1202 01c6 09       		.uleb128 0x9
+ 1203 01c7 B9000000 		.4byte	0xb9
+ 1204 01cb 09       		.uleb128 0x9
+ 1205 01cc B9000000 		.4byte	0xb9
+ 1206 01d0 00       		.byte	0
+ 1207 01d1 0A       		.uleb128 0xa
+ 1208 01d2 04       		.byte	0x4
+ 1209 01d3 A3000000 		.4byte	0xa3
+ 1210 01d7 0A       		.uleb128 0xa
+ 1211 01d8 04       		.byte	0x4
+ 1212 01d9 B3010000 		.4byte	0x1b3
+ 1213 01dd 0B       		.uleb128 0xb
+ 1214 01de B9000000 		.4byte	0xb9
+ 1215 01e2 0A       		.uleb128 0xa
+ 1216 01e3 04       		.byte	0x4
+ 1217 01e4 DD010000 		.4byte	0x1dd
+ 1218 01e8 0D       		.uleb128 0xd
+ 1219 01e9 1E030000 		.4byte	.LASF60
+ 1220 01ed 01       		.byte	0x1
+ 1221 01ee 27       		.byte	0x27
+ 1222 01ef 00000000 		.4byte	.LFB0
+ 1223 01f3 1C000000 		.4byte	.LFE0-.LFB0
+ 1224 01f7 01       		.uleb128 0x1
+ 1225 01f8 9C       		.byte	0x9c
+ 1226 01f9 09020000 		.4byte	0x209
+ 1227 01fd 0E       		.uleb128 0xe
+ 1228 01fe 0A000000 		.4byte	.LVL0
+ 1229 0202 0F       		.uleb128 0xf
+ 1230 0203 01       		.uleb128 0x1
+ 1231 0204 50       		.byte	0x50
+ 1232 0205 01       		.uleb128 0x1
+ 1233 0206 35       		.byte	0x35
+ 1234 0207 00       		.byte	0
+ 1235 0208 00       		.byte	0
+ 1236 0209 10       		.uleb128 0x10
+ 1237 020a 38010000 		.4byte	.LASF31
+ 1238 020e 01       		.byte	0x1
+ 1239 020f 2D       		.byte	0x2d
+ 1240 0210 A3000000 		.4byte	0xa3
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 28
+
+
+ 1241 0214 00000000 		.4byte	.LFB1
+ 1242 0218 18000000 		.4byte	.LFE1-.LFB1
+ 1243 021c 01       		.uleb128 0x1
+ 1244 021d 9C       		.byte	0x9c
+ 1245 021e 32020000 		.4byte	0x232
+ 1246 0222 11       		.uleb128 0x11
+ 1247 0223 CC000000 		.4byte	.LASF33
+ 1248 0227 01       		.byte	0x1
+ 1249 0228 2F       		.byte	0x2f
+ 1250 0229 A3000000 		.4byte	0xa3
+ 1251 022d 00000000 		.4byte	.LLST0
+ 1252 0231 00       		.byte	0
+ 1253 0232 10       		.uleb128 0x10
+ 1254 0233 87000000 		.4byte	.LASF32
+ 1255 0237 01       		.byte	0x1
+ 1256 0238 33       		.byte	0x33
+ 1257 0239 A3000000 		.4byte	0xa3
+ 1258 023d 00000000 		.4byte	.LFB2
+ 1259 0241 10000000 		.4byte	.LFE2-.LFB2
+ 1260 0245 01       		.uleb128 0x1
+ 1261 0246 9C       		.byte	0x9c
+ 1262 0247 5D020000 		.4byte	0x25d
+ 1263 024b 12       		.uleb128 0x12
+ 1264 024c CC000000 		.4byte	.LASF33
+ 1265 0250 01       		.byte	0x1
+ 1266 0251 35       		.byte	0x35
+ 1267 0252 A3000000 		.4byte	0xa3
+ 1268 0256 05       		.uleb128 0x5
+ 1269 0257 73       		.byte	0x73
+ 1270 0258 00       		.sleb128 0
+ 1271 0259 31       		.byte	0x31
+ 1272 025a 1A       		.byte	0x1a
+ 1273 025b 9F       		.byte	0x9f
+ 1274 025c 00       		.byte	0
+ 1275 025d 13       		.uleb128 0x13
+ 1276 025e 09030000 		.4byte	.LASF34
+ 1277 0262 01       		.byte	0x1
+ 1278 0263 39       		.byte	0x39
+ 1279 0264 A3000000 		.4byte	0xa3
+ 1280 0268 00000000 		.4byte	.LFB3
+ 1281 026c 24000000 		.4byte	.LFE3-.LFB3
+ 1282 0270 01       		.uleb128 0x1
+ 1283 0271 9C       		.byte	0x9c
+ 1284 0272 AB020000 		.4byte	0x2ab
+ 1285 0276 12       		.uleb128 0x12
+ 1286 0277 3B030000 		.4byte	.LASF35
+ 1287 027b 01       		.byte	0x1
+ 1288 027c 3B       		.byte	0x3b
+ 1289 027d A3000000 		.4byte	0xa3
+ 1290 0281 01       		.uleb128 0x1
+ 1291 0282 50       		.byte	0x50
+ 1292 0283 14       		.uleb128 0x14
+ 1293 0284 0A000000 		.4byte	.LVL6
+ 1294 0288 92020000 		.4byte	0x292
+ 1295 028c 0F       		.uleb128 0xf
+ 1296 028d 01       		.uleb128 0x1
+ 1297 028e 50       		.byte	0x50
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 29
+
+
+ 1298 028f 01       		.uleb128 0x1
+ 1299 0290 35       		.byte	0x35
+ 1300 0291 00       		.byte	0
+ 1301 0292 14       		.uleb128 0x14
+ 1302 0293 10000000 		.4byte	.LVL7
+ 1303 0297 A1020000 		.4byte	0x2a1
+ 1304 029b 0F       		.uleb128 0xf
+ 1305 029c 01       		.uleb128 0x1
+ 1306 029d 50       		.byte	0x50
+ 1307 029e 01       		.uleb128 0x1
+ 1308 029f 30       		.byte	0x30
+ 1309 02a0 00       		.byte	0
+ 1310 02a1 15       		.uleb128 0x15
+ 1311 02a2 14000000 		.4byte	.LVL8
+ 1312 02a6 E8010000 		.4byte	0x1e8
+ 1313 02aa 00       		.byte	0
+ 1314 02ab 16       		.uleb128 0x16
+ 1315 02ac 00000000 		.4byte	.LASF39
+ 1316 02b0 01       		.byte	0x1
+ 1317 02b1 45       		.byte	0x45
+ 1318 02b2 A3000000 		.4byte	0xa3
+ 1319 02b6 00000000 		.4byte	.LFB4
+ 1320 02ba 6C000000 		.4byte	.LFE4-.LFB4
+ 1321 02be 01       		.uleb128 0x1
+ 1322 02bf 9C       		.byte	0x9c
+ 1323 02c0 5A030000 		.4byte	0x35a
+ 1324 02c4 17       		.uleb128 0x17
+ 1325 02c5 9D010000 		.4byte	.LASF36
+ 1326 02c9 01       		.byte	0x1
+ 1327 02ca 45       		.byte	0x45
+ 1328 02cb B9000000 		.4byte	0xb9
+ 1329 02cf 34000000 		.4byte	.LLST1
+ 1330 02d3 17       		.uleb128 0x17
+ 1331 02d4 20010000 		.4byte	.LASF37
+ 1332 02d8 01       		.byte	0x1
+ 1333 02d9 45       		.byte	0x45
+ 1334 02da D1010000 		.4byte	0x1d1
+ 1335 02de 60000000 		.4byte	.LLST2
+ 1336 02e2 17       		.uleb128 0x17
+ 1337 02e3 9B000000 		.4byte	.LASF38
+ 1338 02e7 01       		.byte	0x1
+ 1339 02e8 45       		.byte	0x45
+ 1340 02e9 B9000000 		.4byte	0xb9
+ 1341 02ed 8C000000 		.4byte	.LLST3
+ 1342 02f1 18       		.uleb128 0x18
+ 1343 02f2 6900     		.ascii	"i\000"
+ 1344 02f4 01       		.byte	0x1
+ 1345 02f5 47       		.byte	0x47
+ 1346 02f6 B9000000 		.4byte	0xb9
+ 1347 02fa B8000000 		.4byte	.LLST4
+ 1348 02fe 14       		.uleb128 0x14
+ 1349 02ff 10000000 		.4byte	.LVL13
+ 1350 0303 0D030000 		.4byte	0x30d
+ 1351 0307 0F       		.uleb128 0xf
+ 1352 0308 01       		.uleb128 0x1
+ 1353 0309 50       		.byte	0x50
+ 1354 030a 01       		.uleb128 0x1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 30
+
+
+ 1355 030b 33       		.byte	0x33
+ 1356 030c 00       		.byte	0
+ 1357 030d 14       		.uleb128 0x14
+ 1358 030e 18000000 		.4byte	.LVL14
+ 1359 0312 1F030000 		.4byte	0x31f
+ 1360 0316 0F       		.uleb128 0xf
+ 1361 0317 01       		.uleb128 0x1
+ 1362 0318 50       		.byte	0x50
+ 1363 0319 04       		.uleb128 0x4
+ 1364 031a 74       		.byte	0x74
+ 1365 031b 00       		.sleb128 0
+ 1366 031c 40       		.byte	0x40
+ 1367 031d 25       		.byte	0x25
+ 1368 031e 00       		.byte	0
+ 1369 031f 14       		.uleb128 0x14
+ 1370 0320 20000000 		.4byte	.LVL15
+ 1371 0324 31030000 		.4byte	0x331
+ 1372 0328 0F       		.uleb128 0xf
+ 1373 0329 01       		.uleb128 0x1
+ 1374 032a 50       		.byte	0x50
+ 1375 032b 04       		.uleb128 0x4
+ 1376 032c 74       		.byte	0x74
+ 1377 032d 00       		.sleb128 0
+ 1378 032e 38       		.byte	0x38
+ 1379 032f 25       		.byte	0x25
+ 1380 0330 00       		.byte	0
+ 1381 0331 14       		.uleb128 0x14
+ 1382 0332 26000000 		.4byte	.LVL16
+ 1383 0336 41030000 		.4byte	0x341
+ 1384 033a 0F       		.uleb128 0xf
+ 1385 033b 01       		.uleb128 0x1
+ 1386 033c 50       		.byte	0x50
+ 1387 033d 02       		.uleb128 0x2
+ 1388 033e 74       		.byte	0x74
+ 1389 033f 00       		.sleb128 0
+ 1390 0340 00       		.byte	0
+ 1391 0341 14       		.uleb128 0x14
+ 1392 0342 32000000 		.4byte	.LVL19
+ 1393 0346 50030000 		.4byte	0x350
+ 1394 034a 0F       		.uleb128 0xf
+ 1395 034b 01       		.uleb128 0x1
+ 1396 034c 50       		.byte	0x50
+ 1397 034d 01       		.uleb128 0x1
+ 1398 034e 30       		.byte	0x30
+ 1399 034f 00       		.byte	0
+ 1400 0350 15       		.uleb128 0x15
+ 1401 0351 3C000000 		.4byte	.LVL21
+ 1402 0355 E8010000 		.4byte	0x1e8
+ 1403 0359 00       		.byte	0
+ 1404 035a 16       		.uleb128 0x16
+ 1405 035b 17010000 		.4byte	.LASF40
+ 1406 035f 01       		.byte	0x1
+ 1407 0360 5E       		.byte	0x5e
+ 1408 0361 A3000000 		.4byte	0xa3
+ 1409 0365 00000000 		.4byte	.LFB5
+ 1410 0369 6C000000 		.4byte	.LFE5-.LFB5
+ 1411 036d 01       		.uleb128 0x1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 31
+
+
+ 1412 036e 9C       		.byte	0x9c
+ 1413 036f 4A040000 		.4byte	0x44a
+ 1414 0373 17       		.uleb128 0x17
+ 1415 0374 9D010000 		.4byte	.LASF36
+ 1416 0378 01       		.byte	0x1
+ 1417 0379 5E       		.byte	0x5e
+ 1418 037a B9000000 		.4byte	0xb9
+ 1419 037e EE000000 		.4byte	.LLST5
+ 1420 0382 17       		.uleb128 0x17
+ 1421 0383 20010000 		.4byte	.LASF37
+ 1422 0387 01       		.byte	0x1
+ 1423 0388 5E       		.byte	0x5e
+ 1424 0389 D1010000 		.4byte	0x1d1
+ 1425 038d 1A010000 		.4byte	.LLST6
+ 1426 0391 17       		.uleb128 0x17
+ 1427 0392 9B000000 		.4byte	.LASF38
+ 1428 0396 01       		.byte	0x1
+ 1429 0397 5E       		.byte	0x5e
+ 1430 0398 B9000000 		.4byte	0xb9
+ 1431 039c 46010000 		.4byte	.LLST7
+ 1432 03a0 19       		.uleb128 0x19
+ 1433 03a1 3A000000 		.4byte	.LBB2
+ 1434 03a5 12000000 		.4byte	.LBE2-.LBB2
+ 1435 03a9 BB030000 		.4byte	0x3bb
+ 1436 03ad 18       		.uleb128 0x18
+ 1437 03ae 6900     		.ascii	"i\000"
+ 1438 03b0 01       		.byte	0x1
+ 1439 03b1 6B       		.byte	0x6b
+ 1440 03b2 B9000000 		.4byte	0xb9
+ 1441 03b6 71010000 		.4byte	.LLST8
+ 1442 03ba 00       		.byte	0
+ 1443 03bb 19       		.uleb128 0x19
+ 1444 03bc 50000000 		.4byte	.LBB3
+ 1445 03c0 12000000 		.4byte	.LBE3-.LBB3
+ 1446 03c4 D6030000 		.4byte	0x3d6
+ 1447 03c8 18       		.uleb128 0x18
+ 1448 03c9 6900     		.ascii	"i\000"
+ 1449 03cb 01       		.byte	0x1
+ 1450 03cc 72       		.byte	0x72
+ 1451 03cd B9000000 		.4byte	0xb9
+ 1452 03d1 90010000 		.4byte	.LLST9
+ 1453 03d5 00       		.byte	0
+ 1454 03d6 14       		.uleb128 0x14
+ 1455 03d7 10000000 		.4byte	.LVL35
+ 1456 03db E5030000 		.4byte	0x3e5
+ 1457 03df 0F       		.uleb128 0xf
+ 1458 03e0 01       		.uleb128 0x1
+ 1459 03e1 50       		.byte	0x50
+ 1460 03e2 01       		.uleb128 0x1
+ 1461 03e3 36       		.byte	0x36
+ 1462 03e4 00       		.byte	0
+ 1463 03e5 15       		.uleb128 0x15
+ 1464 03e6 14000000 		.4byte	.LVL36
+ 1465 03ea E8010000 		.4byte	0x1e8
+ 1466 03ee 14       		.uleb128 0x14
+ 1467 03ef 1E000000 		.4byte	.LVL38
+ 1468 03f3 FD030000 		.4byte	0x3fd
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 32
+
+
+ 1469 03f7 0F       		.uleb128 0xf
+ 1470 03f8 01       		.uleb128 0x1
+ 1471 03f9 50       		.byte	0x50
+ 1472 03fa 01       		.uleb128 0x1
+ 1473 03fb 3A       		.byte	0x3a
+ 1474 03fc 00       		.byte	0
+ 1475 03fd 14       		.uleb128 0x14
+ 1476 03fe 24000000 		.4byte	.LVL39
+ 1477 0402 0C040000 		.4byte	0x40c
+ 1478 0406 0F       		.uleb128 0xf
+ 1479 0407 01       		.uleb128 0x1
+ 1480 0408 50       		.byte	0x50
+ 1481 0409 01       		.uleb128 0x1
+ 1482 040a 32       		.byte	0x32
+ 1483 040b 00       		.byte	0
+ 1484 040c 14       		.uleb128 0x14
+ 1485 040d 2C000000 		.4byte	.LVL40
+ 1486 0411 1E040000 		.4byte	0x41e
+ 1487 0415 0F       		.uleb128 0xf
+ 1488 0416 01       		.uleb128 0x1
+ 1489 0417 50       		.byte	0x50
+ 1490 0418 04       		.uleb128 0x4
+ 1491 0419 77       		.byte	0x77
+ 1492 041a 00       		.sleb128 0
+ 1493 041b 40       		.byte	0x40
+ 1494 041c 25       		.byte	0x25
+ 1495 041d 00       		.byte	0
+ 1496 041e 14       		.uleb128 0x14
+ 1497 041f 34000000 		.4byte	.LVL41
+ 1498 0423 30040000 		.4byte	0x430
+ 1499 0427 0F       		.uleb128 0xf
+ 1500 0428 01       		.uleb128 0x1
+ 1501 0429 50       		.byte	0x50
+ 1502 042a 04       		.uleb128 0x4
+ 1503 042b 77       		.byte	0x77
+ 1504 042c 00       		.sleb128 0
+ 1505 042d 38       		.byte	0x38
+ 1506 042e 25       		.byte	0x25
+ 1507 042f 00       		.byte	0
+ 1508 0430 14       		.uleb128 0x14
+ 1509 0431 3A000000 		.4byte	.LVL42
+ 1510 0435 40040000 		.4byte	0x440
+ 1511 0439 0F       		.uleb128 0xf
+ 1512 043a 01       		.uleb128 0x1
+ 1513 043b 50       		.byte	0x50
+ 1514 043c 02       		.uleb128 0x2
+ 1515 043d 77       		.byte	0x77
+ 1516 043e 00       		.sleb128 0
+ 1517 043f 00       		.byte	0
+ 1518 0440 15       		.uleb128 0x15
+ 1519 0441 50000000 		.4byte	.LVL46
+ 1520 0445 E8010000 		.4byte	0x1e8
+ 1521 0449 00       		.byte	0
+ 1522 044a 13       		.uleb128 0x13
+ 1523 044b A5010000 		.4byte	.LASF41
+ 1524 044f 01       		.byte	0x1
+ 1525 0450 79       		.byte	0x79
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 33
+
+
+ 1526 0451 A3000000 		.4byte	0xa3
+ 1527 0455 00000000 		.4byte	.LFB6
+ 1528 0459 1C000000 		.4byte	.LFE6-.LFB6
+ 1529 045d 01       		.uleb128 0x1
+ 1530 045e 9C       		.byte	0x9c
+ 1531 045f 73040000 		.4byte	0x473
+ 1532 0463 11       		.uleb128 0x11
+ 1533 0464 3B030000 		.4byte	.LASF35
+ 1534 0468 01       		.byte	0x1
+ 1535 0469 7B       		.byte	0x7b
+ 1536 046a B9000000 		.4byte	0xb9
+ 1537 046e AF010000 		.4byte	.LLST10
+ 1538 0472 00       		.byte	0
+ 1539 0473 16       		.uleb128 0x16
+ 1540 0474 80010000 		.4byte	.LASF42
+ 1541 0478 01       		.byte	0x1
+ 1542 0479 85       		.byte	0x85
+ 1543 047a A3000000 		.4byte	0xa3
+ 1544 047e 00000000 		.4byte	.LFB7
+ 1545 0482 78000000 		.4byte	.LFE7-.LFB7
+ 1546 0486 01       		.uleb128 0x1
+ 1547 0487 9C       		.byte	0x9c
+ 1548 0488 38050000 		.4byte	0x538
+ 1549 048c 17       		.uleb128 0x17
+ 1550 048d 9D010000 		.4byte	.LASF36
+ 1551 0491 01       		.byte	0x1
+ 1552 0492 85       		.byte	0x85
+ 1553 0493 B9000000 		.4byte	0xb9
+ 1554 0497 C2010000 		.4byte	.LLST11
+ 1555 049b 17       		.uleb128 0x17
+ 1556 049c 20010000 		.4byte	.LASF37
+ 1557 04a0 01       		.byte	0x1
+ 1558 04a1 85       		.byte	0x85
+ 1559 04a2 D1010000 		.4byte	0x1d1
+ 1560 04a6 E3010000 		.4byte	.LLST12
+ 1561 04aa 17       		.uleb128 0x17
+ 1562 04ab 9B000000 		.4byte	.LASF38
+ 1563 04af 01       		.byte	0x1
+ 1564 04b0 85       		.byte	0x85
+ 1565 04b1 B9000000 		.4byte	0xb9
+ 1566 04b5 02020000 		.4byte	.LLST13
+ 1567 04b9 12       		.uleb128 0x12
+ 1568 04ba FD020000 		.4byte	.LASF43
+ 1569 04be 01       		.byte	0x1
+ 1570 04bf 87       		.byte	0x87
+ 1571 04c0 38050000 		.4byte	0x538
+ 1572 04c4 02       		.uleb128 0x2
+ 1573 04c5 91       		.byte	0x91
+ 1574 04c6 64       		.sleb128 -28
+ 1575 04c7 11       		.uleb128 0x11
+ 1576 04c8 3B030000 		.4byte	.LASF35
+ 1577 04cc 01       		.byte	0x1
+ 1578 04cd 88       		.byte	0x88
+ 1579 04ce B9000000 		.4byte	0xb9
+ 1580 04d2 21020000 		.4byte	.LLST14
+ 1581 04d6 11       		.uleb128 0x11
+ 1582 04d7 BD020000 		.4byte	.LASF44
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 34
+
+
+ 1583 04db 01       		.byte	0x1
+ 1584 04dc 89       		.byte	0x89
+ 1585 04dd A3000000 		.4byte	0xa3
+ 1586 04e1 4A020000 		.4byte	.LLST15
+ 1587 04e5 1A       		.uleb128 0x1a
+ 1588 04e6 34000000 		.4byte	.LVL62
+ 1589 04ea 02       		.uleb128 0x2
+ 1590 04eb 76       		.byte	0x76
+ 1591 04ec 00       		.sleb128 0
+ 1592 04ed 03050000 		.4byte	0x503
+ 1593 04f1 0F       		.uleb128 0xf
+ 1594 04f2 01       		.uleb128 0x1
+ 1595 04f3 52       		.byte	0x52
+ 1596 04f4 01       		.uleb128 0x1
+ 1597 04f5 32       		.byte	0x32
+ 1598 04f6 0F       		.uleb128 0xf
+ 1599 04f7 01       		.uleb128 0x1
+ 1600 04f8 51       		.byte	0x51
+ 1601 04f9 02       		.uleb128 0x2
+ 1602 04fa 74       		.byte	0x74
+ 1603 04fb 00       		.sleb128 0
+ 1604 04fc 0F       		.uleb128 0xf
+ 1605 04fd 01       		.uleb128 0x1
+ 1606 04fe 50       		.byte	0x50
+ 1607 04ff 02       		.uleb128 0x2
+ 1608 0500 77       		.byte	0x77
+ 1609 0501 00       		.sleb128 0
+ 1610 0502 00       		.byte	0
+ 1611 0503 15       		.uleb128 0x15
+ 1612 0504 3C000000 		.4byte	.LVL63
+ 1613 0508 4A040000 		.4byte	0x44a
+ 1614 050c 1A       		.uleb128 0x1a
+ 1615 050d 52000000 		.4byte	.LVL66
+ 1616 0511 02       		.uleb128 0x2
+ 1617 0512 76       		.byte	0x76
+ 1618 0513 00       		.sleb128 0
+ 1619 0514 2E050000 		.4byte	0x52e
+ 1620 0518 0F       		.uleb128 0xf
+ 1621 0519 01       		.uleb128 0x1
+ 1622 051a 52       		.byte	0x52
+ 1623 051b 03       		.uleb128 0x3
+ 1624 051c 91       		.byte	0x91
+ 1625 051d 54       		.sleb128 -44
+ 1626 051e 06       		.byte	0x6
+ 1627 051f 0F       		.uleb128 0xf
+ 1628 0520 01       		.uleb128 0x1
+ 1629 0521 51       		.byte	0x51
+ 1630 0522 03       		.uleb128 0x3
+ 1631 0523 91       		.byte	0x91
+ 1632 0524 5C       		.sleb128 -36
+ 1633 0525 06       		.byte	0x6
+ 1634 0526 0F       		.uleb128 0xf
+ 1635 0527 01       		.uleb128 0x1
+ 1636 0528 50       		.byte	0x50
+ 1637 0529 03       		.uleb128 0x3
+ 1638 052a 91       		.byte	0x91
+ 1639 052b 58       		.sleb128 -40
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 35
+
+
+ 1640 052c 06       		.byte	0x6
+ 1641 052d 00       		.byte	0
+ 1642 052e 15       		.uleb128 0x15
+ 1643 052f 5A000000 		.4byte	.LVL67
+ 1644 0533 4A040000 		.4byte	0x44a
+ 1645 0537 00       		.byte	0
+ 1646 0538 1B       		.uleb128 0x1b
+ 1647 0539 A3000000 		.4byte	0xa3
+ 1648 053d 48050000 		.4byte	0x548
+ 1649 0541 1C       		.uleb128 0x1c
+ 1650 0542 93000000 		.4byte	0x93
+ 1651 0546 01       		.byte	0x1
+ 1652 0547 00       		.byte	0
+ 1653 0548 10       		.uleb128 0x10
+ 1654 0549 5D000000 		.4byte	.LASF45
+ 1655 054d 01       		.byte	0x1
+ 1656 054e D1       		.byte	0xd1
+ 1657 054f A3000000 		.4byte	0xa3
+ 1658 0553 00000000 		.4byte	.LFB9
+ 1659 0557 14000000 		.4byte	.LFE9-.LFB9
+ 1660 055b 01       		.uleb128 0x1
+ 1661 055c 9C       		.byte	0x9c
+ 1662 055d 8A050000 		.4byte	0x58a
+ 1663 0561 12       		.uleb128 0x12
+ 1664 0562 20010000 		.4byte	.LASF37
+ 1665 0566 01       		.byte	0x1
+ 1666 0567 D3       		.byte	0xd3
+ 1667 0568 A3000000 		.4byte	0xa3
+ 1668 056c 02       		.uleb128 0x2
+ 1669 056d 91       		.byte	0x91
+ 1670 056e 77       		.sleb128 -9
+ 1671 056f 1D       		.uleb128 0x1d
+ 1672 0570 10000000 		.4byte	.LVL71
+ 1673 0574 73040000 		.4byte	0x473
+ 1674 0578 0F       		.uleb128 0xf
+ 1675 0579 01       		.uleb128 0x1
+ 1676 057a 52       		.byte	0x52
+ 1677 057b 01       		.uleb128 0x1
+ 1678 057c 31       		.byte	0x31
+ 1679 057d 0F       		.uleb128 0xf
+ 1680 057e 01       		.uleb128 0x1
+ 1681 057f 51       		.byte	0x51
+ 1682 0580 02       		.uleb128 0x2
+ 1683 0581 7D       		.byte	0x7d
+ 1684 0582 07       		.sleb128 7
+ 1685 0583 0F       		.uleb128 0xf
+ 1686 0584 01       		.uleb128 0x1
+ 1687 0585 50       		.byte	0x50
+ 1688 0586 01       		.uleb128 0x1
+ 1689 0587 30       		.byte	0x30
+ 1690 0588 00       		.byte	0
+ 1691 0589 00       		.byte	0
+ 1692 058a 16       		.uleb128 0x16
+ 1693 058b 5E020000 		.4byte	.LASF46
+ 1694 058f 01       		.byte	0x1
+ 1695 0590 AB       		.byte	0xab
+ 1696 0591 A3000000 		.4byte	0xa3
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 36
+
+
+ 1697 0595 00000000 		.4byte	.LFB8
+ 1698 0599 74000000 		.4byte	.LFE8-.LFB8
+ 1699 059d 01       		.uleb128 0x1
+ 1700 059e 9C       		.byte	0x9c
+ 1701 059f 30060000 		.4byte	0x630
+ 1702 05a3 17       		.uleb128 0x17
+ 1703 05a4 9D010000 		.4byte	.LASF36
+ 1704 05a8 01       		.byte	0x1
+ 1705 05a9 AB       		.byte	0xab
+ 1706 05aa B9000000 		.4byte	0xb9
+ 1707 05ae 68020000 		.4byte	.LLST16
+ 1708 05b2 17       		.uleb128 0x17
+ 1709 05b3 20010000 		.4byte	.LASF37
+ 1710 05b7 01       		.byte	0x1
+ 1711 05b8 AB       		.byte	0xab
+ 1712 05b9 D1010000 		.4byte	0x1d1
+ 1713 05bd A2020000 		.4byte	.LLST17
+ 1714 05c1 17       		.uleb128 0x17
+ 1715 05c2 9B000000 		.4byte	.LASF38
+ 1716 05c6 01       		.byte	0x1
+ 1717 05c7 AB       		.byte	0xab
+ 1718 05c8 B9000000 		.4byte	0xb9
+ 1719 05cc DC020000 		.4byte	.LLST18
+ 1720 05d0 12       		.uleb128 0x12
+ 1721 05d1 FD020000 		.4byte	.LASF43
+ 1722 05d5 01       		.byte	0x1
+ 1723 05d6 AD       		.byte	0xad
+ 1724 05d7 30060000 		.4byte	0x630
+ 1725 05db 03       		.uleb128 0x3
+ 1726 05dc 91       		.byte	0x91
+ 1727 05dd E47E     		.sleb128 -156
+ 1728 05df 11       		.uleb128 0x11
+ 1729 05e0 3B030000 		.4byte	.LASF35
+ 1730 05e4 01       		.byte	0x1
+ 1731 05e5 AE       		.byte	0xae
+ 1732 05e6 B9000000 		.4byte	0xb9
+ 1733 05ea 08030000 		.4byte	.LLST19
+ 1734 05ee 11       		.uleb128 0x11
+ 1735 05ef BD020000 		.4byte	.LASF44
+ 1736 05f3 01       		.byte	0x1
+ 1737 05f4 AF       		.byte	0xaf
+ 1738 05f5 A3000000 		.4byte	0xa3
+ 1739 05f9 3C030000 		.4byte	.LLST20
+ 1740 05fd 1E       		.uleb128 0x1e
+ 1741 05fe 2C000000 		.4byte	.LVL78
+ 1742 0602 34080000 		.4byte	0x834
+ 1743 0606 17060000 		.4byte	0x617
+ 1744 060a 0F       		.uleb128 0xf
+ 1745 060b 01       		.uleb128 0x1
+ 1746 060c 52       		.byte	0x52
+ 1747 060d 02       		.uleb128 0x2
+ 1748 060e 75       		.byte	0x75
+ 1749 060f 00       		.sleb128 0
+ 1750 0610 0F       		.uleb128 0xf
+ 1751 0611 01       		.uleb128 0x1
+ 1752 0612 50       		.byte	0x50
+ 1753 0613 02       		.uleb128 0x2
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 37
+
+
+ 1754 0614 7D       		.byte	0x7d
+ 1755 0615 06       		.sleb128 6
+ 1756 0616 00       		.byte	0
+ 1757 0617 0E       		.uleb128 0xe
+ 1758 0618 40000000 		.4byte	.LVL80
+ 1759 061c 0F       		.uleb128 0xf
+ 1760 061d 01       		.uleb128 0x1
+ 1761 061e 52       		.byte	0x52
+ 1762 061f 02       		.uleb128 0x2
+ 1763 0620 75       		.byte	0x75
+ 1764 0621 02       		.sleb128 2
+ 1765 0622 0F       		.uleb128 0xf
+ 1766 0623 01       		.uleb128 0x1
+ 1767 0624 51       		.byte	0x51
+ 1768 0625 02       		.uleb128 0x2
+ 1769 0626 76       		.byte	0x76
+ 1770 0627 00       		.sleb128 0
+ 1771 0628 0F       		.uleb128 0xf
+ 1772 0629 01       		.uleb128 0x1
+ 1773 062a 50       		.byte	0x50
+ 1774 062b 02       		.uleb128 0x2
+ 1775 062c 74       		.byte	0x74
+ 1776 062d 00       		.sleb128 0
+ 1777 062e 00       		.byte	0
+ 1778 062f 00       		.byte	0
+ 1779 0630 1B       		.uleb128 0x1b
+ 1780 0631 A3000000 		.4byte	0xa3
+ 1781 0635 40060000 		.4byte	0x640
+ 1782 0639 1C       		.uleb128 0x1c
+ 1783 063a 93000000 		.4byte	0x93
+ 1784 063e 81       		.byte	0x81
+ 1785 063f 00       		.byte	0
+ 1786 0640 1F       		.uleb128 0x1f
+ 1787 0641 C8020000 		.4byte	.LASF48
+ 1788 0645 01       		.byte	0x1
+ 1789 0646 D8       		.byte	0xd8
+ 1790 0647 00000000 		.4byte	.LFB10
+ 1791 064b 2C000000 		.4byte	.LFE10-.LFB10
+ 1792 064f 01       		.uleb128 0x1
+ 1793 0650 9C       		.byte	0x9c
+ 1794 0651 64060000 		.4byte	0x664
+ 1795 0655 20       		.uleb128 0x20
+ 1796 0656 4A030000 		.4byte	.LASF47
+ 1797 065a 01       		.byte	0x1
+ 1798 065b D8       		.byte	0xd8
+ 1799 065c C4000000 		.4byte	0xc4
+ 1800 0660 02       		.uleb128 0x2
+ 1801 0661 91       		.byte	0x91
+ 1802 0662 70       		.sleb128 -16
+ 1803 0663 00       		.byte	0
+ 1804 0664 1F       		.uleb128 0x1f
+ 1805 0665 F5000000 		.4byte	.LASF49
+ 1806 0669 01       		.byte	0x1
+ 1807 066a DE       		.byte	0xde
+ 1808 066b 00000000 		.4byte	.LFB11
+ 1809 066f 30000000 		.4byte	.LFE11-.LFB11
+ 1810 0673 01       		.uleb128 0x1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 38
+
+
+ 1811 0674 9C       		.byte	0x9c
+ 1812 0675 88060000 		.4byte	0x688
+ 1813 0679 20       		.uleb128 0x20
+ 1814 067a DE000000 		.4byte	.LASF50
+ 1815 067e 01       		.byte	0x1
+ 1816 067f DE       		.byte	0xde
+ 1817 0680 3A010000 		.4byte	0x13a
+ 1818 0684 02       		.uleb128 0x2
+ 1819 0685 91       		.byte	0x91
+ 1820 0686 70       		.sleb128 -16
+ 1821 0687 00       		.byte	0
+ 1822 0688 21       		.uleb128 0x21
+ 1823 0689 75030000 		.4byte	.LASF61
+ 1824 068d 01       		.byte	0x1
+ 1825 068e E4       		.byte	0xe4
+ 1826 068f 00000000 		.4byte	.LFB12
+ 1827 0693 02000000 		.4byte	.LFE12-.LFB12
+ 1828 0697 01       		.uleb128 0x1
+ 1829 0698 9C       		.byte	0x9c
+ 1830 0699 22       		.uleb128 0x22
+ 1831 069a 2A030000 		.4byte	.LASF51
+ 1832 069e 01       		.byte	0x1
+ 1833 069f E9       		.byte	0xe9
+ 1834 06a0 A3000000 		.4byte	0xa3
+ 1835 06a4 00000000 		.4byte	.LFB13
+ 1836 06a8 1E000000 		.4byte	.LFE13-.LFB13
+ 1837 06ac 01       		.uleb128 0x1
+ 1838 06ad 9C       		.byte	0x9c
+ 1839 06ae D7060000 		.4byte	0x6d7
+ 1840 06b2 15       		.uleb128 0x15
+ 1841 06b3 06000000 		.4byte	.LVL91
+ 1842 06b7 09020000 		.4byte	0x209
+ 1843 06bb 15       		.uleb128 0x15
+ 1844 06bc 0E000000 		.4byte	.LVL92
+ 1845 06c0 5D020000 		.4byte	0x25d
+ 1846 06c4 15       		.uleb128 0x15
+ 1847 06c5 14000000 		.4byte	.LVL93
+ 1848 06c9 32020000 		.4byte	0x232
+ 1849 06cd 15       		.uleb128 0x15
+ 1850 06ce 1C000000 		.4byte	.LVL94
+ 1851 06d2 48050000 		.4byte	0x548
+ 1852 06d6 00       		.byte	0
+ 1853 06d7 23       		.uleb128 0x23
+ 1854 06d8 48000000 		.4byte	.LASF52
+ 1855 06dc 01       		.byte	0x1
+ 1856 06dd F3       		.byte	0xf3
+ 1857 06de A3000000 		.4byte	0xa3
+ 1858 06e2 00000000 		.4byte	.LFB14
+ 1859 06e6 30000000 		.4byte	.LFE14-.LFB14
+ 1860 06ea 01       		.uleb128 0x1
+ 1861 06eb 9C       		.byte	0x9c
+ 1862 06ec 6C070000 		.4byte	0x76c
+ 1863 06f0 17       		.uleb128 0x17
+ 1864 06f1 9D010000 		.4byte	.LASF36
+ 1865 06f5 01       		.byte	0x1
+ 1866 06f6 F3       		.byte	0xf3
+ 1867 06f7 B9000000 		.4byte	0xb9
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 39
+
+
+ 1868 06fb 72030000 		.4byte	.LLST21
+ 1869 06ff 17       		.uleb128 0x17
+ 1870 0700 20010000 		.4byte	.LASF37
+ 1871 0704 01       		.byte	0x1
+ 1872 0705 F3       		.byte	0xf3
+ 1873 0706 D1010000 		.4byte	0x1d1
+ 1874 070a 9E030000 		.4byte	.LLST22
+ 1875 070e 17       		.uleb128 0x17
+ 1876 070f 9B000000 		.4byte	.LASF38
+ 1877 0713 01       		.byte	0x1
+ 1878 0714 F3       		.byte	0xf3
+ 1879 0715 B9000000 		.4byte	0xb9
+ 1880 0719 CA030000 		.4byte	.LLST23
+ 1881 071d 15       		.uleb128 0x15
+ 1882 071e 0C000000 		.4byte	.LVL96
+ 1883 0722 09020000 		.4byte	0x209
+ 1884 0726 1E       		.uleb128 0x1e
+ 1885 0727 1A000000 		.4byte	.LVL97
+ 1886 072b AB020000 		.4byte	0x2ab
+ 1887 072f 46070000 		.4byte	0x746
+ 1888 0733 0F       		.uleb128 0xf
+ 1889 0734 01       		.uleb128 0x1
+ 1890 0735 52       		.byte	0x52
+ 1891 0736 02       		.uleb128 0x2
+ 1892 0737 74       		.byte	0x74
+ 1893 0738 00       		.sleb128 0
+ 1894 0739 0F       		.uleb128 0xf
+ 1895 073a 01       		.uleb128 0x1
+ 1896 073b 51       		.byte	0x51
+ 1897 073c 02       		.uleb128 0x2
+ 1898 073d 75       		.byte	0x75
+ 1899 073e 00       		.sleb128 0
+ 1900 073f 0F       		.uleb128 0xf
+ 1901 0740 01       		.uleb128 0x1
+ 1902 0741 50       		.byte	0x50
+ 1903 0742 02       		.uleb128 0x2
+ 1904 0743 76       		.byte	0x76
+ 1905 0744 00       		.sleb128 0
+ 1906 0745 00       		.byte	0
+ 1907 0746 15       		.uleb128 0x15
+ 1908 0747 20000000 		.4byte	.LVL98
+ 1909 074b 32020000 		.4byte	0x232
+ 1910 074f 1D       		.uleb128 0x1d
+ 1911 0750 2E000000 		.4byte	.LVL99
+ 1912 0754 73040000 		.4byte	0x473
+ 1913 0758 0F       		.uleb128 0xf
+ 1914 0759 01       		.uleb128 0x1
+ 1915 075a 52       		.byte	0x52
+ 1916 075b 02       		.uleb128 0x2
+ 1917 075c 74       		.byte	0x74
+ 1918 075d 00       		.sleb128 0
+ 1919 075e 0F       		.uleb128 0xf
+ 1920 075f 01       		.uleb128 0x1
+ 1921 0760 51       		.byte	0x51
+ 1922 0761 02       		.uleb128 0x2
+ 1923 0762 75       		.byte	0x75
+ 1924 0763 00       		.sleb128 0
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 40
+
+
+ 1925 0764 0F       		.uleb128 0xf
+ 1926 0765 01       		.uleb128 0x1
+ 1927 0766 50       		.byte	0x50
+ 1928 0767 02       		.uleb128 0x2
+ 1929 0768 76       		.byte	0x76
+ 1930 0769 00       		.sleb128 0
+ 1931 076a 00       		.byte	0
+ 1932 076b 00       		.byte	0
+ 1933 076c 23       		.uleb128 0x23
+ 1934 076d A6000000 		.4byte	.LASF53
+ 1935 0771 01       		.byte	0x1
+ 1936 0772 FE       		.byte	0xfe
+ 1937 0773 A3000000 		.4byte	0xa3
+ 1938 0777 00000000 		.4byte	.LFB15
+ 1939 077b 30000000 		.4byte	.LFE15-.LFB15
+ 1940 077f 01       		.uleb128 0x1
+ 1941 0780 9C       		.byte	0x9c
+ 1942 0781 01080000 		.4byte	0x801
+ 1943 0785 17       		.uleb128 0x17
+ 1944 0786 9D010000 		.4byte	.LASF36
+ 1945 078a 01       		.byte	0x1
+ 1946 078b FE       		.byte	0xfe
+ 1947 078c B9000000 		.4byte	0xb9
+ 1948 0790 F6030000 		.4byte	.LLST24
+ 1949 0794 17       		.uleb128 0x17
+ 1950 0795 20010000 		.4byte	.LASF37
+ 1951 0799 01       		.byte	0x1
+ 1952 079a FE       		.byte	0xfe
+ 1953 079b D1010000 		.4byte	0x1d1
+ 1954 079f 22040000 		.4byte	.LLST25
+ 1955 07a3 17       		.uleb128 0x17
+ 1956 07a4 9B000000 		.4byte	.LASF38
+ 1957 07a8 01       		.byte	0x1
+ 1958 07a9 FE       		.byte	0xfe
+ 1959 07aa B9000000 		.4byte	0xb9
+ 1960 07ae 4E040000 		.4byte	.LLST26
+ 1961 07b2 15       		.uleb128 0x15
+ 1962 07b3 0C000000 		.4byte	.LVL104
+ 1963 07b7 09020000 		.4byte	0x209
+ 1964 07bb 1E       		.uleb128 0x1e
+ 1965 07bc 1A000000 		.4byte	.LVL105
+ 1966 07c0 5A030000 		.4byte	0x35a
+ 1967 07c4 DB070000 		.4byte	0x7db
+ 1968 07c8 0F       		.uleb128 0xf
+ 1969 07c9 01       		.uleb128 0x1
+ 1970 07ca 52       		.byte	0x52
+ 1971 07cb 02       		.uleb128 0x2
+ 1972 07cc 74       		.byte	0x74
+ 1973 07cd 00       		.sleb128 0
+ 1974 07ce 0F       		.uleb128 0xf
+ 1975 07cf 01       		.uleb128 0x1
+ 1976 07d0 51       		.byte	0x51
+ 1977 07d1 02       		.uleb128 0x2
+ 1978 07d2 75       		.byte	0x75
+ 1979 07d3 00       		.sleb128 0
+ 1980 07d4 0F       		.uleb128 0xf
+ 1981 07d5 01       		.uleb128 0x1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 41
+
+
+ 1982 07d6 50       		.byte	0x50
+ 1983 07d7 02       		.uleb128 0x2
+ 1984 07d8 76       		.byte	0x76
+ 1985 07d9 00       		.sleb128 0
+ 1986 07da 00       		.byte	0
+ 1987 07db 15       		.uleb128 0x15
+ 1988 07dc 20000000 		.4byte	.LVL106
+ 1989 07e0 32020000 		.4byte	0x232
+ 1990 07e4 1D       		.uleb128 0x1d
+ 1991 07e5 2E000000 		.4byte	.LVL107
+ 1992 07e9 8A050000 		.4byte	0x58a
+ 1993 07ed 0F       		.uleb128 0xf
+ 1994 07ee 01       		.uleb128 0x1
+ 1995 07ef 52       		.byte	0x52
+ 1996 07f0 02       		.uleb128 0x2
+ 1997 07f1 74       		.byte	0x74
+ 1998 07f2 00       		.sleb128 0
+ 1999 07f3 0F       		.uleb128 0xf
+ 2000 07f4 01       		.uleb128 0x1
+ 2001 07f5 51       		.byte	0x51
+ 2002 07f6 02       		.uleb128 0x2
+ 2003 07f7 75       		.byte	0x75
+ 2004 07f8 00       		.sleb128 0
+ 2005 07f9 0F       		.uleb128 0xf
+ 2006 07fa 01       		.uleb128 0x1
+ 2007 07fb 50       		.byte	0x50
+ 2008 07fc 02       		.uleb128 0x2
+ 2009 07fd 76       		.byte	0x76
+ 2010 07fe 00       		.sleb128 0
+ 2011 07ff 00       		.byte	0
+ 2012 0800 00       		.byte	0
+ 2013 0801 12       		.uleb128 0x12
+ 2014 0802 43000000 		.4byte	.LASF54
+ 2015 0806 01       		.byte	0x1
+ 2016 0807 23       		.byte	0x23
+ 2017 0808 C4000000 		.4byte	0xc4
+ 2018 080c 05       		.uleb128 0x5
+ 2019 080d 03       		.byte	0x3
+ 2020 080e 00000000 		.4byte	_spi
+ 2021 0812 12       		.uleb128 0x12
+ 2022 0813 04030000 		.4byte	.LASF55
+ 2023 0817 01       		.byte	0x1
+ 2024 0818 24       		.byte	0x24
+ 2025 0819 3A010000 		.4byte	0x13a
+ 2026 081d 05       		.uleb128 0x5
+ 2027 081e 03       		.byte	0x3
+ 2028 081f 18000000 		.4byte	_i2c
+ 2029 0823 12       		.uleb128 0x12
+ 2030 0824 68030000 		.4byte	.LASF56
+ 2031 0828 01       		.byte	0x1
+ 2032 0829 25       		.byte	0x25
+ 2033 082a A3000000 		.4byte	0xa3
+ 2034 082e 05       		.uleb128 0x5
+ 2035 082f 03       		.byte	0x3
+ 2036 0830 14000000 		.4byte	_initialized
+ 2037 0834 24       		.uleb128 0x24
+ 2038 0835 6A000000 		.4byte	.LASF62
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 42
+
+
+ 2039 0839 9A000000 		.4byte	0x9a
+ 2040 083d 51080000 		.4byte	0x851
+ 2041 0841 09       		.uleb128 0x9
+ 2042 0842 9A000000 		.4byte	0x9a
+ 2043 0846 09       		.uleb128 0x9
+ 2044 0847 51080000 		.4byte	0x851
+ 2045 084b 09       		.uleb128 0x9
+ 2046 084c 93000000 		.4byte	0x93
+ 2047 0850 00       		.byte	0
+ 2048 0851 0A       		.uleb128 0xa
+ 2049 0852 04       		.byte	0x4
+ 2050 0853 57080000 		.4byte	0x857
+ 2051 0857 25       		.uleb128 0x25
+ 2052 0858 00       		.byte	0
+ 2053              		.section	.debug_abbrev,"",%progbits
+ 2054              	.Ldebug_abbrev0:
+ 2055 0000 01       		.uleb128 0x1
+ 2056 0001 11       		.uleb128 0x11
+ 2057 0002 01       		.byte	0x1
+ 2058 0003 25       		.uleb128 0x25
+ 2059 0004 0E       		.uleb128 0xe
+ 2060 0005 13       		.uleb128 0x13
+ 2061 0006 0B       		.uleb128 0xb
+ 2062 0007 03       		.uleb128 0x3
+ 2063 0008 0E       		.uleb128 0xe
+ 2064 0009 1B       		.uleb128 0x1b
+ 2065 000a 0E       		.uleb128 0xe
+ 2066 000b 55       		.uleb128 0x55
+ 2067 000c 17       		.uleb128 0x17
+ 2068 000d 11       		.uleb128 0x11
+ 2069 000e 01       		.uleb128 0x1
+ 2070 000f 10       		.uleb128 0x10
+ 2071 0010 17       		.uleb128 0x17
+ 2072 0011 00       		.byte	0
+ 2073 0012 00       		.byte	0
+ 2074 0013 02       		.uleb128 0x2
+ 2075 0014 24       		.uleb128 0x24
+ 2076 0015 00       		.byte	0
+ 2077 0016 0B       		.uleb128 0xb
+ 2078 0017 0B       		.uleb128 0xb
+ 2079 0018 3E       		.uleb128 0x3e
+ 2080 0019 0B       		.uleb128 0xb
+ 2081 001a 03       		.uleb128 0x3
+ 2082 001b 08       		.uleb128 0x8
+ 2083 001c 00       		.byte	0
+ 2084 001d 00       		.byte	0
+ 2085 001e 03       		.uleb128 0x3
+ 2086 001f 24       		.uleb128 0x24
+ 2087 0020 00       		.byte	0
+ 2088 0021 0B       		.uleb128 0xb
+ 2089 0022 0B       		.uleb128 0xb
+ 2090 0023 3E       		.uleb128 0x3e
+ 2091 0024 0B       		.uleb128 0xb
+ 2092 0025 03       		.uleb128 0x3
+ 2093 0026 0E       		.uleb128 0xe
+ 2094 0027 00       		.byte	0
+ 2095 0028 00       		.byte	0
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 43
+
+
+ 2096 0029 04       		.uleb128 0x4
+ 2097 002a 16       		.uleb128 0x16
+ 2098 002b 00       		.byte	0
+ 2099 002c 03       		.uleb128 0x3
+ 2100 002d 0E       		.uleb128 0xe
+ 2101 002e 3A       		.uleb128 0x3a
+ 2102 002f 0B       		.uleb128 0xb
+ 2103 0030 3B       		.uleb128 0x3b
+ 2104 0031 0B       		.uleb128 0xb
+ 2105 0032 49       		.uleb128 0x49
+ 2106 0033 13       		.uleb128 0x13
+ 2107 0034 00       		.byte	0
+ 2108 0035 00       		.byte	0
+ 2109 0036 05       		.uleb128 0x5
+ 2110 0037 0F       		.uleb128 0xf
+ 2111 0038 00       		.byte	0
+ 2112 0039 0B       		.uleb128 0xb
+ 2113 003a 0B       		.uleb128 0xb
+ 2114 003b 00       		.byte	0
+ 2115 003c 00       		.byte	0
+ 2116 003d 06       		.uleb128 0x6
+ 2117 003e 13       		.uleb128 0x13
+ 2118 003f 01       		.byte	0x1
+ 2119 0040 03       		.uleb128 0x3
+ 2120 0041 0E       		.uleb128 0xe
+ 2121 0042 0B       		.uleb128 0xb
+ 2122 0043 0B       		.uleb128 0xb
+ 2123 0044 3A       		.uleb128 0x3a
+ 2124 0045 0B       		.uleb128 0xb
+ 2125 0046 3B       		.uleb128 0x3b
+ 2126 0047 0B       		.uleb128 0xb
+ 2127 0048 01       		.uleb128 0x1
+ 2128 0049 13       		.uleb128 0x13
+ 2129 004a 00       		.byte	0
+ 2130 004b 00       		.byte	0
+ 2131 004c 07       		.uleb128 0x7
+ 2132 004d 0D       		.uleb128 0xd
+ 2133 004e 00       		.byte	0
+ 2134 004f 03       		.uleb128 0x3
+ 2135 0050 0E       		.uleb128 0xe
+ 2136 0051 3A       		.uleb128 0x3a
+ 2137 0052 0B       		.uleb128 0xb
+ 2138 0053 3B       		.uleb128 0x3b
+ 2139 0054 0B       		.uleb128 0xb
+ 2140 0055 49       		.uleb128 0x49
+ 2141 0056 13       		.uleb128 0x13
+ 2142 0057 38       		.uleb128 0x38
+ 2143 0058 0B       		.uleb128 0xb
+ 2144 0059 00       		.byte	0
+ 2145 005a 00       		.byte	0
+ 2146 005b 08       		.uleb128 0x8
+ 2147 005c 15       		.uleb128 0x15
+ 2148 005d 01       		.byte	0x1
+ 2149 005e 27       		.uleb128 0x27
+ 2150 005f 19       		.uleb128 0x19
+ 2151 0060 01       		.uleb128 0x1
+ 2152 0061 13       		.uleb128 0x13
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 44
+
+
+ 2153 0062 00       		.byte	0
+ 2154 0063 00       		.byte	0
+ 2155 0064 09       		.uleb128 0x9
+ 2156 0065 05       		.uleb128 0x5
+ 2157 0066 00       		.byte	0
+ 2158 0067 49       		.uleb128 0x49
+ 2159 0068 13       		.uleb128 0x13
+ 2160 0069 00       		.byte	0
+ 2161 006a 00       		.byte	0
+ 2162 006b 0A       		.uleb128 0xa
+ 2163 006c 0F       		.uleb128 0xf
+ 2164 006d 00       		.byte	0
+ 2165 006e 0B       		.uleb128 0xb
+ 2166 006f 0B       		.uleb128 0xb
+ 2167 0070 49       		.uleb128 0x49
+ 2168 0071 13       		.uleb128 0x13
+ 2169 0072 00       		.byte	0
+ 2170 0073 00       		.byte	0
+ 2171 0074 0B       		.uleb128 0xb
+ 2172 0075 15       		.uleb128 0x15
+ 2173 0076 00       		.byte	0
+ 2174 0077 27       		.uleb128 0x27
+ 2175 0078 19       		.uleb128 0x19
+ 2176 0079 49       		.uleb128 0x49
+ 2177 007a 13       		.uleb128 0x13
+ 2178 007b 00       		.byte	0
+ 2179 007c 00       		.byte	0
+ 2180 007d 0C       		.uleb128 0xc
+ 2181 007e 15       		.uleb128 0x15
+ 2182 007f 01       		.byte	0x1
+ 2183 0080 27       		.uleb128 0x27
+ 2184 0081 19       		.uleb128 0x19
+ 2185 0082 49       		.uleb128 0x49
+ 2186 0083 13       		.uleb128 0x13
+ 2187 0084 01       		.uleb128 0x1
+ 2188 0085 13       		.uleb128 0x13
+ 2189 0086 00       		.byte	0
+ 2190 0087 00       		.byte	0
+ 2191 0088 0D       		.uleb128 0xd
+ 2192 0089 2E       		.uleb128 0x2e
+ 2193 008a 01       		.byte	0x1
+ 2194 008b 03       		.uleb128 0x3
+ 2195 008c 0E       		.uleb128 0xe
+ 2196 008d 3A       		.uleb128 0x3a
+ 2197 008e 0B       		.uleb128 0xb
+ 2198 008f 3B       		.uleb128 0x3b
+ 2199 0090 0B       		.uleb128 0xb
+ 2200 0091 11       		.uleb128 0x11
+ 2201 0092 01       		.uleb128 0x1
+ 2202 0093 12       		.uleb128 0x12
+ 2203 0094 06       		.uleb128 0x6
+ 2204 0095 40       		.uleb128 0x40
+ 2205 0096 18       		.uleb128 0x18
+ 2206 0097 9642     		.uleb128 0x2116
+ 2207 0099 19       		.uleb128 0x19
+ 2208 009a 01       		.uleb128 0x1
+ 2209 009b 13       		.uleb128 0x13
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 45
+
+
+ 2210 009c 00       		.byte	0
+ 2211 009d 00       		.byte	0
+ 2212 009e 0E       		.uleb128 0xe
+ 2213 009f 898201   		.uleb128 0x4109
+ 2214 00a2 01       		.byte	0x1
+ 2215 00a3 11       		.uleb128 0x11
+ 2216 00a4 01       		.uleb128 0x1
+ 2217 00a5 00       		.byte	0
+ 2218 00a6 00       		.byte	0
+ 2219 00a7 0F       		.uleb128 0xf
+ 2220 00a8 8A8201   		.uleb128 0x410a
+ 2221 00ab 00       		.byte	0
+ 2222 00ac 02       		.uleb128 0x2
+ 2223 00ad 18       		.uleb128 0x18
+ 2224 00ae 9142     		.uleb128 0x2111
+ 2225 00b0 18       		.uleb128 0x18
+ 2226 00b1 00       		.byte	0
+ 2227 00b2 00       		.byte	0
+ 2228 00b3 10       		.uleb128 0x10
+ 2229 00b4 2E       		.uleb128 0x2e
+ 2230 00b5 01       		.byte	0x1
+ 2231 00b6 03       		.uleb128 0x3
+ 2232 00b7 0E       		.uleb128 0xe
+ 2233 00b8 3A       		.uleb128 0x3a
+ 2234 00b9 0B       		.uleb128 0xb
+ 2235 00ba 3B       		.uleb128 0x3b
+ 2236 00bb 0B       		.uleb128 0xb
+ 2237 00bc 49       		.uleb128 0x49
+ 2238 00bd 13       		.uleb128 0x13
+ 2239 00be 11       		.uleb128 0x11
+ 2240 00bf 01       		.uleb128 0x1
+ 2241 00c0 12       		.uleb128 0x12
+ 2242 00c1 06       		.uleb128 0x6
+ 2243 00c2 40       		.uleb128 0x40
+ 2244 00c3 18       		.uleb128 0x18
+ 2245 00c4 9742     		.uleb128 0x2117
+ 2246 00c6 19       		.uleb128 0x19
+ 2247 00c7 01       		.uleb128 0x1
+ 2248 00c8 13       		.uleb128 0x13
+ 2249 00c9 00       		.byte	0
+ 2250 00ca 00       		.byte	0
+ 2251 00cb 11       		.uleb128 0x11
+ 2252 00cc 34       		.uleb128 0x34
+ 2253 00cd 00       		.byte	0
+ 2254 00ce 03       		.uleb128 0x3
+ 2255 00cf 0E       		.uleb128 0xe
+ 2256 00d0 3A       		.uleb128 0x3a
+ 2257 00d1 0B       		.uleb128 0xb
+ 2258 00d2 3B       		.uleb128 0x3b
+ 2259 00d3 0B       		.uleb128 0xb
+ 2260 00d4 49       		.uleb128 0x49
+ 2261 00d5 13       		.uleb128 0x13
+ 2262 00d6 02       		.uleb128 0x2
+ 2263 00d7 17       		.uleb128 0x17
+ 2264 00d8 00       		.byte	0
+ 2265 00d9 00       		.byte	0
+ 2266 00da 12       		.uleb128 0x12
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 46
+
+
+ 2267 00db 34       		.uleb128 0x34
+ 2268 00dc 00       		.byte	0
+ 2269 00dd 03       		.uleb128 0x3
+ 2270 00de 0E       		.uleb128 0xe
+ 2271 00df 3A       		.uleb128 0x3a
+ 2272 00e0 0B       		.uleb128 0xb
+ 2273 00e1 3B       		.uleb128 0x3b
+ 2274 00e2 0B       		.uleb128 0xb
+ 2275 00e3 49       		.uleb128 0x49
+ 2276 00e4 13       		.uleb128 0x13
+ 2277 00e5 02       		.uleb128 0x2
+ 2278 00e6 18       		.uleb128 0x18
+ 2279 00e7 00       		.byte	0
+ 2280 00e8 00       		.byte	0
+ 2281 00e9 13       		.uleb128 0x13
+ 2282 00ea 2E       		.uleb128 0x2e
+ 2283 00eb 01       		.byte	0x1
+ 2284 00ec 03       		.uleb128 0x3
+ 2285 00ed 0E       		.uleb128 0xe
+ 2286 00ee 3A       		.uleb128 0x3a
+ 2287 00ef 0B       		.uleb128 0xb
+ 2288 00f0 3B       		.uleb128 0x3b
+ 2289 00f1 0B       		.uleb128 0xb
+ 2290 00f2 49       		.uleb128 0x49
+ 2291 00f3 13       		.uleb128 0x13
+ 2292 00f4 11       		.uleb128 0x11
+ 2293 00f5 01       		.uleb128 0x1
+ 2294 00f6 12       		.uleb128 0x12
+ 2295 00f7 06       		.uleb128 0x6
+ 2296 00f8 40       		.uleb128 0x40
+ 2297 00f9 18       		.uleb128 0x18
+ 2298 00fa 9642     		.uleb128 0x2116
+ 2299 00fc 19       		.uleb128 0x19
+ 2300 00fd 01       		.uleb128 0x1
+ 2301 00fe 13       		.uleb128 0x13
+ 2302 00ff 00       		.byte	0
+ 2303 0100 00       		.byte	0
+ 2304 0101 14       		.uleb128 0x14
+ 2305 0102 898201   		.uleb128 0x4109
+ 2306 0105 01       		.byte	0x1
+ 2307 0106 11       		.uleb128 0x11
+ 2308 0107 01       		.uleb128 0x1
+ 2309 0108 01       		.uleb128 0x1
+ 2310 0109 13       		.uleb128 0x13
+ 2311 010a 00       		.byte	0
+ 2312 010b 00       		.byte	0
+ 2313 010c 15       		.uleb128 0x15
+ 2314 010d 898201   		.uleb128 0x4109
+ 2315 0110 00       		.byte	0
+ 2316 0111 11       		.uleb128 0x11
+ 2317 0112 01       		.uleb128 0x1
+ 2318 0113 31       		.uleb128 0x31
+ 2319 0114 13       		.uleb128 0x13
+ 2320 0115 00       		.byte	0
+ 2321 0116 00       		.byte	0
+ 2322 0117 16       		.uleb128 0x16
+ 2323 0118 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 47
+
+
+ 2324 0119 01       		.byte	0x1
+ 2325 011a 03       		.uleb128 0x3
+ 2326 011b 0E       		.uleb128 0xe
+ 2327 011c 3A       		.uleb128 0x3a
+ 2328 011d 0B       		.uleb128 0xb
+ 2329 011e 3B       		.uleb128 0x3b
+ 2330 011f 0B       		.uleb128 0xb
+ 2331 0120 27       		.uleb128 0x27
+ 2332 0121 19       		.uleb128 0x19
+ 2333 0122 49       		.uleb128 0x49
+ 2334 0123 13       		.uleb128 0x13
+ 2335 0124 11       		.uleb128 0x11
+ 2336 0125 01       		.uleb128 0x1
+ 2337 0126 12       		.uleb128 0x12
+ 2338 0127 06       		.uleb128 0x6
+ 2339 0128 40       		.uleb128 0x40
+ 2340 0129 18       		.uleb128 0x18
+ 2341 012a 9642     		.uleb128 0x2116
+ 2342 012c 19       		.uleb128 0x19
+ 2343 012d 01       		.uleb128 0x1
+ 2344 012e 13       		.uleb128 0x13
+ 2345 012f 00       		.byte	0
+ 2346 0130 00       		.byte	0
+ 2347 0131 17       		.uleb128 0x17
+ 2348 0132 05       		.uleb128 0x5
+ 2349 0133 00       		.byte	0
+ 2350 0134 03       		.uleb128 0x3
+ 2351 0135 0E       		.uleb128 0xe
+ 2352 0136 3A       		.uleb128 0x3a
+ 2353 0137 0B       		.uleb128 0xb
+ 2354 0138 3B       		.uleb128 0x3b
+ 2355 0139 0B       		.uleb128 0xb
+ 2356 013a 49       		.uleb128 0x49
+ 2357 013b 13       		.uleb128 0x13
+ 2358 013c 02       		.uleb128 0x2
+ 2359 013d 17       		.uleb128 0x17
+ 2360 013e 00       		.byte	0
+ 2361 013f 00       		.byte	0
+ 2362 0140 18       		.uleb128 0x18
+ 2363 0141 34       		.uleb128 0x34
+ 2364 0142 00       		.byte	0
+ 2365 0143 03       		.uleb128 0x3
+ 2366 0144 08       		.uleb128 0x8
+ 2367 0145 3A       		.uleb128 0x3a
+ 2368 0146 0B       		.uleb128 0xb
+ 2369 0147 3B       		.uleb128 0x3b
+ 2370 0148 0B       		.uleb128 0xb
+ 2371 0149 49       		.uleb128 0x49
+ 2372 014a 13       		.uleb128 0x13
+ 2373 014b 02       		.uleb128 0x2
+ 2374 014c 17       		.uleb128 0x17
+ 2375 014d 00       		.byte	0
+ 2376 014e 00       		.byte	0
+ 2377 014f 19       		.uleb128 0x19
+ 2378 0150 0B       		.uleb128 0xb
+ 2379 0151 01       		.byte	0x1
+ 2380 0152 11       		.uleb128 0x11
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 48
+
+
+ 2381 0153 01       		.uleb128 0x1
+ 2382 0154 12       		.uleb128 0x12
+ 2383 0155 06       		.uleb128 0x6
+ 2384 0156 01       		.uleb128 0x1
+ 2385 0157 13       		.uleb128 0x13
+ 2386 0158 00       		.byte	0
+ 2387 0159 00       		.byte	0
+ 2388 015a 1A       		.uleb128 0x1a
+ 2389 015b 898201   		.uleb128 0x4109
+ 2390 015e 01       		.byte	0x1
+ 2391 015f 11       		.uleb128 0x11
+ 2392 0160 01       		.uleb128 0x1
+ 2393 0161 9342     		.uleb128 0x2113
+ 2394 0163 18       		.uleb128 0x18
+ 2395 0164 01       		.uleb128 0x1
+ 2396 0165 13       		.uleb128 0x13
+ 2397 0166 00       		.byte	0
+ 2398 0167 00       		.byte	0
+ 2399 0168 1B       		.uleb128 0x1b
+ 2400 0169 01       		.uleb128 0x1
+ 2401 016a 01       		.byte	0x1
+ 2402 016b 49       		.uleb128 0x49
+ 2403 016c 13       		.uleb128 0x13
+ 2404 016d 01       		.uleb128 0x1
+ 2405 016e 13       		.uleb128 0x13
+ 2406 016f 00       		.byte	0
+ 2407 0170 00       		.byte	0
+ 2408 0171 1C       		.uleb128 0x1c
+ 2409 0172 21       		.uleb128 0x21
+ 2410 0173 00       		.byte	0
+ 2411 0174 49       		.uleb128 0x49
+ 2412 0175 13       		.uleb128 0x13
+ 2413 0176 2F       		.uleb128 0x2f
+ 2414 0177 0B       		.uleb128 0xb
+ 2415 0178 00       		.byte	0
+ 2416 0179 00       		.byte	0
+ 2417 017a 1D       		.uleb128 0x1d
+ 2418 017b 898201   		.uleb128 0x4109
+ 2419 017e 01       		.byte	0x1
+ 2420 017f 11       		.uleb128 0x11
+ 2421 0180 01       		.uleb128 0x1
+ 2422 0181 31       		.uleb128 0x31
+ 2423 0182 13       		.uleb128 0x13
+ 2424 0183 00       		.byte	0
+ 2425 0184 00       		.byte	0
+ 2426 0185 1E       		.uleb128 0x1e
+ 2427 0186 898201   		.uleb128 0x4109
+ 2428 0189 01       		.byte	0x1
+ 2429 018a 11       		.uleb128 0x11
+ 2430 018b 01       		.uleb128 0x1
+ 2431 018c 31       		.uleb128 0x31
+ 2432 018d 13       		.uleb128 0x13
+ 2433 018e 01       		.uleb128 0x1
+ 2434 018f 13       		.uleb128 0x13
+ 2435 0190 00       		.byte	0
+ 2436 0191 00       		.byte	0
+ 2437 0192 1F       		.uleb128 0x1f
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 49
+
+
+ 2438 0193 2E       		.uleb128 0x2e
+ 2439 0194 01       		.byte	0x1
+ 2440 0195 3F       		.uleb128 0x3f
+ 2441 0196 19       		.uleb128 0x19
+ 2442 0197 03       		.uleb128 0x3
+ 2443 0198 0E       		.uleb128 0xe
+ 2444 0199 3A       		.uleb128 0x3a
+ 2445 019a 0B       		.uleb128 0xb
+ 2446 019b 3B       		.uleb128 0x3b
+ 2447 019c 0B       		.uleb128 0xb
+ 2448 019d 27       		.uleb128 0x27
+ 2449 019e 19       		.uleb128 0x19
+ 2450 019f 11       		.uleb128 0x11
+ 2451 01a0 01       		.uleb128 0x1
+ 2452 01a1 12       		.uleb128 0x12
+ 2453 01a2 06       		.uleb128 0x6
+ 2454 01a3 40       		.uleb128 0x40
+ 2455 01a4 18       		.uleb128 0x18
+ 2456 01a5 9742     		.uleb128 0x2117
+ 2457 01a7 19       		.uleb128 0x19
+ 2458 01a8 01       		.uleb128 0x1
+ 2459 01a9 13       		.uleb128 0x13
+ 2460 01aa 00       		.byte	0
+ 2461 01ab 00       		.byte	0
+ 2462 01ac 20       		.uleb128 0x20
+ 2463 01ad 05       		.uleb128 0x5
+ 2464 01ae 00       		.byte	0
+ 2465 01af 03       		.uleb128 0x3
+ 2466 01b0 0E       		.uleb128 0xe
+ 2467 01b1 3A       		.uleb128 0x3a
+ 2468 01b2 0B       		.uleb128 0xb
+ 2469 01b3 3B       		.uleb128 0x3b
+ 2470 01b4 0B       		.uleb128 0xb
+ 2471 01b5 49       		.uleb128 0x49
+ 2472 01b6 13       		.uleb128 0x13
+ 2473 01b7 02       		.uleb128 0x2
+ 2474 01b8 18       		.uleb128 0x18
+ 2475 01b9 00       		.byte	0
+ 2476 01ba 00       		.byte	0
+ 2477 01bb 21       		.uleb128 0x21
+ 2478 01bc 2E       		.uleb128 0x2e
+ 2479 01bd 00       		.byte	0
+ 2480 01be 3F       		.uleb128 0x3f
+ 2481 01bf 19       		.uleb128 0x19
+ 2482 01c0 03       		.uleb128 0x3
+ 2483 01c1 0E       		.uleb128 0xe
+ 2484 01c2 3A       		.uleb128 0x3a
+ 2485 01c3 0B       		.uleb128 0xb
+ 2486 01c4 3B       		.uleb128 0x3b
+ 2487 01c5 0B       		.uleb128 0xb
+ 2488 01c6 11       		.uleb128 0x11
+ 2489 01c7 01       		.uleb128 0x1
+ 2490 01c8 12       		.uleb128 0x12
+ 2491 01c9 06       		.uleb128 0x6
+ 2492 01ca 40       		.uleb128 0x40
+ 2493 01cb 18       		.uleb128 0x18
+ 2494 01cc 9742     		.uleb128 0x2117
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 50
+
+
+ 2495 01ce 19       		.uleb128 0x19
+ 2496 01cf 00       		.byte	0
+ 2497 01d0 00       		.byte	0
+ 2498 01d1 22       		.uleb128 0x22
+ 2499 01d2 2E       		.uleb128 0x2e
+ 2500 01d3 01       		.byte	0x1
+ 2501 01d4 3F       		.uleb128 0x3f
+ 2502 01d5 19       		.uleb128 0x19
+ 2503 01d6 03       		.uleb128 0x3
+ 2504 01d7 0E       		.uleb128 0xe
+ 2505 01d8 3A       		.uleb128 0x3a
+ 2506 01d9 0B       		.uleb128 0xb
+ 2507 01da 3B       		.uleb128 0x3b
+ 2508 01db 0B       		.uleb128 0xb
+ 2509 01dc 49       		.uleb128 0x49
+ 2510 01dd 13       		.uleb128 0x13
+ 2511 01de 11       		.uleb128 0x11
+ 2512 01df 01       		.uleb128 0x1
+ 2513 01e0 12       		.uleb128 0x12
+ 2514 01e1 06       		.uleb128 0x6
+ 2515 01e2 40       		.uleb128 0x40
+ 2516 01e3 18       		.uleb128 0x18
+ 2517 01e4 9742     		.uleb128 0x2117
+ 2518 01e6 19       		.uleb128 0x19
+ 2519 01e7 01       		.uleb128 0x1
+ 2520 01e8 13       		.uleb128 0x13
+ 2521 01e9 00       		.byte	0
+ 2522 01ea 00       		.byte	0
+ 2523 01eb 23       		.uleb128 0x23
+ 2524 01ec 2E       		.uleb128 0x2e
+ 2525 01ed 01       		.byte	0x1
+ 2526 01ee 3F       		.uleb128 0x3f
+ 2527 01ef 19       		.uleb128 0x19
+ 2528 01f0 03       		.uleb128 0x3
+ 2529 01f1 0E       		.uleb128 0xe
+ 2530 01f2 3A       		.uleb128 0x3a
+ 2531 01f3 0B       		.uleb128 0xb
+ 2532 01f4 3B       		.uleb128 0x3b
+ 2533 01f5 0B       		.uleb128 0xb
+ 2534 01f6 27       		.uleb128 0x27
+ 2535 01f7 19       		.uleb128 0x19
+ 2536 01f8 49       		.uleb128 0x49
+ 2537 01f9 13       		.uleb128 0x13
+ 2538 01fa 11       		.uleb128 0x11
+ 2539 01fb 01       		.uleb128 0x1
+ 2540 01fc 12       		.uleb128 0x12
+ 2541 01fd 06       		.uleb128 0x6
+ 2542 01fe 40       		.uleb128 0x40
+ 2543 01ff 18       		.uleb128 0x18
+ 2544 0200 9742     		.uleb128 0x2117
+ 2545 0202 19       		.uleb128 0x19
+ 2546 0203 01       		.uleb128 0x1
+ 2547 0204 13       		.uleb128 0x13
+ 2548 0205 00       		.byte	0
+ 2549 0206 00       		.byte	0
+ 2550 0207 24       		.uleb128 0x24
+ 2551 0208 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 51
+
+
+ 2552 0209 01       		.byte	0x1
+ 2553 020a 3F       		.uleb128 0x3f
+ 2554 020b 19       		.uleb128 0x19
+ 2555 020c 03       		.uleb128 0x3
+ 2556 020d 0E       		.uleb128 0xe
+ 2557 020e 27       		.uleb128 0x27
+ 2558 020f 19       		.uleb128 0x19
+ 2559 0210 49       		.uleb128 0x49
+ 2560 0211 13       		.uleb128 0x13
+ 2561 0212 34       		.uleb128 0x34
+ 2562 0213 19       		.uleb128 0x19
+ 2563 0214 3C       		.uleb128 0x3c
+ 2564 0215 19       		.uleb128 0x19
+ 2565 0216 01       		.uleb128 0x1
+ 2566 0217 13       		.uleb128 0x13
+ 2567 0218 00       		.byte	0
+ 2568 0219 00       		.byte	0
+ 2569 021a 25       		.uleb128 0x25
+ 2570 021b 26       		.uleb128 0x26
+ 2571 021c 00       		.byte	0
+ 2572 021d 00       		.byte	0
+ 2573 021e 00       		.byte	0
+ 2574 021f 00       		.byte	0
+ 2575              		.section	.debug_loc,"",%progbits
+ 2576              	.Ldebug_loc0:
+ 2577              	.LLST0:
+ 2578 0000 08000000 		.4byte	.LVL2
+ 2579 0004 0A000000 		.4byte	.LVL3
+ 2580 0008 0100     		.2byte	0x1
+ 2581 000a 50       		.byte	0x50
+ 2582 000b 0A000000 		.4byte	.LVL3
+ 2583 000f 0E000000 		.4byte	.LVL4
+ 2584 0013 0300     		.2byte	0x3
+ 2585 0015 70       		.byte	0x70
+ 2586 0016 03       		.sleb128 3
+ 2587 0017 9F       		.byte	0x9f
+ 2588 0018 0E000000 		.4byte	.LVL4
+ 2589 001c 18000000 		.4byte	.LFE1
+ 2590 0020 0A00     		.2byte	0xa
+ 2591 0022 03       		.byte	0x3
+ 2592 0023 14000000 		.4byte	_initialized
+ 2593 0027 94       		.byte	0x94
+ 2594 0028 01       		.byte	0x1
+ 2595 0029 33       		.byte	0x33
+ 2596 002a 1A       		.byte	0x1a
+ 2597 002b 9F       		.byte	0x9f
+ 2598 002c 00000000 		.4byte	0
+ 2599 0030 00000000 		.4byte	0
+ 2600              	.LLST1:
+ 2601 0034 00000000 		.4byte	.LVL11
+ 2602 0038 0C000000 		.4byte	.LVL12
+ 2603 003c 0100     		.2byte	0x1
+ 2604 003e 50       		.byte	0x50
+ 2605 003f 0C000000 		.4byte	.LVL12
+ 2606 0043 28000000 		.4byte	.LVL17
+ 2607 0047 0100     		.2byte	0x1
+ 2608 0049 54       		.byte	0x54
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 52
+
+
+ 2609 004a 28000000 		.4byte	.LVL17
+ 2610 004e 6C000000 		.4byte	.LFE4
+ 2611 0052 0400     		.2byte	0x4
+ 2612 0054 F3       		.byte	0xf3
+ 2613 0055 01       		.uleb128 0x1
+ 2614 0056 50       		.byte	0x50
+ 2615 0057 9F       		.byte	0x9f
+ 2616 0058 00000000 		.4byte	0
+ 2617 005c 00000000 		.4byte	0
+ 2618              	.LLST2:
+ 2619 0060 00000000 		.4byte	.LVL11
+ 2620 0064 0F000000 		.4byte	.LVL13-1
+ 2621 0068 0100     		.2byte	0x1
+ 2622 006a 51       		.byte	0x51
+ 2623 006b 0F000000 		.4byte	.LVL13-1
+ 2624 006f 64000000 		.4byte	.LVL32
+ 2625 0073 0100     		.2byte	0x1
+ 2626 0075 57       		.byte	0x57
+ 2627 0076 64000000 		.4byte	.LVL32
+ 2628 007a 6C000000 		.4byte	.LFE4
+ 2629 007e 0400     		.2byte	0x4
+ 2630 0080 F3       		.byte	0xf3
+ 2631 0081 01       		.uleb128 0x1
+ 2632 0082 51       		.byte	0x51
+ 2633 0083 9F       		.byte	0x9f
+ 2634 0084 00000000 		.4byte	0
+ 2635 0088 00000000 		.4byte	0
+ 2636              	.LLST3:
+ 2637 008c 00000000 		.4byte	.LVL11
+ 2638 0090 0F000000 		.4byte	.LVL13-1
+ 2639 0094 0100     		.2byte	0x1
+ 2640 0096 52       		.byte	0x52
+ 2641 0097 0F000000 		.4byte	.LVL13-1
+ 2642 009b 64000000 		.4byte	.LVL31
+ 2643 009f 0100     		.2byte	0x1
+ 2644 00a1 55       		.byte	0x55
+ 2645 00a2 64000000 		.4byte	.LVL31
+ 2646 00a6 6C000000 		.4byte	.LFE4
+ 2647 00aa 0400     		.2byte	0x4
+ 2648 00ac F3       		.byte	0xf3
+ 2649 00ad 01       		.uleb128 0x1
+ 2650 00ae 52       		.byte	0x52
+ 2651 00af 9F       		.byte	0x9f
+ 2652 00b0 00000000 		.4byte	0
+ 2653 00b4 00000000 		.4byte	0
+ 2654              	.LLST4:
+ 2655 00b8 26000000 		.4byte	.LVL16
+ 2656 00bc 2A000000 		.4byte	.LVL18
+ 2657 00c0 0200     		.2byte	0x2
+ 2658 00c2 30       		.byte	0x30
+ 2659 00c3 9F       		.byte	0x9f
+ 2660 00c4 2A000000 		.4byte	.LVL18
+ 2661 00c8 3E000000 		.4byte	.LVL22
+ 2662 00cc 0100     		.2byte	0x1
+ 2663 00ce 54       		.byte	0x54
+ 2664 00cf 4E000000 		.4byte	.LVL26
+ 2665 00d3 52000000 		.4byte	.LVL27
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 53
+
+
+ 2666 00d7 0200     		.2byte	0x2
+ 2667 00d9 30       		.byte	0x30
+ 2668 00da 9F       		.byte	0x9f
+ 2669 00db 52000000 		.4byte	.LVL27
+ 2670 00df 64000000 		.4byte	.LVL30
+ 2671 00e3 0100     		.2byte	0x1
+ 2672 00e5 54       		.byte	0x54
+ 2673 00e6 00000000 		.4byte	0
+ 2674 00ea 00000000 		.4byte	0
+ 2675              	.LLST5:
+ 2676 00ee 00000000 		.4byte	.LVL33
+ 2677 00f2 0C000000 		.4byte	.LVL34
+ 2678 00f6 0100     		.2byte	0x1
+ 2679 00f8 50       		.byte	0x50
+ 2680 00f9 0C000000 		.4byte	.LVL34
+ 2681 00fd 64000000 		.4byte	.LVL54
+ 2682 0101 0100     		.2byte	0x1
+ 2683 0103 57       		.byte	0x57
+ 2684 0104 64000000 		.4byte	.LVL54
+ 2685 0108 6C000000 		.4byte	.LFE5
+ 2686 010c 0400     		.2byte	0x4
+ 2687 010e F3       		.byte	0xf3
+ 2688 010f 01       		.uleb128 0x1
+ 2689 0110 50       		.byte	0x50
+ 2690 0111 9F       		.byte	0x9f
+ 2691 0112 00000000 		.4byte	0
+ 2692 0116 00000000 		.4byte	0
+ 2693              	.LLST6:
+ 2694 011a 00000000 		.4byte	.LVL33
+ 2695 011e 0F000000 		.4byte	.LVL35-1
+ 2696 0122 0100     		.2byte	0x1
+ 2697 0124 51       		.byte	0x51
+ 2698 0125 0F000000 		.4byte	.LVL35-1
+ 2699 0129 64000000 		.4byte	.LVL53
+ 2700 012d 0100     		.2byte	0x1
+ 2701 012f 56       		.byte	0x56
+ 2702 0130 64000000 		.4byte	.LVL53
+ 2703 0134 6C000000 		.4byte	.LFE5
+ 2704 0138 0400     		.2byte	0x4
+ 2705 013a F3       		.byte	0xf3
+ 2706 013b 01       		.uleb128 0x1
+ 2707 013c 51       		.byte	0x51
+ 2708 013d 9F       		.byte	0x9f
+ 2709 013e 00000000 		.4byte	0
+ 2710 0142 00000000 		.4byte	0
+ 2711              	.LLST7:
+ 2712 0146 00000000 		.4byte	.LVL33
+ 2713 014a 0F000000 		.4byte	.LVL35-1
+ 2714 014e 0100     		.2byte	0x1
+ 2715 0150 52       		.byte	0x52
+ 2716 0151 0F000000 		.4byte	.LVL35-1
+ 2717 0155 64000000 		.4byte	.LVL52
+ 2718 0159 0100     		.2byte	0x1
+ 2719 015b 55       		.byte	0x55
+ 2720 015c 64000000 		.4byte	.LVL52
+ 2721 0160 6C000000 		.4byte	.LFE5
+ 2722 0164 0300     		.2byte	0x3
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 54
+
+
+ 2723 0166 73       		.byte	0x73
+ 2724 0167 7C       		.sleb128 -4
+ 2725 0168 9F       		.byte	0x9f
+ 2726 0169 00000000 		.4byte	0
+ 2727 016d 00000000 		.4byte	0
+ 2728              	.LLST8:
+ 2729 0171 3A000000 		.4byte	.LVL42
+ 2730 0175 3E000000 		.4byte	.LVL43
+ 2731 0179 0200     		.2byte	0x2
+ 2732 017b 30       		.byte	0x30
+ 2733 017c 9F       		.byte	0x9f
+ 2734 017d 3E000000 		.4byte	.LVL43
+ 2735 0181 52000000 		.4byte	.LVL47
+ 2736 0185 0100     		.2byte	0x1
+ 2737 0187 54       		.byte	0x54
+ 2738 0188 00000000 		.4byte	0
+ 2739 018c 00000000 		.4byte	0
+ 2740              	.LLST9:
+ 2741 0190 50000000 		.4byte	.LVL46
+ 2742 0194 54000000 		.4byte	.LVL48
+ 2743 0198 0200     		.2byte	0x2
+ 2744 019a 30       		.byte	0x30
+ 2745 019b 9F       		.byte	0x9f
+ 2746 019c 54000000 		.4byte	.LVL48
+ 2747 01a0 64000000 		.4byte	.LVL51
+ 2748 01a4 0100     		.2byte	0x1
+ 2749 01a6 54       		.byte	0x54
+ 2750 01a7 00000000 		.4byte	0
+ 2751 01ab 00000000 		.4byte	0
+ 2752              	.LLST10:
+ 2753 01af 08000000 		.4byte	.LVL55
+ 2754 01b3 14000000 		.4byte	.LVL56
+ 2755 01b7 0100     		.2byte	0x1
+ 2756 01b9 50       		.byte	0x50
+ 2757 01ba 00000000 		.4byte	0
+ 2758 01be 00000000 		.4byte	0
+ 2759              	.LLST11:
+ 2760 01c2 00000000 		.4byte	.LVL57
+ 2761 01c6 25000000 		.4byte	.LVL61-1
+ 2762 01ca 0100     		.2byte	0x1
+ 2763 01cc 50       		.byte	0x50
+ 2764 01cd 25000000 		.4byte	.LVL61-1
+ 2765 01d1 78000000 		.4byte	.LFE7
+ 2766 01d5 0400     		.2byte	0x4
+ 2767 01d7 F3       		.byte	0xf3
+ 2768 01d8 01       		.uleb128 0x1
+ 2769 01d9 50       		.byte	0x50
+ 2770 01da 9F       		.byte	0x9f
+ 2771 01db 00000000 		.4byte	0
+ 2772 01df 00000000 		.4byte	0
+ 2773              	.LLST12:
+ 2774 01e3 00000000 		.4byte	.LVL57
+ 2775 01e7 25000000 		.4byte	.LVL61-1
+ 2776 01eb 0100     		.2byte	0x1
+ 2777 01ed 51       		.byte	0x51
+ 2778 01ee 25000000 		.4byte	.LVL61-1
+ 2779 01f2 78000000 		.4byte	.LFE7
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 55
+
+
+ 2780 01f6 0200     		.2byte	0x2
+ 2781 01f8 91       		.byte	0x91
+ 2782 01f9 5C       		.sleb128 -36
+ 2783 01fa 00000000 		.4byte	0
+ 2784 01fe 00000000 		.4byte	0
+ 2785              	.LLST13:
+ 2786 0202 00000000 		.4byte	.LVL57
+ 2787 0206 0C000000 		.4byte	.LVL58
+ 2788 020a 0100     		.2byte	0x1
+ 2789 020c 52       		.byte	0x52
+ 2790 020d 0C000000 		.4byte	.LVL58
+ 2791 0211 78000000 		.4byte	.LFE7
+ 2792 0215 0200     		.2byte	0x2
+ 2793 0217 91       		.byte	0x91
+ 2794 0218 54       		.sleb128 -44
+ 2795 0219 00000000 		.4byte	0
+ 2796 021d 00000000 		.4byte	0
+ 2797              	.LLST14:
+ 2798 0221 34000000 		.4byte	.LVL62
+ 2799 0225 3B000000 		.4byte	.LVL63-1
+ 2800 0229 0100     		.2byte	0x1
+ 2801 022b 50       		.byte	0x50
+ 2802 022c 52000000 		.4byte	.LVL66
+ 2803 0230 59000000 		.4byte	.LVL67-1
+ 2804 0234 0100     		.2byte	0x1
+ 2805 0236 50       		.byte	0x50
+ 2806 0237 64000000 		.4byte	.LVL68
+ 2807 023b 68000000 		.4byte	.LVL69
+ 2808 023f 0100     		.2byte	0x1
+ 2809 0241 50       		.byte	0x50
+ 2810 0242 00000000 		.4byte	0
+ 2811 0246 00000000 		.4byte	0
+ 2812              	.LLST15:
+ 2813 024a 0E000000 		.4byte	.LVL59
+ 2814 024e 42000000 		.4byte	.LVL64
+ 2815 0252 0100     		.2byte	0x1
+ 2816 0254 57       		.byte	0x57
+ 2817 0255 64000000 		.4byte	.LVL68
+ 2818 0259 6A000000 		.4byte	.LVL70
+ 2819 025d 0100     		.2byte	0x1
+ 2820 025f 57       		.byte	0x57
+ 2821 0260 00000000 		.4byte	0
+ 2822 0264 00000000 		.4byte	0
+ 2823              	.LLST16:
+ 2824 0268 00000000 		.4byte	.LVL72
+ 2825 026c 26000000 		.4byte	.LVL77
+ 2826 0270 0100     		.2byte	0x1
+ 2827 0272 50       		.byte	0x50
+ 2828 0273 26000000 		.4byte	.LVL77
+ 2829 0277 5C000000 		.4byte	.LVL84
+ 2830 027b 0400     		.2byte	0x4
+ 2831 027d F3       		.byte	0xf3
+ 2832 027e 01       		.uleb128 0x1
+ 2833 027f 50       		.byte	0x50
+ 2834 0280 9F       		.byte	0x9f
+ 2835 0281 5C000000 		.4byte	.LVL84
+ 2836 0285 5E000000 		.4byte	.LVL85
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 56
+
+
+ 2837 0289 0100     		.2byte	0x1
+ 2838 028b 50       		.byte	0x50
+ 2839 028c 5E000000 		.4byte	.LVL85
+ 2840 0290 74000000 		.4byte	.LFE8
+ 2841 0294 0400     		.2byte	0x4
+ 2842 0296 F3       		.byte	0xf3
+ 2843 0297 01       		.uleb128 0x1
+ 2844 0298 50       		.byte	0x50
+ 2845 0299 9F       		.byte	0x9f
+ 2846 029a 00000000 		.4byte	0
+ 2847 029e 00000000 		.4byte	0
+ 2848              	.LLST17:
+ 2849 02a2 00000000 		.4byte	.LVL72
+ 2850 02a6 2B000000 		.4byte	.LVL78-1
+ 2851 02aa 0100     		.2byte	0x1
+ 2852 02ac 51       		.byte	0x51
+ 2853 02ad 2B000000 		.4byte	.LVL78-1
+ 2854 02b1 5C000000 		.4byte	.LVL84
+ 2855 02b5 0400     		.2byte	0x4
+ 2856 02b7 F3       		.byte	0xf3
+ 2857 02b8 01       		.uleb128 0x1
+ 2858 02b9 51       		.byte	0x51
+ 2859 02ba 9F       		.byte	0x9f
+ 2860 02bb 5C000000 		.4byte	.LVL84
+ 2861 02bf 60000000 		.4byte	.LVL86
+ 2862 02c3 0100     		.2byte	0x1
+ 2863 02c5 51       		.byte	0x51
+ 2864 02c6 60000000 		.4byte	.LVL86
+ 2865 02ca 74000000 		.4byte	.LFE8
+ 2866 02ce 0400     		.2byte	0x4
+ 2867 02d0 F3       		.byte	0xf3
+ 2868 02d1 01       		.uleb128 0x1
+ 2869 02d2 51       		.byte	0x51
+ 2870 02d3 9F       		.byte	0x9f
+ 2871 02d4 00000000 		.4byte	0
+ 2872 02d8 00000000 		.4byte	0
+ 2873              	.LLST18:
+ 2874 02dc 00000000 		.4byte	.LVL72
+ 2875 02e0 0A000000 		.4byte	.LVL73
+ 2876 02e4 0100     		.2byte	0x1
+ 2877 02e6 52       		.byte	0x52
+ 2878 02e7 0A000000 		.4byte	.LVL73
+ 2879 02eb 68000000 		.4byte	.LVL90
+ 2880 02ef 0100     		.2byte	0x1
+ 2881 02f1 55       		.byte	0x55
+ 2882 02f2 68000000 		.4byte	.LVL90
+ 2883 02f6 74000000 		.4byte	.LFE8
+ 2884 02fa 0400     		.2byte	0x4
+ 2885 02fc F3       		.byte	0xf3
+ 2886 02fd 01       		.uleb128 0x1
+ 2887 02fe 52       		.byte	0x52
+ 2888 02ff 9F       		.byte	0x9f
+ 2889 0300 00000000 		.4byte	0
+ 2890 0304 00000000 		.4byte	0
+ 2891              	.LLST19:
+ 2892 0308 40000000 		.4byte	.LVL80
+ 2893 030c 49000000 		.4byte	.LVL82-1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 57
+
+
+ 2894 0310 0100     		.2byte	0x1
+ 2895 0312 50       		.byte	0x50
+ 2896 0313 4A000000 		.4byte	.LVL82
+ 2897 0317 5A000000 		.4byte	.LVL83
+ 2898 031b 0100     		.2byte	0x1
+ 2899 031d 50       		.byte	0x50
+ 2900 031e 60000000 		.4byte	.LVL86
+ 2901 0322 62000000 		.4byte	.LVL87
+ 2902 0326 0100     		.2byte	0x1
+ 2903 0328 50       		.byte	0x50
+ 2904 0329 64000000 		.4byte	.LVL88
+ 2905 032d 66000000 		.4byte	.LVL89
+ 2906 0331 0100     		.2byte	0x1
+ 2907 0333 50       		.byte	0x50
+ 2908 0334 00000000 		.4byte	0
+ 2909 0338 00000000 		.4byte	0
+ 2910              	.LLST20:
+ 2911 033c 0C000000 		.4byte	.LVL74
+ 2912 0340 18000000 		.4byte	.LVL75
+ 2913 0344 0100     		.2byte	0x1
+ 2914 0346 54       		.byte	0x54
+ 2915 0347 18000000 		.4byte	.LVL75
+ 2916 034b 1A000000 		.4byte	.LVL76
+ 2917 034f 0300     		.2byte	0x3
+ 2918 0351 74       		.byte	0x74
+ 2919 0352 7F       		.sleb128 -1
+ 2920 0353 9F       		.byte	0x9f
+ 2921 0354 1A000000 		.4byte	.LVL76
+ 2922 0358 44000000 		.4byte	.LVL81
+ 2923 035c 0100     		.2byte	0x1
+ 2924 035e 54       		.byte	0x54
+ 2925 035f 5C000000 		.4byte	.LVL84
+ 2926 0363 64000000 		.4byte	.LVL88
+ 2927 0367 0100     		.2byte	0x1
+ 2928 0369 54       		.byte	0x54
+ 2929 036a 00000000 		.4byte	0
+ 2930 036e 00000000 		.4byte	0
+ 2931              	.LLST21:
+ 2932 0372 00000000 		.4byte	.LVL95
+ 2933 0376 0B000000 		.4byte	.LVL96-1
+ 2934 037a 0100     		.2byte	0x1
+ 2935 037c 50       		.byte	0x50
+ 2936 037d 0B000000 		.4byte	.LVL96-1
+ 2937 0381 2E000000 		.4byte	.LVL102
+ 2938 0385 0100     		.2byte	0x1
+ 2939 0387 56       		.byte	0x56
+ 2940 0388 2E000000 		.4byte	.LVL102
+ 2941 038c 30000000 		.4byte	.LFE14
+ 2942 0390 0400     		.2byte	0x4
+ 2943 0392 F3       		.byte	0xf3
+ 2944 0393 01       		.uleb128 0x1
+ 2945 0394 50       		.byte	0x50
+ 2946 0395 9F       		.byte	0x9f
+ 2947 0396 00000000 		.4byte	0
+ 2948 039a 00000000 		.4byte	0
+ 2949              	.LLST22:
+ 2950 039e 00000000 		.4byte	.LVL95
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 58
+
+
+ 2951 03a2 0B000000 		.4byte	.LVL96-1
+ 2952 03a6 0100     		.2byte	0x1
+ 2953 03a8 51       		.byte	0x51
+ 2954 03a9 0B000000 		.4byte	.LVL96-1
+ 2955 03ad 2E000000 		.4byte	.LVL101
+ 2956 03b1 0100     		.2byte	0x1
+ 2957 03b3 55       		.byte	0x55
+ 2958 03b4 2E000000 		.4byte	.LVL101
+ 2959 03b8 30000000 		.4byte	.LFE14
+ 2960 03bc 0400     		.2byte	0x4
+ 2961 03be F3       		.byte	0xf3
+ 2962 03bf 01       		.uleb128 0x1
+ 2963 03c0 51       		.byte	0x51
+ 2964 03c1 9F       		.byte	0x9f
+ 2965 03c2 00000000 		.4byte	0
+ 2966 03c6 00000000 		.4byte	0
+ 2967              	.LLST23:
+ 2968 03ca 00000000 		.4byte	.LVL95
+ 2969 03ce 0B000000 		.4byte	.LVL96-1
+ 2970 03d2 0100     		.2byte	0x1
+ 2971 03d4 52       		.byte	0x52
+ 2972 03d5 0B000000 		.4byte	.LVL96-1
+ 2973 03d9 2E000000 		.4byte	.LVL100
+ 2974 03dd 0100     		.2byte	0x1
+ 2975 03df 54       		.byte	0x54
+ 2976 03e0 2E000000 		.4byte	.LVL100
+ 2977 03e4 30000000 		.4byte	.LFE14
+ 2978 03e8 0400     		.2byte	0x4
+ 2979 03ea F3       		.byte	0xf3
+ 2980 03eb 01       		.uleb128 0x1
+ 2981 03ec 52       		.byte	0x52
+ 2982 03ed 9F       		.byte	0x9f
+ 2983 03ee 00000000 		.4byte	0
+ 2984 03f2 00000000 		.4byte	0
+ 2985              	.LLST24:
+ 2986 03f6 00000000 		.4byte	.LVL103
+ 2987 03fa 0B000000 		.4byte	.LVL104-1
+ 2988 03fe 0100     		.2byte	0x1
+ 2989 0400 50       		.byte	0x50
+ 2990 0401 0B000000 		.4byte	.LVL104-1
+ 2991 0405 2E000000 		.4byte	.LVL110
+ 2992 0409 0100     		.2byte	0x1
+ 2993 040b 56       		.byte	0x56
+ 2994 040c 2E000000 		.4byte	.LVL110
+ 2995 0410 30000000 		.4byte	.LFE15
+ 2996 0414 0400     		.2byte	0x4
+ 2997 0416 F3       		.byte	0xf3
+ 2998 0417 01       		.uleb128 0x1
+ 2999 0418 50       		.byte	0x50
+ 3000 0419 9F       		.byte	0x9f
+ 3001 041a 00000000 		.4byte	0
+ 3002 041e 00000000 		.4byte	0
+ 3003              	.LLST25:
+ 3004 0422 00000000 		.4byte	.LVL103
+ 3005 0426 0B000000 		.4byte	.LVL104-1
+ 3006 042a 0100     		.2byte	0x1
+ 3007 042c 51       		.byte	0x51
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 59
+
+
+ 3008 042d 0B000000 		.4byte	.LVL104-1
+ 3009 0431 2E000000 		.4byte	.LVL109
+ 3010 0435 0100     		.2byte	0x1
+ 3011 0437 55       		.byte	0x55
+ 3012 0438 2E000000 		.4byte	.LVL109
+ 3013 043c 30000000 		.4byte	.LFE15
+ 3014 0440 0400     		.2byte	0x4
+ 3015 0442 F3       		.byte	0xf3
+ 3016 0443 01       		.uleb128 0x1
+ 3017 0444 51       		.byte	0x51
+ 3018 0445 9F       		.byte	0x9f
+ 3019 0446 00000000 		.4byte	0
+ 3020 044a 00000000 		.4byte	0
+ 3021              	.LLST26:
+ 3022 044e 00000000 		.4byte	.LVL103
+ 3023 0452 0B000000 		.4byte	.LVL104-1
+ 3024 0456 0100     		.2byte	0x1
+ 3025 0458 52       		.byte	0x52
+ 3026 0459 0B000000 		.4byte	.LVL104-1
+ 3027 045d 2E000000 		.4byte	.LVL108
+ 3028 0461 0100     		.2byte	0x1
+ 3029 0463 54       		.byte	0x54
+ 3030 0464 2E000000 		.4byte	.LVL108
+ 3031 0468 30000000 		.4byte	.LFE15
+ 3032 046c 0400     		.2byte	0x4
+ 3033 046e F3       		.byte	0xf3
+ 3034 046f 01       		.uleb128 0x1
+ 3035 0470 52       		.byte	0x52
+ 3036 0471 9F       		.byte	0x9f
+ 3037 0472 00000000 		.4byte	0
+ 3038 0476 00000000 		.4byte	0
+ 3039              		.section	.debug_aranges,"",%progbits
+ 3040 0000 94000000 		.4byte	0x94
+ 3041 0004 0200     		.2byte	0x2
+ 3042 0006 00000000 		.4byte	.Ldebug_info0
+ 3043 000a 04       		.byte	0x4
+ 3044 000b 00       		.byte	0
+ 3045 000c 0000     		.2byte	0
+ 3046 000e 0000     		.2byte	0
+ 3047 0010 00000000 		.4byte	.LFB0
+ 3048 0014 1C000000 		.4byte	.LFE0-.LFB0
+ 3049 0018 00000000 		.4byte	.LFB1
+ 3050 001c 18000000 		.4byte	.LFE1-.LFB1
+ 3051 0020 00000000 		.4byte	.LFB2
+ 3052 0024 10000000 		.4byte	.LFE2-.LFB2
+ 3053 0028 00000000 		.4byte	.LFB3
+ 3054 002c 24000000 		.4byte	.LFE3-.LFB3
+ 3055 0030 00000000 		.4byte	.LFB4
+ 3056 0034 6C000000 		.4byte	.LFE4-.LFB4
+ 3057 0038 00000000 		.4byte	.LFB5
+ 3058 003c 6C000000 		.4byte	.LFE5-.LFB5
+ 3059 0040 00000000 		.4byte	.LFB6
+ 3060 0044 1C000000 		.4byte	.LFE6-.LFB6
+ 3061 0048 00000000 		.4byte	.LFB7
+ 3062 004c 78000000 		.4byte	.LFE7-.LFB7
+ 3063 0050 00000000 		.4byte	.LFB9
+ 3064 0054 14000000 		.4byte	.LFE9-.LFB9
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 60
+
+
+ 3065 0058 00000000 		.4byte	.LFB8
+ 3066 005c 74000000 		.4byte	.LFE8-.LFB8
+ 3067 0060 00000000 		.4byte	.LFB10
+ 3068 0064 2C000000 		.4byte	.LFE10-.LFB10
+ 3069 0068 00000000 		.4byte	.LFB11
+ 3070 006c 30000000 		.4byte	.LFE11-.LFB11
+ 3071 0070 00000000 		.4byte	.LFB12
+ 3072 0074 02000000 		.4byte	.LFE12-.LFB12
+ 3073 0078 00000000 		.4byte	.LFB13
+ 3074 007c 1E000000 		.4byte	.LFE13-.LFB13
+ 3075 0080 00000000 		.4byte	.LFB14
+ 3076 0084 30000000 		.4byte	.LFE14-.LFB14
+ 3077 0088 00000000 		.4byte	.LFB15
+ 3078 008c 30000000 		.4byte	.LFE15-.LFB15
+ 3079 0090 00000000 		.4byte	0
+ 3080 0094 00000000 		.4byte	0
+ 3081              		.section	.debug_ranges,"",%progbits
+ 3082              	.Ldebug_ranges0:
+ 3083 0000 00000000 		.4byte	.LFB0
+ 3084 0004 1C000000 		.4byte	.LFE0
+ 3085 0008 00000000 		.4byte	.LFB1
+ 3086 000c 18000000 		.4byte	.LFE1
+ 3087 0010 00000000 		.4byte	.LFB2
+ 3088 0014 10000000 		.4byte	.LFE2
+ 3089 0018 00000000 		.4byte	.LFB3
+ 3090 001c 24000000 		.4byte	.LFE3
+ 3091 0020 00000000 		.4byte	.LFB4
+ 3092 0024 6C000000 		.4byte	.LFE4
+ 3093 0028 00000000 		.4byte	.LFB5
+ 3094 002c 6C000000 		.4byte	.LFE5
+ 3095 0030 00000000 		.4byte	.LFB6
+ 3096 0034 1C000000 		.4byte	.LFE6
+ 3097 0038 00000000 		.4byte	.LFB7
+ 3098 003c 78000000 		.4byte	.LFE7
+ 3099 0040 00000000 		.4byte	.LFB9
+ 3100 0044 14000000 		.4byte	.LFE9
+ 3101 0048 00000000 		.4byte	.LFB8
+ 3102 004c 74000000 		.4byte	.LFE8
+ 3103 0050 00000000 		.4byte	.LFB10
+ 3104 0054 2C000000 		.4byte	.LFE10
+ 3105 0058 00000000 		.4byte	.LFB11
+ 3106 005c 30000000 		.4byte	.LFE11
+ 3107 0060 00000000 		.4byte	.LFB12
+ 3108 0064 02000000 		.4byte	.LFE12
+ 3109 0068 00000000 		.4byte	.LFB13
+ 3110 006c 1E000000 		.4byte	.LFE13
+ 3111 0070 00000000 		.4byte	.LFB14
+ 3112 0074 30000000 		.4byte	.LFE14
+ 3113 0078 00000000 		.4byte	.LFB15
+ 3114 007c 30000000 		.4byte	.LFE15
+ 3115 0080 00000000 		.4byte	0
+ 3116 0084 00000000 		.4byte	0
+ 3117              		.section	.debug_line,"",%progbits
+ 3118              	.Ldebug_line0:
+ 3119 0000 EF020000 		.section	.debug_str,"MS",%progbits,1
+ 3119      02002301 
+ 3119      00000201 
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 61
+
+
+ 3119      FB0E0D00 
+ 3119      01010101 
+ 3120              	.LASF39:
+ 3121 0000 73706952 		.ascii	"spiRead\000"
+ 3121      65616400 
+ 3122              	.LASF6:
+ 3123 0008 5F5F7569 		.ascii	"__uint8_t\000"
+ 3123      6E74385F 
+ 3123      7400
+ 3124              	.LASF12:
+ 3125 0012 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3125      206C6F6E 
+ 3125      6720756E 
+ 3125      7369676E 
+ 3125      65642069 
+ 3126              	.LASF1:
+ 3127 0029 6C6F6E67 		.ascii	"long long int\000"
+ 3127      206C6F6E 
+ 3127      6720696E 
+ 3127      7400
+ 3128              	.LASF3:
+ 3129 0037 7369676E 		.ascii	"signed char\000"
+ 3129      65642063 
+ 3129      68617200 
+ 3130              	.LASF54:
+ 3131 0043 5F737069 		.ascii	"_spi\000"
+ 3131      00
+ 3132              	.LASF52:
+ 3133 0048 45455052 		.ascii	"EEPROM_read\000"
+ 3133      4F4D5F72 
+ 3133      65616400 
+ 3134              	.LASF9:
+ 3135 0054 6C6F6E67 		.ascii	"long int\000"
+ 3135      20696E74 
+ 3135      00
+ 3136              	.LASF45:
+ 3137 005d 69326347 		.ascii	"i2cGetStatus\000"
+ 3137      65745374 
+ 3137      61747573 
+ 3137      00
+ 3138              	.LASF62:
+ 3139 006a 6D656D63 		.ascii	"memcpy\000"
+ 3139      707900
+ 3140              	.LASF16:
+ 3141 0071 75696E74 		.ascii	"uint16_t\000"
+ 3141      31365F74 
+ 3141      00
+ 3142              	.LASF24:
+ 3143 007a 49324349 		.ascii	"I2CInterface\000"
+ 3143      6E746572 
+ 3143      66616365 
+ 3143      00
+ 3144              	.LASF32:
+ 3145 0087 6973496E 		.ascii	"isInitializedAndI2C\000"
+ 3145      69746961 
+ 3145      6C697A65 
+ 3145      64416E64 
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 62
+
+
+ 3145      49324300 
+ 3146              	.LASF38:
+ 3147 009b 64617461 		.ascii	"dataLength\000"
+ 3147      4C656E67 
+ 3147      746800
+ 3148              	.LASF53:
+ 3149 00a6 45455052 		.ascii	"EEPROM_write\000"
+ 3149      4F4D5F77 
+ 3149      72697465 
+ 3149      00
+ 3150              	.LASF10:
+ 3151 00b3 5F5F7569 		.ascii	"__uint32_t\000"
+ 3151      6E743332 
+ 3151      5F7400
+ 3152              	.LASF30:
+ 3153 00be 64657669 		.ascii	"deviceAddress\000"
+ 3153      63654164 
+ 3153      64726573 
+ 3153      7300
+ 3154              	.LASF33:
+ 3155 00cc 74656D70 		.ascii	"temp\000"
+ 3155      00
+ 3156              	.LASF0:
+ 3157 00d1 756E7369 		.ascii	"unsigned int\000"
+ 3157      676E6564 
+ 3157      20696E74 
+ 3157      00
+ 3158              	.LASF50:
+ 3159 00de 69326349 		.ascii	"i2cInterface\000"
+ 3159      6E746572 
+ 3159      66616365 
+ 3159      00
+ 3160              	.LASF25:
+ 3161 00eb 67657453 		.ascii	"getStatus\000"
+ 3161      74617475 
+ 3161      7300
+ 3162              	.LASF49:
+ 3163 00f5 45455052 		.ascii	"EEPROM_init_i2c\000"
+ 3163      4F4D5F69 
+ 3163      6E69745F 
+ 3163      69326300 
+ 3164              	.LASF11:
+ 3165 0105 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3165      20756E73 
+ 3165      69676E65 
+ 3165      6420696E 
+ 3165      7400
+ 3166              	.LASF40:
+ 3167 0117 73706957 		.ascii	"spiWrite\000"
+ 3167      72697465 
+ 3167      00
+ 3168              	.LASF37:
+ 3169 0120 64617461 		.ascii	"data\000"
+ 3169      00
+ 3170              	.LASF8:
+ 3171 0125 73686F72 		.ascii	"short unsigned int\000"
+ 3171      7420756E 
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 63
+
+
+ 3171      7369676E 
+ 3171      65642069 
+ 3171      6E7400
+ 3172              	.LASF31:
+ 3173 0138 6973496E 		.ascii	"isInitializedAndSPI\000"
+ 3173      69746961 
+ 3173      6C697A65 
+ 3173      64416E64 
+ 3173      53504900 
+ 3174              	.LASF26:
+ 3175 014c 636C6561 		.ascii	"clearStatus\000"
+ 3175      72537461 
+ 3175      74757300 
+ 3176              	.LASF29:
+ 3177 0158 636F6D70 		.ascii	"completeTransferMask\000"
+ 3177      6C657465 
+ 3177      5472616E 
+ 3177      73666572 
+ 3177      4D61736B 
+ 3178              	.LASF23:
+ 3179 016d 53504949 		.ascii	"SPIInterface\000"
+ 3179      6E746572 
+ 3179      66616365 
+ 3179      00
+ 3180              	.LASF18:
+ 3181 017a 77726974 		.ascii	"write\000"
+ 3181      6500
+ 3182              	.LASF42:
+ 3183 0180 69326352 		.ascii	"i2cRead\000"
+ 3183      65616400 
+ 3184              	.LASF13:
+ 3185 0188 73697A65 		.ascii	"sizetype\000"
+ 3185      74797065 
+ 3185      00
+ 3186              	.LASF2:
+ 3187 0191 6C6F6E67 		.ascii	"long double\000"
+ 3187      20646F75 
+ 3187      626C6500 
+ 3188              	.LASF36:
+ 3189 019d 61646472 		.ascii	"address\000"
+ 3189      65737300 
+ 3190              	.LASF41:
+ 3191 01a5 69326357 		.ascii	"i2cWaitForIdle\000"
+ 3191      61697446 
+ 3191      6F724964 
+ 3191      6C6500
+ 3192              	.LASF28:
+ 3193 01b4 6572726F 		.ascii	"errorMask\000"
+ 3193      724D6173 
+ 3193      6B00
+ 3194              	.LASF57:
+ 3195 01be 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 3195      4320342E 
+ 3195      392E3320 
+ 3195      32303135 
+ 3195      30333033 
+ 3196 01f1 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m0 -mthumb -g -O"
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 64
+
+
+ 3196      20726576 
+ 3196      6973696F 
+ 3196      6E203232 
+ 3196      31323230 
+ 3197 0224 67202D73 		.ascii	"g -std=c11 -ffunction-sections -ffat-lto-objects\000"
+ 3197      74643D63 
+ 3197      3131202D 
+ 3197      6666756E 
+ 3197      6374696F 
+ 3198              	.LASF58:
+ 3199 0255 45455072 		.ascii	"EEProm.c\000"
+ 3199      6F6D2E63 
+ 3199      00
+ 3200              	.LASF46:
+ 3201 025e 69326357 		.ascii	"i2cWrite\000"
+ 3201      72697465 
+ 3201      00
+ 3202              	.LASF4:
+ 3203 0267 756E7369 		.ascii	"unsigned char\000"
+ 3203      676E6564 
+ 3203      20636861 
+ 3203      7200
+ 3204              	.LASF27:
+ 3205 0275 7472616E 		.ascii	"transferInProgressMask\000"
+ 3205      73666572 
+ 3205      496E5072 
+ 3205      6F677265 
+ 3205      73734D61 
+ 3206              	.LASF5:
+ 3207 028c 73686F72 		.ascii	"short int\000"
+ 3207      7420696E 
+ 3207      7400
+ 3208              	.LASF59:
+ 3209 0296 433A5C70 		.ascii	"C:\\projects\\POVDisplay\\st_eeprom.cylib\000"
+ 3209      726F6A65 
+ 3209      6374735C 
+ 3209      504F5644 
+ 3209      6973706C 
+ 3210              	.LASF44:
+ 3211 02bd 64657641 		.ascii	"devAddress\000"
+ 3211      64647265 
+ 3211      737300
+ 3212              	.LASF48:
+ 3213 02c8 45455052 		.ascii	"EEPROM_init_spi\000"
+ 3213      4F4D5F69 
+ 3213      6E69745F 
+ 3213      73706900 
+ 3214              	.LASF17:
+ 3215 02d8 75696E74 		.ascii	"uint32_t\000"
+ 3215      33325F74 
+ 3215      00
+ 3216              	.LASF20:
+ 3217 02e1 67657454 		.ascii	"getTxStatus\000"
+ 3217      78537461 
+ 3217      74757300 
+ 3218              	.LASF14:
+ 3219 02ed 63686172 		.ascii	"char\000"
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 65
+
+
+ 3219      00
+ 3220              	.LASF7:
+ 3221 02f2 5F5F7569 		.ascii	"__uint16_t\000"
+ 3221      6E743136 
+ 3221      5F7400
+ 3222              	.LASF43:
+ 3223 02fd 62756666 		.ascii	"buffer\000"
+ 3223      657200
+ 3224              	.LASF55:
+ 3225 0304 5F693263 		.ascii	"_i2c\000"
+ 3225      00
+ 3226              	.LASF34:
+ 3227 0309 73706947 		.ascii	"spiGetStatus\000"
+ 3227      65745374 
+ 3227      61747573 
+ 3227      00
+ 3228              	.LASF21:
+ 3229 0316 64656C61 		.ascii	"delayUs\000"
+ 3229      79557300 
+ 3230              	.LASF60:
+ 3231 031e 77616974 		.ascii	"waitForIdle\000"
+ 3231      466F7249 
+ 3231      646C6500 
+ 3232              	.LASF51:
+ 3233 032a 45455052 		.ascii	"EEPROM_getStatus\000"
+ 3233      4F4D5F67 
+ 3233      65745374 
+ 3233      61747573 
+ 3233      00
+ 3234              	.LASF35:
+ 3235 033b 73746174 		.ascii	"status\000"
+ 3235      757300
+ 3236              	.LASF15:
+ 3237 0342 75696E74 		.ascii	"uint8_t\000"
+ 3237      385F7400 
+ 3238              	.LASF47:
+ 3239 034a 73706949 		.ascii	"spiInterface\000"
+ 3239      6E746572 
+ 3239      66616365 
+ 3239      00
+ 3240              	.LASF19:
+ 3241 0357 72656164 		.ascii	"read\000"
+ 3241      00
+ 3242              	.LASF22:
+ 3243 035c 73706949 		.ascii	"spiIdleMask\000"
+ 3243      646C654D 
+ 3243      61736B00 
+ 3244              	.LASF56:
+ 3245 0368 5F696E69 		.ascii	"_initialized\000"
+ 3245      7469616C 
+ 3245      697A6564 
+ 3245      00
+ 3246              	.LASF61:
+ 3247 0375 45455052 		.ascii	"EEPROM_clearBuffers\000"
+ 3247      4F4D5F63 
+ 3247      6C656172 
+ 3247      42756666 
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccUd6u83.s 			page 66
+
+
+ 3247      65727300 
+ 3248              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

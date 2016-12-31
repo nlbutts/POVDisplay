@@ -1,0 +1,4 @@
+--------------- Build Started: 12/30/2016 10:48:28 Project: st_eeprom, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
+arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -Wa,-alh=.\CortexM0\ARM_GCC_493\Debug/EEProm.lst -g -D DEBUG -Wall -ffunction-sections -Og -ffat-lto-objects -std=c11 -c EEProm.c -o .\CortexM0\ARM_GCC_493\Debug\EEProm.o
+arm-none-eabi-ar.exe -rs .\CortexM0\ARM_GCC_493\Debug\st_eeprom.a C:\projects\POVDisplay\st_eeprom.cylib\CortexM0\ARM_GCC_493\Debug\EEProm.o
+--------------- Build Succeeded: 12/30/2016 10:48:29 ---------------

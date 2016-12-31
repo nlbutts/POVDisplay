@@ -1,0 +1,11 @@
+C:\projects\POVDisplay\POVRotate.cydsn\POVRotate.cyprj|303b6e89-31d5-4ba9-a328-5350afefda09
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|4494690f-08a4-41b1-97e7-2937bf1b127f
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|262b81a8-20bf-44e2-9d03-e30372f5a4d3
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|ce388806-b5a6-43db-ab5a-7fd3e38b6043
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|ef087809-f703-474b-b7f4-6188d588d8c5
+C:\projects\POVDisplay\POVBase2.cydsn\POVBase2.cyprj|bbf76c6d-dbdb-4c1e-b059-0b240f36e232
+C:\projects\POVDisplay\POVBase.cydsn\POVBase.cyprj|da523d03-ed17-48c5-a8da-d377d8d5096c
+C:\projects\POVDisplay\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj|d1e0e25a-bce1-40ac-b4c8-bb4d354d036f
+C:\projects\POVDisplay\st_eeprom.cylib\st_eeprom.cyprj|3f988dae-93e8-4244-86e2-7e5273decc57
+C:\projects\POVDisplay\UART_to_BLE_central.cydsn\UART_to_BLE_central.cyprj|37bfd923-5c98-48ed-9fdb-1df8d88433e9
+C:\projects\POVDisplay\UART_to_BLE_peripheral.cydsn\UART_to_BLE_peripheral.cyprj|f82b0df7-875b-48b1-96fa-d0bd89068d2c
