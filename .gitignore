@@ -35,3 +35,12 @@ toolchain/*
 
 #Ignore sublime workspace file
 POVDisplay.sublime-workspace
+
+codegentemp
+Generated_Source
+*bak
+*cyprj.Nick*
+*.cycdx
+*.rpt
+*.html
+
