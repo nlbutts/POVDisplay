@@ -11,6 +11,25 @@
 */
 #include <project.h>
 #include "LED.h"
+#include "EEPROM.h"
+
+void testEEPROM(uint8_t xor)
+{
+    const uint8_t testLen = 32;
+    volatile uint8_t rdData[testLen];
+    volatile uint8_t wrData[testLen];
+    volatile uint8_t status;
+
+    status = EEPROM_read(0, rdData, testLen);
+    for (uint8_t i = 0; i < testLen; i++)
+    {
+        wrData[i] = i & xor;
+    }
+    status = EEPROM_write(0, wrData, testLen);
+    CyDelay(100);
+    status = EEPROM_read(0, rdData, testLen);    
+    rdData[0]++;
+}
 
 int main()
 {
@@ -21,9 +40,26 @@ int main()
     SPI_LED_Start();
     I2C_EEPROM_Start();
 
+    // Configure the LED code.
     LED_S cfg;
     cfg.numberOfLeds = 8;
-    led_init(&cfg);    
+    led_init(&cfg);
+
+    // Configure the EEPROM
+    struct I2CInterface i2cCfg;
+    i2cCfg.write        = I2C_EEPROM_I2CMasterWriteBuf;
+    i2cCfg.read         = I2C_EEPROM_I2CMasterReadBuf;
+    i2cCfg.getStatus    = I2C_EEPROM_I2CMasterStatus;
+    i2cCfg.delayUs      = CyDelayUs;
+    i2cCfg.clearStatus  = I2C_EEPROM_I2CMasterClearStatus;
+
+    i2cCfg.transferInProgressMask   = I2C_EEPROM_I2C_MSTAT_XFER_INP;
+    i2cCfg.errorMask                = I2C_EEPROM_I2C_MSTAT_ERR_XFER;
+    i2cCfg.completeTransferMask     = I2C_EEPROM_I2C_MODE_COMPLETE_XFER;
+    i2cCfg.deviceAddress            = 0x50;
+    EEPROM_init_i2c(i2cCfg);
+    
+    WP_Write(0);
 
     for(;;)
     {
@@ -31,14 +67,15 @@ int main()
         STATUS_LED_Write(ledState);
         ledState = !ledState;
         CyDelay(1000);
+        testEEPROM(0);
         led_setColor(OFF);
-        CyDelay(100);
+        CyDelay(1000);
         led_setColor(RED);
-        CyDelay(100);
+        CyDelay(1000);
         led_setColor(GREEN);
-        CyDelay(100);
+        CyDelay(1000);
         led_setColor(BLUE);
-        CyDelay(100);
+        CyDelay(1000);
         led_setColor(WHITE);
     }
 }

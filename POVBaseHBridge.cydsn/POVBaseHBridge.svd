@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <device schemaVersion="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_0.xsd">
-  <name>CY8C5888LTQ_LP097</name>
+  <name>CY8C4245AXI_483</name>
   <version>0.1</version>
-  <description>CY8C58LP</description>
+  <description>PSoC 4200</description>
   <addressUnitBits>8</addressUnitBits>
   <width>32</width>
   <peripherals>
@@ -19,7 +19,7 @@
         <register>
           <name>PWM_DeadBand_Counter</name>
           <description>UDB DeadBand - DeadBand Counter Value</description>
-          <addressOffset>0x40006506</addressOffset>
+          <addressOffset>0x400F0003</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -28,7 +28,7 @@
         <register>
           <name>PWM_COMPARE_Reg</name>
           <description>UDB.D0 - Assigned Compare Value</description>
-          <addressOffset>0x40006524</addressOffset>
+          <addressOffset>0x400F0020</addressOffset>
           <size>16</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -37,7 +37,7 @@
         <register>
           <name>PWM_DeadBand_Count</name>
           <description>UDB DeadBand - Assigned DeadBand Count Value</description>
-          <addressOffset>0x40006526</addressOffset>
+          <addressOffset>0x400F0023</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -46,7 +46,7 @@
         <register>
           <name>PWM_Control_Reg</name>
           <description>UDB Control Register - Assigned Control Register Value</description>
-          <addressOffset>0x40006576</addressOffset>
+          <addressOffset>0x400F0070</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -78,7 +78,7 @@
         <register>
           <name>PWM_STATUS_MASK</name>
           <description>UDB Status bits Interrupt Mask Enable Register</description>
-          <addressOffset>0x40006585</addressOffset>
+          <addressOffset>0x400F0081</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -124,7 +124,7 @@
         <register>
           <name>PWM_STATUS_AUX_CTRLDP0</name>
           <description>UDB Auxilliary Control Register</description>
-          <addressOffset>0x40006594</addressOffset>
+          <addressOffset>0x400F0090</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
@@ -249,7 +249,7 @@
         <register>
           <name>PWM_STATUS_AUX_CTRLDP1</name>
           <description>UDB Auxilliary Control Register</description>
-          <addressOffset>0x40006595</addressOffset>
+          <addressOffset>0x400F0091</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>

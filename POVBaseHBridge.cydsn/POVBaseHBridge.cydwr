@@ -258,6 +258,7 @@
   <Group key="Component">
     <Group key="v1">
       <Data key="cy_boot" value="cy_boot_v5_50" />
+      <Data key="cy_lfclk" value="cy_lfclk_v1_10" />
       <Data key="LIN_Dynamic" value="LIN_Dynamic_v3_40" />
     </Group>
   </Group>
@@ -3359,22 +3360,22 @@
   <Group key="Pin2">
     <Group key="028a32aa-fbbd-43d6-932f-f0f7f500f367">
       <Group key="0">
-        <Data key="Port Format" value="3,1" />
+        <Data key="Port Format" value="2,1" />
       </Group>
     </Group>
     <Group key="adc4631f-32b5-438b-a9ee-822a93e02414">
       <Group key="0">
-        <Data key="Port Format" value="2,2" />
+        <Data key="Port Format" value="0,7" />
       </Group>
     </Group>
     <Group key="bb5792e6-5aac-4150-937e-d226602453cc">
       <Group key="0">
-        <Data key="Port Format" value="2,1" />
+        <Data key="Port Format" value="1,6" />
       </Group>
     </Group>
     <Group key="e851a3b9-efb8-48be-bbb8-b303b216c393">
       <Group key="0">
-        <Data key="Port Format" value="3,0" />
+        <Data key="Port Format" value="2,0" />
       </Group>
     </Group>
   </Group>

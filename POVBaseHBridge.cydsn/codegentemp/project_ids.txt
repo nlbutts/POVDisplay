@@ -1,8 +1,0 @@
-C:\projects\POVDisplay\POVRotate.cydsn\POVRotate.cyprj|91088af7-8f2a-420f-a625-6190b585a4b1
-C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|9a864e26-b82d-41fd-a59e-40b3d25c521d
-C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|0a224732-aae1-49d4-9628-d31efc404a8e
-C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|9617bd52-c1aa-4a37-a98a-2e1df01ef9f0
-C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|01d34e40-5b34-4ede-8a4d-f5fc0f740d9b
-C:\projects\POVDisplay\POVBase2.cydsn\POVBase2.cyprj|ca6b910f-24c5-49f4-94d6-1c8c87e8f074
-C:\projects\POVDisplay\POVBase.cydsn\POVBase.cyprj|0f462b9b-1f05-484f-96bb-fbc895ba8e3b
-C:\projects\POVDisplay\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj|7fbd7737-313f-49b2-ad92-5c9c0ae46a18

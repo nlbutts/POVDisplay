@@ -11,10 +11,10 @@
 */
 #include <project.h>
 
-#define PWM_CLOCK 48000000
+#define PWM_CLOCK 12000000
 //#define STARTING_FREQ 267000
 //#define STARTING_FREQ 100000
-#define STARTING_FREQ 59000
+#define STARTING_FREQ 86000
 #define ELEMENTS(x)    (sizeof(x) / sizeof(x[0]))
 
 uint8_t buttonPressed = 0;
@@ -39,7 +39,7 @@ void setFrequency(uint32_t freq)
     uint16_t period = PWM_CLOCK / freq;
 
     PWM_WritePeriod(period);
-    PWM_WriteCompare1(period/2);
+    PWM_WriteCompare(period/2);
 
 }
 
@@ -110,8 +110,12 @@ int main()
     //setFrequency(currentFrequency);
     buttonPressed = 0;
     
+    setFrequency(currentFrequency);
+    
     for(;;)
     {
+        Pin_LED_Write(!Pin_LED_Read());
+        CyDelay(1000);
         /* Place your application code here. */
 //        if (autoSweep || buttonPressed)
 //        {            

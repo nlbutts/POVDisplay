@@ -18,8 +18,8 @@
 #include <string.h>
 #include "LED.h"
 
-bool _initialized = false;
-LED_S _cfg;
+static bool _initialized = false;
+static LED_S _cfg;
 
 void led_init(LED_S * cfg)
 {
