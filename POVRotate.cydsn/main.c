@@ -9,6 +9,7 @@
  *
  * ========================================
 */
+#include <stdio.h>
 #include <project.h>
 #include "LED.h"
 #include "EEPROM.h"
@@ -16,6 +17,17 @@
 #include "app_LED.h"
 #include "uartBuf.h"
 #include "stdbool.h"
+#include "options.h"
+
+static uint32_t _pwrMVolts;
+static uint16_t _previousCapture = 0;
+static uint32_t _rotationRate = 0;
+static uint8_t  _ledState = 0;
+static uint8_t  _leds[3] = {0};
+static uint32_t _alignmentIntCount = 0;
+static uint32_t _ledUpdateIntCount = 0;
+static float    _rotationFilter = 0.0f;
+
 
 void testEEPROM(uint8_t xor)
 {
@@ -34,6 +46,82 @@ void testEEPROM(uint8_t xor)
     status = EEPROM_read(0, rdData, testLen);
     rdData[0]++;
 }
+
+uint16_t filterRotation(uint16_t lastRotationTime)
+{
+    float temp = lastRotationTime;
+    _rotationFilter = _rotationFilter + ((temp - _rotationFilter) * ROTATION_FILTER_K);
+    return (uint16_t)_rotationFilter;
+}
+
+CY_ISR(adcISR)
+{
+    uint16_t result = ADC_SAR_Seq_GetResult16(1);
+    _pwrMVolts = ADC_SAR_Seq_CountsTo_mVolts(1, result);
+    _pwrMVolts *= 11;
+}
+
+CY_ISR(alignmentISR)
+{
+    Timer_ClearInterrupt(0xFF);
+    uint16_t capture = Timer_ReadCapture();
+    uint16_t diffTime = capture - _previousCapture;
+    _previousCapture = capture;
+    _rotationRate = filterRotation(diffTime);
+
+    _ledState = 0;
+    TimerLED_Start();
+    TimerLED_WritePeriod(_rotationRate/4); 
+    TimerLED_WriteCounter(0);                
+    //TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
+    //isrLEDUpdate_ClearPending();
+
+    _alignmentIntCount++;
+}
+
+CY_ISR(ledUpdateISR)
+{
+    TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
+    switch (_ledState)
+    {
+        case 0:
+            _leds[0] = 0xFF;
+            _leds[1] = 0;
+            _leds[2] = 0;
+            led_pushLEDs(_leds);
+            break;
+        case 1:
+            _leds[0] = 0;
+            _leds[1] = 0xFF;
+            _leds[2] = 0;
+            led_pushLEDs(_leds);
+            break;
+        case 2:
+            _leds[0] = 0;
+            _leds[1] = 0;
+            _leds[2] = 0xFF;
+            led_pushLEDs(_leds);
+            break;
+        case 3:
+            _leds[0] = 0xFF;
+            _leds[1] = 0xFF;
+            _leds[2] = 0xFF;
+            led_pushLEDs(_leds);
+            break;
+        default:
+            _leds[0] = 0;
+            _leds[1] = 0;
+            _leds[2] = 0;
+            led_pushLEDs(_leds);
+            break;
+    }
+    if (_ledState < 3)
+    {
+        _ledState++;
+    }
+    _ledUpdateIntCount++;
+}
+
 
 int main()
 {
@@ -76,19 +164,47 @@ int main()
     i2cCfg.deviceAddress            = 0x50;
     EEPROM_init_i2c(i2cCfg);
 
-    WP_Write(0);
+    isrADC_StartEx(adcISR);
 
+    ADC_SAR_Seq_Start();
+    ADC_SAR_Seq_StartConvert();
+
+    Timer_Start();
+    alignment_isr_StartEx(alignmentISR);
+
+    isrLEDUpdate_StartEx(ledUpdateISR);
+    
+    //TimerLED_Start();
+    //TimerLED_WritePeriod(50000); 
+    //TimerLED_WriteCounter(50000);                
+    //TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
+    
+    
+    WP_Write(0);
+   
     for(;;)
     {
         HandleLeds();
         HandleBleProcessing();
         CyBle_ProcessEvents();
 
+
         loopCounter++;
-        if (loopCounter > 65000)
+        if (loopCounter > 20000)
         {
             loopCounter = 0;
-            UartBuffer_putString("Hello POV\n");
+            if (_pwrMVolts > 0)
+            {
+                printf("Main power %d mV\n", (int)_pwrMVolts);
+                _pwrMVolts = 0;
+                printf("Rotation rate %d\n", (int)_rotationRate);
+                printf("Alignment int count %d\n", (int)_alignmentIntCount);
+                printf("LED Update int count %d\n", (int)_ledUpdateIntCount);
+            }            
+        }
+        if (_rotationRate < MINIMUM_ROTATION_RATE)
+        {
+            TimerLED_Stop();
         }
     }
 }

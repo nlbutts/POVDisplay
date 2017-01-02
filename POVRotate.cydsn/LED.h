@@ -24,7 +24,7 @@ typedef struct
 } LED_S;
 
 
-typedef enum 
+typedef enum
 {
     OFF,
     RED,
@@ -46,7 +46,25 @@ void led_init(LED_S * cfg);
 *
 * @param color a typdef that defines the color
 */
-void led_setColor(COLOR_E color);
+void led_setAllColor(COLOR_E color);
 
+/**
+* Push new LED values to the chip
+*
+* @param leds - push new LED values to chip
+*/
+void led_pushLEDs(uint8_t * leds);
+
+/**
+* Turn each LED on one at a time
+*
+*/
+void led_cycle();
+
+
+/**
+* Push the current LED values to the LED driver chip
+*/
+void led_update(void);
 
 #endif /* LED_H */

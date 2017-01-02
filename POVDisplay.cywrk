@@ -12,7 +12,6 @@
 <v>.\POVBase.cydsn\POVBase.cyprj</v>
 <v>.\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj</v>
 <v>.\st_eeprom.cylib\st_eeprom.cyprj</v>
-<v>.\UART_to_BLE_central.cydsn\UART_to_BLE_central.cyprj</v>
 <v>.\UART_to_BLE_peripheral.cydsn\UART_to_BLE_peripheral.cyprj</v>
 </projects>
 <workspace_id v="1be81ebb-8ddb-4949-ac76-fcfd36b8e892" />

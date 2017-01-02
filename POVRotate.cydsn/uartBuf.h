@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 
+void UartBuffer_putChar(char c);
 uint16_t UartBuffer_putString(char * str);
 
 uint16_t UartBuffer_getNumberOfBytesInBuffer();

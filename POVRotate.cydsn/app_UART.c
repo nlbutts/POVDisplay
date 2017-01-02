@@ -34,8 +34,9 @@ void HandleUartRxTraffic(CYBLE_GATTC_HANDLE_VALUE_NTF_PARAM_T *uartRxDataNotific
 {
     if(uartRxDataNotification->handleValPair.attrHandle == txCharHandle)
     {
-//        UART_SpiUartPutArray(uartRxDataNotification->handleValPair.value.val, \
-//            (uint32) uartRxDataNotification->handleValPair.value.len);
+/*        UART_SpiUartPutArray(uartRxDataNotification->handleValPair.value.val, \
+            (uint32) uartRxDataNotification->handleValPair.value.len);
+*/        
     }
 }
 

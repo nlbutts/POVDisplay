@@ -20,6 +20,8 @@
 
 static bool _initialized = false;
 static LED_S _cfg;
+static uint8_t _ledPattern[3];
+static uint32_t _ledCycleState = 1;
 
 void led_init(LED_S * cfg)
 {
@@ -28,49 +30,96 @@ void led_init(LED_S * cfg)
     OE_Write(0);
     LE_Write(0);
     DG_Write(1);
+    _ledPattern[0] = 0;
+    _ledPattern[1] = 0;
+    _ledPattern[2] = 0;
+    led_update();
 }
 
-void led_setColor(COLOR_E color)
+void led_setAllColor(COLOR_E color)
 {
-    uint8_t ledPattern[3];
     switch (color)
     {
         case OFF:
-            ledPattern[0] = 0;
-            ledPattern[1] = 0;
-            ledPattern[2] = 0;
+            _ledPattern[0] = 0;
+            _ledPattern[1] = 0;
+            _ledPattern[2] = 0;
             break;
         case RED:
-            ledPattern[0] = 0xFF;
-            ledPattern[1] = 0;
-            ledPattern[2] = 0;
+            _ledPattern[0] = 0xFF;
+            _ledPattern[1] = 0;
+            _ledPattern[2] = 0;
             break;
         case GREEN:
-            ledPattern[0] = 0;
-            ledPattern[1] = 0xFF;
-            ledPattern[2] = 0;
+            _ledPattern[0] = 0;
+            _ledPattern[1] = 0xFF;
+            _ledPattern[2] = 0;
             break;
         case BLUE:
-            ledPattern[0] = 0;
-            ledPattern[1] = 0;
-            ledPattern[2] = 0xFF;
+            _ledPattern[0] = 0;
+            _ledPattern[1] = 0;
+            _ledPattern[2] = 0xFF;
             break;
         case WHITE:
-            ledPattern[0] = 0xFF;
-            ledPattern[1] = 0xFF;
-            ledPattern[2] = 0xFF;
+            _ledPattern[0] = 0xFF;
+            _ledPattern[1] = 0xFF;
+            _ledPattern[2] = 0xFF;
             break;
     }
 
+    led_update();
+}
+
+
+void led_pushLEDs(uint8_t * leds)
+{
+    _ledPattern[0] = leds[0];
+    _ledPattern[1] = leds[1];
+    _ledPattern[2] = leds[2];
+    led_update();
+}
+
+void led_cycle()
+{
+    if (_ledCycleState & 0xFF)
+    {
+        _ledPattern[0] = _ledCycleState;
+        _ledPattern[1] = 0;
+        _ledPattern[2] = 0;
+    }
+    else if(_ledCycleState & 0xFF00)
+    {
+        _ledPattern[0] = 0;
+        _ledPattern[1] = _ledCycleState >> 8;
+        _ledPattern[2] = 0;
+    }
+    else
+    {
+        _ledPattern[0] = 0;
+        _ledPattern[1] = 0;
+        _ledPattern[2] = _ledCycleState >> 16;
+    }
+    _ledCycleState <<= 1;
+    if (_ledCycleState & 0x1000000)
+    {
+        _ledCycleState = 1;
+    }
+    led_update();
+}
+
+
+void led_update()
+{
     OE_Write(1);
     LE_Write(0);
-    CyDelay(1);
-    SPI_LED_SpiUartWriteTxData(ledPattern[0]);
-    SPI_LED_SpiUartWriteTxData(ledPattern[1]);
-    SPI_LED_SpiUartWriteTxData(ledPattern[2]);
-    while (SPI_LED_SpiUartGetTxBufferSize() > 0) {};   
+    CyDelayUs(10);
+    //CyDelay(1);
+    SPI_LED_SpiUartWriteTxData(_ledPattern[0]);
+    SPI_LED_SpiUartWriteTxData(_ledPattern[1]);
+    SPI_LED_SpiUartWriteTxData(_ledPattern[2]);
+    while (SPI_LED_SpiUartGetTxBufferSize() > 0) {};
     while (SPI_LED_SpiIsBusBusy() > 0) {};
-    CyDelay(10);
+    //CyDelay(10);
     LE_Write(1);
     OE_Write(0);
 }
