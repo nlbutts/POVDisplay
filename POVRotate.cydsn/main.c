@@ -19,32 +19,136 @@
 #include "stdbool.h"
 #include "options.h"
 
+/* Holds the input power in millivolts */
 static uint32_t _pwrMVolts;
+
+/* The previous rising edge of photodiode output */
 static uint16_t _previousCapture = 0;
+
+/* The output of the filtered rotation value */
 static uint32_t _rotationRate = 0;
+
+/* LED State of the 4 quad display */
 static uint8_t  _ledState = 0;
+
+/* The local LED states */
 static uint8_t  _leds[3] = {0};
+
+/* Holds a 60 second free running counter */
+uint32_t _timeInSeconds = 0;
+
+/* Debug variables for counting interrupts */
 static uint32_t _alignmentIntCount = 0;
 static uint32_t _ledUpdateIntCount = 0;
+
+/* This holds the filtered rotation time */
 static float    _rotationFilter = 0.0f;
 
 
-void testEEPROM(uint8_t xor)
-{
-    const uint8_t testLen = 32;
-    volatile uint8_t rdData[testLen];
-    volatile uint8_t wrData[testLen];
-    volatile uint8_t status;
+// void testEEPROM(uint8_t xor)
+// {
+//     const uint8_t testLen = 32;
+//     volatile uint8_t rdData[testLen];
+//     volatile uint8_t wrData[testLen];
+//     volatile uint8_t status;
 
-    status = EEPROM_read(0, rdData, testLen);
-    for (uint8_t i = 0; i < testLen; i++)
+//     status = EEPROM_read(0, rdData, testLen);
+//     for (uint8_t i = 0; i < testLen; i++)
+//     {
+//         wrData[i] = i & xor;
+//     }
+//     status = EEPROM_write(0, wrData, testLen);
+//     CyDelay(100);
+//     status = EEPROM_read(0, rdData, testLen);
+//     rdData[0]++;
+// }
+
+void generateQuadPattern()
+{
+    if (_ledState < 15)
     {
-        wrData[i] = i & xor;
+        _leds[0] = 0xFF;
+        _leds[1] = 0;
+        _leds[2] = 0;
+        led_pushLEDs(_leds);
     }
-    status = EEPROM_write(0, wrData, testLen);
-    CyDelay(100);
-    status = EEPROM_read(0, rdData, testLen);
-    rdData[0]++;
+    else if (_ledState < 30)
+    {
+        _leds[0] = 0;
+        _leds[1] = 0xFF;
+        _leds[2] = 0;
+        led_pushLEDs(_leds);
+    }
+    else if (_ledState < 45)
+    {
+        _leds[0] = 0;
+        _leds[1] = 0;
+        _leds[2] = 0xFF;
+        led_pushLEDs(_leds);
+    }
+    else if (_ledState < 60)
+    {
+        _leds[0] = 0xFF;
+        _leds[1] = 0xFF;
+        _leds[2] = 0xFF;
+        led_pushLEDs(_leds);
+    }
+    else
+    {
+        _leds[0] = 0;
+        _leds[1] = 0;
+        _leds[2] = 0;
+        led_pushLEDs(_leds);
+    }
+    _ledUpdateIntCount++;
+    _ledState++;
+}
+
+void generateClock()
+{
+    // Draw the second hand
+    if (_ledState < _timeInSeconds)
+    {
+        _leds[0] = 0x01;
+        _leds[1] = 0;
+        _leds[2] = 0;
+    }
+    else
+    {
+        _leds[0] = 0;
+        _leds[1] = 0;
+        _leds[2] = 0;
+    }
+
+    // Draw the quad pattern
+    if (_ledState < 15)
+    {
+        _leds[0] |= 0xC0;
+        _leds[1] |= 0x30;
+        _leds[2] |= 0x0C;
+    }
+    else if (_ledState < 30)
+    {
+        _leds[0] |= 0x30;
+        _leds[1] |= 0x0C;
+        _leds[2] |= 0xC0;
+    }
+    else if (_ledState < 45)
+    {
+        _leds[0] |= 0x0C;
+        _leds[1] |= 0xC0;
+        _leds[2] |= 0x30;
+    }
+    else if (_ledState < 60)
+    {
+        _leds[0] |= 0xFC;
+        _leds[1] |= 0xFC;
+        _leds[2] |= 0xFC;
+    }
+
+    led_pushLEDs(_leds);
+
+    _ledState++;
 }
 
 uint16_t filterRotation(uint16_t lastRotationTime)
@@ -71,10 +175,8 @@ CY_ISR(alignmentISR)
 
     _ledState = 0;
     TimerLED_Start();
-    TimerLED_WritePeriod(_rotationRate/4); 
-    TimerLED_WriteCounter(0);                
-    //TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
-    //isrLEDUpdate_ClearPending();
+    TimerLED_WritePeriod(_rotationRate/60);
+    TimerLED_WriteCounter(0);
 
     _alignmentIntCount++;
 }
@@ -82,46 +184,24 @@ CY_ISR(alignmentISR)
 CY_ISR(ledUpdateISR)
 {
     TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
-    switch (_ledState)
-    {
-        case 0:
-            _leds[0] = 0xFF;
-            _leds[1] = 0;
-            _leds[2] = 0;
-            led_pushLEDs(_leds);
-            break;
-        case 1:
-            _leds[0] = 0;
-            _leds[1] = 0xFF;
-            _leds[2] = 0;
-            led_pushLEDs(_leds);
-            break;
-        case 2:
-            _leds[0] = 0;
-            _leds[1] = 0;
-            _leds[2] = 0xFF;
-            led_pushLEDs(_leds);
-            break;
-        case 3:
-            _leds[0] = 0xFF;
-            _leds[1] = 0xFF;
-            _leds[2] = 0xFF;
-            led_pushLEDs(_leds);
-            break;
-        default:
-            _leds[0] = 0;
-            _leds[1] = 0;
-            _leds[2] = 0;
-            led_pushLEDs(_leds);
-            break;
-    }
-    if (_ledState < 3)
-    {
-        _ledState++;
-    }
-    _ledUpdateIntCount++;
+    //generateQuadPattern();
+    generateClock();
 }
 
+static uint32_t _oneSecondCounter = 0;
+void sysTickCallback(void)
+{
+    _oneSecondCounter++;
+    if (_oneSecondCounter >= 1000)
+    {
+        _oneSecondCounter = 0;
+        _timeInSeconds++;
+        if (_timeInSeconds >= 60)
+        {
+            _timeInSeconds = 0;
+        }
+    }
+}
 
 int main()
 {
@@ -173,21 +253,17 @@ int main()
     alignment_isr_StartEx(alignmentISR);
 
     isrLEDUpdate_StartEx(ledUpdateISR);
-    
-    //TimerLED_Start();
-    //TimerLED_WritePeriod(50000); 
-    //TimerLED_WriteCounter(50000);                
-    //TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
-    
-    
+
+    CySysTickStart();
+    CySysTickSetCallback(0, sysTickCallback);
+
     WP_Write(0);
-   
+
     for(;;)
     {
         HandleLeds();
         HandleBleProcessing();
         CyBle_ProcessEvents();
-
 
         loopCounter++;
         if (loopCounter > 20000)
@@ -198,14 +274,16 @@ int main()
                 printf("Main power %d mV\n", (int)_pwrMVolts);
                 _pwrMVolts = 0;
                 printf("Rotation rate %d\n", (int)_rotationRate);
-                printf("Alignment int count %d\n", (int)_alignmentIntCount);
-                printf("LED Update int count %d\n", (int)_ledUpdateIntCount);
-            }            
+                //printf("Alignment int count %d\n", (int)_alignmentIntCount);
+                //printf("LED Update int count %d\n", (int)_ledUpdateIntCount);
+            }
         }
         if (_rotationRate < MINIMUM_ROTATION_RATE)
         {
             TimerLED_Stop();
         }
+
+
     }
 }
 

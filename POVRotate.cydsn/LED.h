@@ -34,6 +34,9 @@ typedef enum
 } COLOR_E;
 
 
+#define LED_SET_PIXEL(x, pos)    (x |= (1 << (pos)))
+#define LED_CLR_PIXEL(x, pos)    (x &= ~(1 << (pos)))
+
 /**
 * Initialies the led functions
 *
@@ -60,7 +63,6 @@ void led_pushLEDs(uint8_t * leds);
 *
 */
 void led_cycle();
-
 
 /**
 * Push the current LED values to the LED driver chip
