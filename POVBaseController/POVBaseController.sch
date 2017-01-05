@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:POVBaseController-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -30,6 +31,8 @@ LIBS:contrib
 LIBS:valves
 LIBS:microchip_pic12mcu
 LIBS:mylib
+LIBS:General
+LIBS:POVBaseController-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -56,7 +59,7 @@ F 3 "" H 7250 1500 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L LED D1
+L LED-RESCUE-POVBaseController D1
 U 1 1 57E825DA
 P 6700 1500
 F 0 "D1" H 6700 1600 50  0000 C CNN
