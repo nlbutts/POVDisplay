@@ -38,8 +38,8 @@ void setFrequency(uint32_t freq)
 {
     uint16_t period = PWM_CLOCK / freq;
 
-    PWM_WritePeriod(period);
-    PWM_WriteCompare(period/2);
+    PWM_Coil_WritePeriod(period);
+    PWM_Coil_WriteCompare(period/2);
 
 }
 
@@ -93,19 +93,9 @@ int main()
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-    PWM_Start();
-    isr_button_StartEx(buttonISR);
+    PWM_Coil_Start();
     
-    if (BUTTON_Read() == 0)
-    {
-        // The button was depressed on power up, perform an automatic sweep
-        autoSweep = 1;
-        currentFrequency = STARTING_FREQ;
-    }
-    else
-    {
-        currentFrequency = STARTING_FREQ;
-    }
+    currentFrequency = STARTING_FREQ;
     
     //setFrequency(currentFrequency);
     buttonPressed = 0;

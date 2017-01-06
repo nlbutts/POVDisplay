@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:POVBaseController-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -691,7 +692,7 @@ Wire Wire Line
 Wire Wire Line
 	3800 3200 3800 3350
 Wire Wire Line
-	3800 3350 4100 3350
+	3800 3350 4700 3350
 Connection ~ 4100 3350
 $Comp
 L GND #PWR?
@@ -733,7 +734,7 @@ Wire Wire Line
 Wire Wire Line
 	2100 3500 2100 3650
 Wire Wire Line
-	1850 3200 1850 3150
+	1850 3050 1850 3200
 Connection ~ 2100 3150
 Wire Wire Line
 	1850 3500 1850 3600
@@ -792,4 +793,46 @@ Wire Wire Line
 	2200 2850 1400 2850
 Text Label 1500 2850 0    60   ~ 0
 nSLEEP
+Wire Wire Line
+	3800 1950 4500 1950
+Wire Wire Line
+	3800 2050 4500 2050
+Wire Wire Line
+	3800 2500 4500 2500
+Wire Wire Line
+	3800 2600 4500 2600
+Wire Wire Line
+	3800 2250 4700 2250
+Wire Wire Line
+	4700 2250 4700 3350
+Wire Wire Line
+	3800 2750 4700 2750
+Connection ~ 4700 2750
+Text Label 3900 1950 0    60   ~ 0
+COIL_A
+Text Label 3900 2050 0    60   ~ 0
+COIL_B
+Text Label 3900 2500 0    60   ~ 0
+MOTOR_A
+Text Label 3900 2600 0    60   ~ 0
+MOTOR_B
+Text Label 1500 2750 0    60   ~ 0
+nFault
+$Comp
+L +12V #PWR?
+U 1 1 586FF9E0
+P 1850 3050
+F 0 "#PWR?" H 1850 2900 50  0001 C CNN
+F 1 "+12V" H 1850 3190 50  0000 C CNN
+F 2 "" H 1850 3050 50  0000 C CNN
+F 3 "" H 1850 3050 50  0000 C CNN
+	1    1850 3050
+	1    0    0    -1  
+$EndComp
+Connection ~ 1850 3150
+Wire Wire Line
+	3800 3050 3900 3050
+Wire Wire Line
+	3900 3050 3900 2950
+Connection ~ 3900 2950
 $EndSCHEMATC
