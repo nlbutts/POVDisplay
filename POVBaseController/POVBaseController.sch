@@ -184,17 +184,6 @@ F 3 "" H 7500 2650 50  0000 C CNN
 	1    7500 2650
 	1    0    0    -1  
 $EndComp
-$Comp
-L TEST_1P W3
-U 1 1 57E86762
-P 4900 3350
-F 0 "W3" H 4900 3620 50  0000 C CNN
-F 1 "TEST_1P" H 4900 3550 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 5100 3350 50  0001 C CNN
-F 3 "" H 5100 3350 50  0000 C CNN
-	1    4900 3350
-	1    0    0    -1  
-$EndComp
 Text Label 10100 1950 2    60   ~ 0
 SWDCLK
 Text Label 10050 2050 2    60   ~ 0
@@ -235,28 +224,17 @@ $EndComp
 $Comp
 L CONN_01X02 P1
 U 1 1 57E8BA15
-P 1300 5650
-F 0 "P1" H 1300 5800 50  0000 C CNN
-F 1 "CONN_01X02" V 1400 5650 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02" H 1300 5650 50  0001 C CNN
-F 3 "" H 1300 5650 50  0000 C CNN
-	1    1300 5650
+P 1250 5950
+F 0 "P1" H 1250 6100 50  0000 C CNN
+F 1 "CONN_01X02" V 1350 5950 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x02" H 1250 5950 50  0001 C CNN
+F 3 "" H 1250 5950 50  0000 C CNN
+	1    1250 5950
 	-1   0    0    1   
 $EndComp
-$Comp
-L CONN_01X02 P2
-U 1 1 57E8BBF6
-P 1300 6300
-F 0 "P2" H 1300 6450 50  0000 C CNN
-F 1 "CONN_01X02" V 1400 6300 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02" H 1300 6300 50  0001 C CNN
-F 3 "" H 1300 6300 50  0000 C CNN
-	1    1300 6300
-	-1   0    0    1   
-$EndComp
-Text Label 1550 5600 0    60   ~ 0
+Text Label 1500 5900 0    60   ~ 0
 COIL_OUT_A
-Text Label 1550 5700 0    60   ~ 0
+Text Label 1500 6000 0    60   ~ 0
 COIL_OUT_B
 $Comp
 L PWR_FLAG #FLG011
@@ -426,7 +404,7 @@ Wire Wire Line
 Wire Wire Line
 	7500 2800 7500 3600
 Wire Wire Line
-	4900 3350 6050 3350
+	5250 3350 6050 3350
 Wire Wire Line
 	8150 2450 8150 2600
 Wire Wire Line
@@ -440,9 +418,9 @@ Wire Wire Line
 	8450 2550 8150 2550
 Connection ~ 8150 2550
 Wire Wire Line
-	1500 5600 2100 5600
+	1450 5900 2050 5900
 Wire Wire Line
-	1500 5700 2100 5700
+	1450 6000 2050 6000
 Wire Wire Line
 	4350 6100 4350 5850
 Wire Wire Line
@@ -538,14 +516,6 @@ Wire Wire Line
 	1950 2200 1100 2200
 Wire Wire Line
 	1950 2300 1100 2300
-Text Label 1200 1950 0    60   ~ 0
-COIL_IN_A
-Text Label 1200 2050 0    60   ~ 0
-COIL_IN_B
-Text Label 1200 2200 0    60   ~ 0
-MOTOR_IN_A
-Text Label 1200 2300 0    60   ~ 0
-MOTOR_IN_B
 $Comp
 L R R1
 U 1 1 586F0B29
@@ -683,9 +653,9 @@ MOTOR_IN_A
 Text Label 5400 3550 0    60   ~ 0
 MOTOR_IN_B
 Wire Wire Line
-	5100 2550 6050 2550
+	5350 2550 6050 2550
 Wire Wire Line
-	4950 2650 6050 2650
+	5350 2650 6050 2650
 Text Label 5400 2550 0    60   ~ 0
 UART_RX
 Text Label 5400 2650 0    60   ~ 0
@@ -698,19 +668,8 @@ Wire Wire Line
 	6050 3150 5350 3150
 Text Label 5400 3150 0    60   ~ 0
 nSLEEP
-$Comp
-L TEST_1P W6
-U 1 1 58713F22
-P 5100 3250
-F 0 "W6" H 5100 3520 50  0000 C CNN
-F 1 "TEST_1P" H 5100 3450 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 5300 3250 50  0001 C CNN
-F 3 "" H 5300 3250 50  0000 C CNN
-	1    5100 3250
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	6050 3250 5100 3250
+	6050 3250 5350 3250
 $Comp
 L TEST_1P W2
 U 1 1 5871401E
@@ -804,14 +763,6 @@ F 3 "" H 1350 7000 50  0000 C CNN
 	1    1350 7000
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1500 6250 2100 6250
-Wire Wire Line
-	1500 6350 2100 6350
-Text Label 1550 6250 0    60   ~ 0
-MOTOR_OUT_A
-Text Label 1550 6350 0    60   ~ 0
-MOTOR_OUT_B
 $Comp
 L GND #PWR020
 U 1 1 5871551C
@@ -845,28 +796,6 @@ Wire Wire Line
 Wire Wire Line
 	1650 7100 2100 7100
 Connection ~ 2100 7100
-$Comp
-L TEST_1P W9
-U 1 1 58716DD8
-P 4950 2650
-F 0 "W9" H 4950 2920 50  0000 C CNN
-F 1 "TX" H 4950 2850 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 5150 2650 50  0001 C CNN
-F 3 "" H 5150 2650 50  0000 C CNN
-	1    4950 2650
-	1    0    0    -1  
-$EndComp
-$Comp
-L TEST_1P W10
-U 1 1 58716E53
-P 5100 2550
-F 0 "W10" H 5100 2820 50  0000 C CNN
-F 1 "RX" H 5100 2750 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 5300 2550 50  0001 C CNN
-F 3 "" H 5300 2550 50  0000 C CNN
-	1    5100 2550
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6400 5050 7100 5050
 $Comp
@@ -883,4 +812,107 @@ F 4 "LM317AEMP/NOPBCT" H 6400 4650 60  0001 C CNN "Digikey"
 $EndComp
 Wire Wire Line
 	6400 5050 6400 4900
+$Comp
+L CONN_01X05 P4
+U 1 1 5872990F
+P 10350 4400
+F 0 "P4" H 10350 4700 50  0000 C CNN
+F 1 "CONN_01X05" V 10450 4400 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x05" H 10350 4400 50  0001 C CNN
+F 3 "" H 10350 4400 50  0000 C CNN
+	1    10350 4400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10150 4200 9500 4200
+Wire Wire Line
+	10150 4300 9500 4300
+Wire Wire Line
+	9350 4400 10150 4400
+Wire Wire Line
+	10150 4500 9500 4500
+Wire Wire Line
+	10150 4600 9500 4600
+Text Label 9550 4500 0    60   ~ 0
+NIR_EMITTER
+Text Label 9550 4600 0    60   ~ 0
+SPARE
+$Comp
+L GND #PWR022
+U 1 1 5872AEFD
+P 9100 4150
+F 0 "#PWR022" H 9100 3900 50  0001 C CNN
+F 1 "GND" H 9100 4000 50  0000 C CNN
+F 2 "" H 9100 4150 50  0000 C CNN
+F 3 "" H 9100 4150 50  0000 C CNN
+	1    9100 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R5
+U 1 1 5872B250
+P 9350 4500
+F 0 "R5" V 9430 4500 50  0000 C CNN
+F 1 "1.5k" V 9350 4500 50  0000 C CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 9280 4500 50  0001 C CNN
+F 3 "" H 9350 4500 50  0000 C CNN
+	1    9350 4500
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9200 4500 8350 4500
+Text Label 8400 4500 0    60   ~ 0
+NIR_EMITTER_LS
+Text Label 9550 4400 0    60   ~ 0
+GND
+Text Label 9550 4200 0    60   ~ 0
+MOTOR_OUT_A
+Text Label 9550 4300 0    60   ~ 0
+MOTOR_OUT_B
+Wire Wire Line
+	9100 4150 9350 4150
+Wire Wire Line
+	9350 4150 9350 4400
+Text Label 5300 3350 0    60   ~ 0
+NIR_EMITTER_LS
+Text Label 5400 3250 0    60   ~ 0
+SPARE
+$Comp
+L CONN_01X01 P2
+U 1 1 5872DB06
+P 10300 3000
+F 0 "P2" H 10300 3100 50  0000 C CNN
+F 1 "CONN_01X01" V 10400 3000 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 10300 3000 50  0001 C CNN
+F 3 "" H 10300 3000 50  0000 C CNN
+	1    10300 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X01 P5
+U 1 1 5872DCFB
+P 10300 3300
+F 0 "P5" H 10300 3400 50  0000 C CNN
+F 1 "CONN_01X01" V 10400 3300 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 10300 3300 50  0001 C CNN
+F 3 "" H 10300 3300 50  0000 C CNN
+	1    10300 3300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10100 3000 9650 3000
+Wire Wire Line
+	10100 3300 9650 3300
+Text Label 9700 3000 0    60   ~ 0
+UART_TX
+Text Label 9700 3300 0    60   ~ 0
+UART_RX
+Text Label 1150 1950 0    60   ~ 0
+COIL_IN_A
+Text Label 1150 2050 0    60   ~ 0
+COIL_IN_B
+Text Label 1150 2200 0    60   ~ 0
+MOTOR_IN_A
+Text Label 1150 2300 0    60   ~ 0
+MOTOR_IN_B
 $EndSCHEMATC
