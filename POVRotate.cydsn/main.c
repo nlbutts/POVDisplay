@@ -18,10 +18,11 @@
 #include "uartBuf.h"
 #include "stdbool.h"
 #include "options.h"
+#include "fonts.h"
 
 #define UPDATES_PER_ROTATION    120
 #define SECONDS_TO_UPDATES(x)   ((x * UPDATES_PER_ROTATION) / 60)
-
+#define UPDATES_TO_
 
 /* Holds the input power in millivolts */
 static uint32_t _pwrMVolts;
@@ -30,11 +31,12 @@ static uint32_t _pwrMVolts;
 static uint16_t _previousCapture = 0;
 
 /* The output of the filtered rotation value */
-#define ROTATION_FILTER_GAIN    (0.2 * 256)
+#define ROTATION_FILTER_GAIN    (0.1 * 256)
 static int32_t _rotationRate = 0;
 
 /* LED State of the 4 quad display */
 static uint8_t  _ledState = 0;
+static uint32_t _angle = 0;
 
 /* The local LED states */
 static uint8_t  _leds[3] = {0};
@@ -48,7 +50,9 @@ static uint32_t _ledUpdateIntCount = 0;
 
 /* Holds the filter for the task time */
 static int32_t _drawLoopAvg = 0;
-#define UPDATE_FILTER_GAIN      (0.2 * 256)
+#define UPDATE_FILTER_GAIN      (0.1 * 256)
+
+uint8_t _sendUpdate = 0;
 
 // void testEEPROM(uint8_t xor)
 // {
@@ -67,6 +71,11 @@ static int32_t _drawLoopAvg = 0;
 //     status = EEPROM_read(0, rdData, testLen);
 //     rdData[0]++;
 // }
+
+uint32_t getAngle()
+{
+    return _angle;
+}
 
 void generateQuadPattern()
 {
@@ -109,9 +118,56 @@ void generateQuadPattern()
     _ledState++;
 }
 
+void printHello()
+{
+    const char str[] = "HELLO";
+    uint32_t strLen = strlen(str);
+    uint32_t angle = getAngle();
+    uint32_t cIndex = angle >> 5;
+    uint32_t bIndex = angle % 0x1F;
+    bIndex /= 4;
+    if (cIndex < strLen)
+    {
+        char c = str[cIndex];
+        const uint8_t * ptr = &Font12.table[(c - ' ') * Font12.Height];
+
+        if (bIndex < 8)
+        {
+            uint8_t mask = 0x80 >> bIndex;
+            uint8_t shift1 = 7 - bIndex;
+            uint8_t shift2 = 7;
+            uint8_t temp = 0;
+            temp |= ((ptr[8] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[7] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[6] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[5] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[4] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[3] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[2] & mask) >> shift1) << shift2--;
+            temp |= ((ptr[1] & mask) >> shift1) << shift2--;
+
+            _leds[0] = temp;
+            _leds[1] = 0;
+            _leds[2] = 0;
+        }
+        else
+        {
+            _leds[0] = 0;
+            _leds[1] = 0;
+            _leds[2] = 0;
+        }
+    }
+    else
+    {
+        _leds[0] = 0;
+        _leds[1] = 0;
+        _leds[2] = 0;
+    }
+}
+
 void generateClock()
 {
-    int temp = _timeInSeconds - _ledState;
+    int temp = SECONDS_TO_UPDATES(_timeInSeconds) - _ledState;
     if ((temp > 0) && (temp <= 2))
     {
         // If within 5 seconds, draw red
@@ -177,8 +233,6 @@ void generateClock()
     //     _leds[2] |= 0xFC;
     // }
 
-    led_pushLEDs(_leds);
-
     _ledState++;
 }
 
@@ -202,12 +256,18 @@ CY_ISR(alignmentISR)
     uint16_t diffTime = capture - _previousCapture;
     _previousCapture = capture;
     _rotationRate = filter(diffTime, _rotationRate, ROTATION_FILTER_GAIN);
-
+    if (_rotationRate < MINIMUM_ROTATION_RATE)
+    {
+        TimerLED_Stop();
+    }
+    else
+    {
+        TimerLED_Start();
+        TimerLED_WritePeriod(_rotationRate/UPDATES_PER_ROTATION);
+        TimerLED_WriteCounter(0);
+    }
     _ledState = 0;
-    TimerLED_Start();
-    TimerLED_WritePeriod(_rotationRate/UPDATES_PER_ROTATION);
-    TimerLED_WriteCounter(0);
-
+    _angle = 0;
     _alignmentIntCount++;
 }
 
@@ -215,8 +275,15 @@ CY_ISR(ledUpdateISR)
 {
     uint16_t start = TimeSpan_ReadCounter();
     TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
+
+    _angle += 360 / UPDATES_PER_ROTATION;
+
     //generateQuadPattern();
-    generateClock();
+    //generateClock();
+    printHello();
+
+    led_pushLEDs(_leds);
+
     uint16_t stop = TimeSpan_ReadCounter();
     _drawLoopAvg = filter(stop - start, _drawLoopAvg, UPDATE_FILTER_GAIN);
 }
@@ -227,6 +294,7 @@ void sysTickCallback(void)
     _oneSecondCounter++;
     if (_oneSecondCounter >= 1000)
     {
+        _sendUpdate++;
         _oneSecondCounter = 0;
         _timeInSeconds++;
         if (_timeInSeconds >= 60)
@@ -238,7 +306,6 @@ void sysTickCallback(void)
 
 int main()
 {
-    uint32_t loopCounter = 0;
     CYBLE_API_RESULT_T      bleApiResult;
 
     CyGlobalIntEnable; /* Enable global interrupts. */
@@ -296,30 +363,19 @@ int main()
 
     for(;;)
     {
+        //printHello();
         HandleLeds();
         HandleBleProcessing();
         CyBle_ProcessEvents();
 
-        loopCounter++;
-        if (loopCounter > 20000)
+        if (_sendUpdate == 2)
         {
-            loopCounter = 0;
-            if (_pwrMVolts > 0)
-            {
-                printf("Main power %d mV\n", (int)_pwrMVolts);
-                _pwrMVolts = 0;
-                printf("Rotation rate %d in us\n", (int)_rotationRate * 10);
-                printf("Loop average %d in us\n", (int)_drawLoopAvg);
-                //printf("Alignment int count %d\n", (int)_alignmentIntCount);
-                //printf("LED Update int count %d\n", (int)_ledUpdateIntCount);
-            }
+            _sendUpdate = 0;
+            printf("Main power %d mV\n", (int)_pwrMVolts);
+            _pwrMVolts = 0;
+            printf("Rotation rate %d in us\n", (int)_rotationRate * 10);
+            printf("Loop average %d in us\n", (int)_drawLoopAvg);
         }
-        if (_rotationRate < MINIMUM_ROTATION_RATE)
-        {
-            TimerLED_Stop();
-        }
-
-
     }
 }
 

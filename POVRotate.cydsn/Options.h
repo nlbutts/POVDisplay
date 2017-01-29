@@ -47,9 +47,8 @@
 
 #define ENCRYPTION_ENABLED      (ENCRYPT_ENABLED || CYDEV_BOOTLOADER_ENABLE)
 
-#define MINIMUM_ROTATION_RATE   1000    
-#define ROTATION_FILTER_K       0.15f
-    
+#define MINIMUM_ROTATION_RATE   2000
+
 #endif /* Options_H */
 
 
