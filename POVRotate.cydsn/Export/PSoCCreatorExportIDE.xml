@@ -6,22 +6,22 @@
     <Toolchain Name="ARM GCC Generic" Selected="True">
       <Tool Name="prebuild" Command="" Options="" />
       <Tool Name="assembler" Command="arm-none-eabi-as.exe" Options="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -alh=${OutputDir}/${CompileFile}.lst -g -W" />
-      <Tool Name="compiler" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -I..\st_eeprom.cylib -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D NDEBUG -Wall -ffunction-sections -Os -ffat-lto-objects -std=gnu11" />
-      <Tool Name="linker" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -g -ffunction-sections -Os -ffat-lto-objects -L Generated_Source\PSoC4 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4\cm0gcc.ld -specs=nano.specs -Wl,--gc-sections" />
+      <Tool Name="compiler" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -I..\st_eeprom.cylib -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -Og -ffat-lto-objects -std=gnu11" />
+      <Tool Name="linker" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -g -ffunction-sections -Og -ffat-lto-objects -L Generated_Source\PSoC4 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4\cm0gcc.ld -specs=nano.specs -Wl,--gc-sections" />
       <Tool Name="postbuild" Command="" Options="" />
     </Toolchain>
     <Toolchain Name="ARM MDK Generic" Selected="False">
       <Tool Name="prebuild" Command="" Options="" />
       <Tool Name="assembler" Command="armasm.exe" Options="--cpu=Cortex-M0 --diag_style=gnu --thumb -i. -iGenerated_Source\PSoC4 -g --list=${OutputDir}/${CompileFile}.lst" />
-      <Tool Name="compiler" Command="armcc.exe" Options="--cpu=Cortex-M0 --diag_style=gnu -I. -IGenerated_Source\PSoC4 --list --signed_chars -g -D NDEBUG -Ospace --split_sections" />
+      <Tool Name="compiler" Command="armcc.exe" Options="--cpu=Cortex-M0 --diag_style=gnu -I. -IGenerated_Source\PSoC4 --list --signed_chars -g -D DEBUG -O0 --split_sections" />
       <Tool Name="linker" Command="armlink.exe" Options="--cpu=Cortex-M0 --diag_style=gnu --no_startup --library_type=microlib --map --list ${OutputDir}/${ProjectShortName}.map --scatter C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4\Cm0RealView.scat" />
       <Tool Name="postbuild" Command="" Options="" />
     </Toolchain>
     <Toolchain Name="ARM IAR Generic" Selected="False">
       <Tool Name="prebuild" Command="" Options="" />
-      <Tool Name="assembler" Command="iasmarm.exe" Options="--cpu Cortex-M0 -I. -IGenerated_Source\PSoC4 -s+ -M&lt;&gt; -w+ -r -DNDEBUG --fpu None" />
-      <Tool Name="compiler" Command="iccarm.exe" Options="--cpu Cortex-M0 -I. -IGenerated_Source\PSoC4 -D NDEBUG --debug --endian=little -e --fpu=None --no_wrap_diagnostics" />
-      <Tool Name="linker" Command="ilinkarm.exe" Options="--semihosting --entry __iar_program_start --config Generated_Source\PSoC4\Cm0Iar.icf" />
+      <Tool Name="assembler" Command="iasmarm.exe" Options="--cpu Cortex-M0 -I. -IGenerated_Source\PSoC4 -s+ -M&lt;&gt; -w+ -r -DDEBUG --fpu None" />
+      <Tool Name="compiler" Command="iccarm.exe" Options="--cpu Cortex-M0 -I. -IGenerated_Source\PSoC4 -D DEBUG --no_cse --no_unroll --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling --debug --endian=little -e --fpu=None -On --no_wrap_diagnostics" />
+      <Tool Name="linker" Command="ilinkarm.exe" Options="--semihosting --entry __iar_program_start --config Generated_Source\PSoC4\Generated_Source\PSoC4\Cm0Iar.icf" />
       <Tool Name="postbuild" Command="" Options="" />
     </Toolchain>
   </Toolchains>
@@ -43,6 +43,7 @@
           <File BuildType="BUILD" Toolchain="">app_UART.c</File>
           <File BuildType="BUILD" Toolchain="">uartBuf.c</File>
           <File BuildType="BUILD" Toolchain="">debug.c</File>
+          <File BuildType="BUILD" Toolchain="">font12.c</File>
           <File BuildType="BUILD" Toolchain="">cyapicallbacks.h</File>
           <File BuildType="BUILD" Toolchain="">LED.h</File>
           <File BuildType="BUILD" Toolchain="">types.h</File>
@@ -53,6 +54,7 @@
           <File BuildType="BUILD" Toolchain="">main.h</File>
           <File BuildType="BUILD" Toolchain="">debug.h</File>
           <File BuildType="BUILD" Toolchain="">Options.h</File>
+          <File BuildType="BUILD" Toolchain="">fonts.h</File>
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4">
@@ -73,6 +75,7 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI_UART.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI_UART.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI_UART_INT.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_BOOT.c</File>
@@ -81,15 +84,12 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI_UART_PVT.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_PVT.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_BOOT.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SPI_UART_INT.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OTHER.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OTHER.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OTHER_aliases.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OTHER_PM.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND_aliases.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\alignment_isr.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\alignment_isr.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq_PM.c</File>
@@ -98,8 +98,10 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\INPUT_POWER.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\INPUT_POWER_aliases.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\INPUT_POWER_PM.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\alignment_isr.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\alignment_isr.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ALIGNMENT_IND_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrADC.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrADC.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\I2C_EEPROM.c</File>
@@ -129,6 +131,52 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SW_Tx_UART.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SW_Tx_UART_PVT.h</File>
           <File BuildType="BUILD" Toolchain="ARM IAR Generic">Generated_Source\PSoC4\SW_Tx_UART_AsmIar.s</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LE.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LE.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LE_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LE_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_gatt.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_gatt.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_eventHandler.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_INT.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_PVT.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_HAL_PVT.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_STACK_PVT.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGap.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGatt.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattDb.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackHostMain.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackL2cap.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattServer.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattClient.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_Stack.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_eventHandler.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerLED.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerLED.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerLED_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_2.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_2.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrLEDUpdate.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrLEDUpdate.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\RTC.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\RTC.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCBCLK.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCBCLK.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_sclk_m.c</File>
@@ -139,6 +187,8 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_mosi_m.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_mosi_m_aliases.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_mosi_m_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq_IRQ.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq_IRQ.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ADC_SAR_Seq_intClock.c</File>
@@ -155,6 +205,8 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\I2C_EEPROM_scl_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\I2C_EEPROM_SCB_IRQ.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\I2C_EEPROM_SCB_IRQ.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.h</File>
           <File BuildType="BUILD" Toolchain="ARM GCC Generic">Generated_Source\PSoC4\cm0gcc.ld</File>
           <File BuildType="BUILD" Toolchain="ARM MDK Generic">Generated_Source\PSoC4\Cm0RealView.scat</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Cm0Start.c</File>
@@ -183,6 +235,7 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cycodeshareimport.ld</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cycodeshareexport.ld</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cycodeshareimport.scat</File>
+<<<<<<< HEAD
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG.c</File>
@@ -238,6 +291,8 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimeSpan_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_3.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_3.h</File>
+=======
+>>>>>>> 850848653b95aaa14605e184110af0fab499ad19
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic">
