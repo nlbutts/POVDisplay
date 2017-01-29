@@ -19,6 +19,10 @@
 #include "stdbool.h"
 #include "options.h"
 
+#define UPDATES_PER_ROTATION    120
+#define SECONDS_TO_UPDATES(x)   ((x * UPDATES_PER_ROTATION) / 60)
+
+
 /* Holds the input power in millivolts */
 static uint32_t _pwrMVolts;
 
@@ -26,7 +30,8 @@ static uint32_t _pwrMVolts;
 static uint16_t _previousCapture = 0;
 
 /* The output of the filtered rotation value */
-static uint32_t _rotationRate = 0;
+#define ROTATION_FILTER_GAIN    (0.2 * 256)
+static int32_t _rotationRate = 0;
 
 /* LED State of the 4 quad display */
 static uint8_t  _ledState = 0;
@@ -41,9 +46,9 @@ uint32_t _timeInSeconds = 0;
 static uint32_t _alignmentIntCount = 0;
 static uint32_t _ledUpdateIntCount = 0;
 
-/* This holds the filtered rotation time */
-static float    _rotationFilter = 0.0f;
-
+/* Holds the filter for the task time */
+static int32_t _drawLoopAvg = 0;
+#define UPDATE_FILTER_GAIN      (0.2 * 256)
 
 // void testEEPROM(uint8_t xor)
 // {
@@ -106,56 +111,81 @@ void generateQuadPattern()
 
 void generateClock()
 {
-    // Draw the second hand
-    if (_ledState < _timeInSeconds)
+    int temp = _timeInSeconds - _ledState;
+    if ((temp > 0) && (temp <= 2))
     {
-        _leds[0] = 0x01;
+        // If within 5 seconds, draw red
+        _leds[0] = 0xFF;
         _leds[1] = 0;
         _leds[2] = 0;
     }
+    else if ((temp > 0) && (temp <= 4))
+    {
+        // Draw green
+        _leds[0] = 0;
+        _leds[1] = 0xFF;
+        _leds[2] = 0;
+    }
+    else if ((temp > 0) && (temp <= 6))
+    {
+        // Draw green
+        _leds[0] = 0;
+        _leds[1] = 0;
+        _leds[2] = 0xFF;
+    }
     else
     {
+        // Make dark
         _leds[0] = 0;
         _leds[1] = 0;
         _leds[2] = 0;
     }
 
-    // Draw the quad pattern
-    if (_ledState < 15)
+    if ((_ledState == SECONDS_TO_UPDATES(15)) ||
+        (_ledState == SECONDS_TO_UPDATES(30)) ||
+        (_ledState == SECONDS_TO_UPDATES(45)) ||
+        (_ledState == SECONDS_TO_UPDATES(0)))
     {
-        _leds[0] |= 0xC0;
-        _leds[1] |= 0x30;
-        _leds[2] |= 0x0C;
+        _leds[0] |= 0x01;
+        _leds[1] |= 0x01;
+        _leds[2] |= 0x01;
     }
-    else if (_ledState < 30)
-    {
-        _leds[0] |= 0x30;
-        _leds[1] |= 0x0C;
-        _leds[2] |= 0xC0;
-    }
-    else if (_ledState < 45)
-    {
-        _leds[0] |= 0x0C;
-        _leds[1] |= 0xC0;
-        _leds[2] |= 0x30;
-    }
-    else if (_ledState < 60)
-    {
-        _leds[0] |= 0xFC;
-        _leds[1] |= 0xFC;
-        _leds[2] |= 0xFC;
-    }
+
+    // // Draw the quad pattern
+    // if (_ledState < 15)
+    // {
+    //     _leds[0] |= 0xC0;
+    //     _leds[1] |= 0x30;
+    //     _leds[2] |= 0x0C;
+    // }
+    // else if (_ledState < 30)
+    // {
+    //     _leds[0] |= 0x30;
+    //     _leds[1] |= 0x0C;
+    //     _leds[2] |= 0xC0;
+    // }
+    // else if (_ledState < 45)
+    // {
+    //     _leds[0] |= 0x0C;
+    //     _leds[1] |= 0xC0;
+    //     _leds[2] |= 0x30;
+    // }
+    // else if (_ledState < 60)
+    // {
+    //     _leds[0] |= 0xFC;
+    //     _leds[1] |= 0xFC;
+    //     _leds[2] |= 0xFC;
+    // }
 
     led_pushLEDs(_leds);
 
     _ledState++;
 }
 
-uint16_t filterRotation(uint16_t lastRotationTime)
+int32_t filter(int32_t x, int32_t y, int32_t k)
 {
-    float temp = lastRotationTime;
-    _rotationFilter = _rotationFilter + ((temp - _rotationFilter) * ROTATION_FILTER_K);
-    return (uint16_t)_rotationFilter;
+    y = y + (((x - y) * k) >> 8);
+    return y;
 }
 
 CY_ISR(adcISR)
@@ -167,15 +197,15 @@ CY_ISR(adcISR)
 
 CY_ISR(alignmentISR)
 {
-    Timer_ClearInterrupt(0xFF);
-    uint16_t capture = Timer_ReadCapture();
+    TimerAlignment_ClearInterrupt(0xFF);
+    uint16_t capture = TimerAlignment_ReadCapture();
     uint16_t diffTime = capture - _previousCapture;
     _previousCapture = capture;
-    _rotationRate = filterRotation(diffTime);
+    _rotationRate = filter(diffTime, _rotationRate, ROTATION_FILTER_GAIN);
 
     _ledState = 0;
     TimerLED_Start();
-    TimerLED_WritePeriod(_rotationRate/60);
+    TimerLED_WritePeriod(_rotationRate/UPDATES_PER_ROTATION);
     TimerLED_WriteCounter(0);
 
     _alignmentIntCount++;
@@ -183,9 +213,12 @@ CY_ISR(alignmentISR)
 
 CY_ISR(ledUpdateISR)
 {
+    uint16_t start = TimeSpan_ReadCounter();
     TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
     //generateQuadPattern();
     generateClock();
+    uint16_t stop = TimeSpan_ReadCounter();
+    _drawLoopAvg = filter(stop - start, _drawLoopAvg, UPDATE_FILTER_GAIN);
 }
 
 static uint32_t _oneSecondCounter = 0;
@@ -249,13 +282,15 @@ int main()
     ADC_SAR_Seq_Start();
     ADC_SAR_Seq_StartConvert();
 
-    Timer_Start();
+    TimerAlignment_Start();
     alignment_isr_StartEx(alignmentISR);
 
     isrLEDUpdate_StartEx(ledUpdateISR);
 
     CySysTickStart();
     CySysTickSetCallback(0, sysTickCallback);
+
+    TimeSpan_Start();
 
     WP_Write(0);
 
@@ -273,7 +308,8 @@ int main()
             {
                 printf("Main power %d mV\n", (int)_pwrMVolts);
                 _pwrMVolts = 0;
-                printf("Rotation rate %d\n", (int)_rotationRate);
+                printf("Rotation rate %d in us\n", (int)_rotationRate * 10);
+                printf("Loop average %d in us\n", (int)_drawLoopAvg);
                 //printf("Alignment int count %d\n", (int)_alignmentIntCount);
                 //printf("LED Update int count %d\n", (int)_ledUpdateIntCount);
             }

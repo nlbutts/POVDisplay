@@ -219,9 +219,6 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_2.c</File>
@@ -233,6 +230,14 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerLED_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\RTC.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\RTC.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerAlignment.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerAlignment.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimerAlignment_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimeSpan.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimeSpan.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\TimeSpan_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_3.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_3.h</File>
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic">

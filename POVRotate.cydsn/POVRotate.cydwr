@@ -17,6 +17,15 @@
       <Data key="836d1828-dfe8-4f0e-b031-3abe16605ae4/5c71752a-e182-47ca-942c-9cb20adbdf2f" value="ADC_SAR_Seq_intClock" />
       <Data key="8674d08e-21ec-4ab5-9f6d-d1870d407309" value="Clock_2" />
     </Group>
+    <Group key="Interrupt">
+      <Data key="1e3c308b-0d4f-4b33-aa61-8250d54f1151" value="isrLEDUpdate" />
+      <Data key="3dbba19d-7851-4a83-b204-a0a386fe8d68/696fcfb7-e3b3-4302-9123-1e2c9e4522d2" value="I2C_EEPROM_SCB_IRQ" />
+      <Data key="8c8734ef-3644-4eed-bc55-360072b94fff/696fcfb7-e3b3-4302-9123-1e2c9e4522d2" value="SPI_LED_SCB_IRQ" />
+      <Data key="43b32828-1bc6-4f60-8661-55e8e3c70c20/0bca1fc6-354d-4d61-89fa-de74f0d280d1" value="BLE_bless_isr" />
+      <Data key="44a161a7-a7a1-4577-8abd-911846479689" value="isrADC" />
+      <Data key="836d1828-dfe8-4f0e-b031-3abe16605ae4/a1033dc5-f595-4313-8eee-ea9108ee36fd" value="ADC_SAR_Seq_IRQ" />
+      <Data key="853e52f3-2785-4a0b-a91c-f0800ef96010" value="alignment_isr" />
+    </Group>
     <Group key="Pin">
       <Data key="3dbba19d-7851-4a83-b204-a0a386fe8d68/5382e105-1382-4a2e-b9f4-3bb2feba71e0" value="I2C_EEPROM_sda" />
       <Data key="3dbba19d-7851-4a83-b204-a0a386fe8d68/22863ebe-a37b-476f-b252-6e49a8c00b12" value="I2C_EEPROM_scl" />
@@ -3135,6 +3144,9 @@
         <Data key="LevelKey" value="0" />
       </Group>
     </Group>
+  </Group>
+  <Group key="Interrupt">
+    <Data key="1e3c308b-0d4f-4b33-aa61-8250d54f1151" value="0" />
   </Group>
   <Group key="M0S8Clock">
     <Group key="LocalClks">

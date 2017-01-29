@@ -113,13 +113,11 @@ void led_update()
     OE_Write(1);
     LE_Write(0);
     CyDelayUs(10);
-    //CyDelay(1);
     SPI_LED_SpiUartWriteTxData(_ledPattern[0]);
     SPI_LED_SpiUartWriteTxData(_ledPattern[1]);
     SPI_LED_SpiUartWriteTxData(_ledPattern[2]);
     while (SPI_LED_SpiUartGetTxBufferSize() > 0) {};
     while (SPI_LED_SpiIsBusBusy() > 0) {};
-    //CyDelay(10);
     LE_Write(1);
     OE_Write(0);
 }
