@@ -54,6 +54,8 @@ static int32_t _drawLoopAvg = 0;
 
 uint8_t _sendUpdate = 0;
 
+char printStr[10];
+
 // void testEEPROM(uint8_t xor)
 // {
 //     const uint8_t testLen = 32;
@@ -118,20 +120,19 @@ void generateQuadPattern()
     _ledState++;
 }
 
-void printHello()
+void printText()
 {
-    const char str[] = "HELLO";
-    uint32_t strLen = strlen(str);
+    uint32_t strLen = strlen(printStr);
     uint32_t angle = getAngle();
     uint32_t cIndex = angle >> 5;
-    uint32_t bIndex = angle % 0x1F;
+    uint32_t bIndex = angle & 0x1F;
     bIndex /= 4;
     if (cIndex < strLen)
     {
-        char c = str[cIndex];
+        char c = printStr[cIndex];
         const uint8_t * ptr = &Font12.table[(c - ' ') * Font12.Height];
 
-        if (bIndex < 8)
+        if (bIndex < 7)
         {
             uint8_t mask = 0x80 >> bIndex;
             uint8_t shift1 = 7 - bIndex;
@@ -280,7 +281,7 @@ CY_ISR(ledUpdateISR)
 
     //generateQuadPattern();
     //generateClock();
-    printHello();
+    printText();
 
     led_pushLEDs(_leds);
 
@@ -301,6 +302,10 @@ void sysTickCallback(void)
         {
             _timeInSeconds = 0;
         }
+
+        //RTC_Update();
+        uint32_t time = RTC_GetTime();
+        snprintf(printStr, 10, "%02d:%02d:%02d", (int)RTC_GetHours(time), (int)RTC_GetMinutes(time), (int)RTC_GetSecond(time));
     }
 }
 
@@ -358,6 +363,12 @@ int main()
     CySysTickSetCallback(0, sysTickCallback);
 
     TimeSpan_Start();
+    
+    RTC_Start();
+    
+    uint32_t date = RTC_ConstructDate(2, 1, 2017);
+    uint32_t time = RTC_ConstructTime(RTC_24_HOURS_FORMAT, 0, 20, 41, 00);    
+    RTC_SetDateAndTime(time, date);
 
     WP_Write(0);
 
