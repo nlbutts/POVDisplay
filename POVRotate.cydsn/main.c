@@ -363,11 +363,11 @@ int main()
     CySysTickSetCallback(0, sysTickCallback);
 
     TimeSpan_Start();
-    
+
     RTC_Start();
-    
+
     uint32_t date = RTC_ConstructDate(2, 1, 2017);
-    uint32_t time = RTC_ConstructTime(RTC_24_HOURS_FORMAT, 0, 20, 41, 00);    
+    uint32_t time = RTC_ConstructTime(RTC_24_HOURS_FORMAT, 0, 20, 41, 00);
     RTC_SetDateAndTime(time, date);
 
     WP_Write(0);
