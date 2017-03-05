@@ -75,10 +75,10 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\PWM_Coil.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\PWM_Coil.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\PWM_Coil_PM.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_NEG.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_NEG.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_NEG_aliases.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_NEG_PM.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_Neg.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_Neg.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_Neg_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\MOTOR_Neg_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_1.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\PWM_Motor.c</File>

@@ -94,6 +94,14 @@ int main()
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     PWM_Coil_Start();
+    //PWM_Motor_Start();
+    //PWM_Motor_WriteCompare(9000);
+
+    nSleep_Write(0);
+    CyDelay(1000);
+    nSleep_Write(1);
+    MOTOR_Neg_Write(0);
+    MOTOR_Plus_Write(1);
     
     currentFrequency = STARTING_FREQ;
     
@@ -106,6 +114,16 @@ int main()
     {
         Pin_LED_Write(!Pin_LED_Read());
         CyDelay(1000);
+        
+        if (!nFault_Read())
+        {
+            Pin_LED_Write(!Pin_LED_Read());
+            CyDelay(100);            
+            Pin_LED_Write(!Pin_LED_Read());
+            CyDelay(100);            
+            Pin_LED_Write(!Pin_LED_Read());
+            CyDelay(100);            
+        }
         /* Place your application code here. */
 //        if (autoSweep || buttonPressed)
 //        {            
