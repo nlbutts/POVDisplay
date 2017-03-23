@@ -12,129 +12,30 @@
 *******************************************************************************/
 
 #include "app_Ble.h"
+#include "types.h"
+#include <stdio.h>
 
-uint16 txCharHandle             = 0;                /* Handle for the TX data characteristic */
-uint16 rxCharHandle             = 0;                /* Handle for the RX data characteristic */
-uint16 txCharDescHandle         = 0;                /* Handle for the TX data characteristic descriptor */
-uint16 bleUartServiceHandle     = 0;                /* Handle for the BLE UART service */
-uint16 bleUartServiceEndHandle  = 0;                /* End handle for the BLE UART service */
-uint16 mtuSize                  = CYBLE_GATT_MTU;   /* MTU size to be used by Client and Server after MTU exchange */
-
-const uint8 enableNotificationParam[2] = {0x01, 0x00};
-
-volatile static bool peerDeviceFound         = false;
-volatile static bool notificationEnabled     = false;
-
-static CYBLE_GAP_BD_ADDR_T      peerAddr;           /* BD address of the peer device */
-static INFO_EXCHANGE_STATE_T    infoExchangeState   = INFO_EXCHANGE_START;
-
-CYBLE_GATT_ATTR_HANDLE_RANGE_T  attrHandleRange;
-CYBLE_GATTC_FIND_INFO_REQ_T     charDescHandleRange;
-
-/* UUID of the custom BLE UART service */
-const uint8 bleUartServiceUuid[16]    = {
-                                            0x31, 0x01, 0x9b, 0x5f, 0x80, 0x00, 0x00,0x80, \
-                                            0x00, 0x10, 0x00, 0x00, 0xd0, 0xcd, 0x03, 0x00 \
-                                        };
-
-/* UUID of the TX attribute of the custom BLE UART service */
-const uint8 uartTxAttrUuid[16]        = {
-                                            0x31, 0x01, 0x9b, 0x5f, 0x80, 0x00, 0x00,0x80, \
-                                            0x00, 0x10, 0x00, 0x00, 0xd1, 0xcd, 0x03, 0x00 \
-                                        };
-
-/* UUID of the RX attribute of the custom BLE UART service */
-const uint8 uartRxAttrUuid[16]        = {
-                                            0x31, 0x01, 0x9b, 0x5f, 0x80, 0x00, 0x00,0x80, \
-                                            0x00, 0x10, 0x00, 0x00, 0xd2, 0xcd, 0x03, 0x00 \
-                                        };
-
-/* structure to be passed for discovering service by UUID */
-const CYBLE_GATT_VALUE_T    bleUartServiceUuidInfo = { 
-                                                        (uint8 *) bleUartServiceUuid, \
-                                                        CYBLE_GATT_128_BIT_UUID_SIZE,\
-                                                        CYBLE_GATT_128_BIT_UUID_SIZE \
-                                                      };
-
-/* structure to be passed for the enable notification request */
-CYBLE_GATTC_WRITE_REQ_T     enableNotificationReqParam   = {
-                                                                {(uint8*)enableNotificationParam, 2, 2},
-                                                                0
-                                                            };
+/***************************************
+*        Global Variables
+***************************************/
+CYBLE_CONN_HANDLE_T     connHandle;
+uint8                   rtcIntOccured = false;
+uint8                   buttonIsInUse = false;
+uint8_t                 localSWVersion[3];
+uint8_t                 connected;
 
 
-/*******************************************************************************
-* Function Name: HandleBleProcessing
-********************************************************************************
-*
-* Summary:
-*   Handles the BLE state machine for intiating different procedures
-*   during different states of BLESS.
-*
-* Parameters:
-*   None.
-*
-* Return:
-*   None.
-*
-*******************************************************************************/
-void HandleBleProcessing(void)
-{    
-    CYBLE_API_RESULT_T      cyble_api_result;
-    
-    switch (cyBle_state)
-    {
-        case CYBLE_STATE_SCANNING:
-            if(peerDeviceFound)
-            {
-                CyBle_GapcStopScan();
-            }
-            break;
-    
-        case CYBLE_STATE_CONNECTED:
-            
-            /* if Client does not has all the information about attribute handles 
-             * call procedure for getting it */
-            if((INFO_EXCHANGE_COMPLETE != infoExchangeState))
-            {
-                attrHandleInit();
-            }
-            
-            /* enable notifications if not enabled already */
-            else if(false == notificationEnabled)
-            {
-                enableNotifications();
-            }
-            
-            /* if client has all required info and stack is free, handle UART traffic */
-            else if(CyBle_GattGetBusStatus() != CYBLE_STACK_STATE_BUSY)
-            {
-                HandleUartTxTraffic();
-            }
-            
-            break;
-                
-        case CYBLE_STATE_DISCONNECTED:
-        {
-            if(peerDeviceFound)
-            {
-                cyble_api_result = CyBle_GapcConnectDevice(&peerAddr);
-                
-			    if(CYBLE_ERROR_OK == cyble_api_result)
-			    {
-				    peerDeviceFound = false;
-			    }
-            }
-            else
-            {
-                CyBle_GapcStartScan(CYBLE_SCANNING_FAST);  
-            }
-            break;
-        }
-        
-        default:
-            break;       
-    }
+/***************************************************************
+ * Function to update the SW Version string
+ **************************************************************/
+void updateSWVersion()
+{
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
+
+//    tempHandle.attrHandle = CYBLE_POVINFO_FIRMWARE_REVISION_STRING_CHAR_HANDLE;
+//    tempHandle.value.val = (uint8_t*)localSWVersion;
+//    tempHandle.value.len = 3;
+//    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
 }
 
 
@@ -143,221 +44,316 @@ void HandleBleProcessing(void)
 ********************************************************************************
 *
 * Summary:
-*   Call back function for BLE stack to handle BLESS events
+*  This is an event callback function to receive events from the CYBLE Component.
 *
 * Parameters:
-*   event       - the event generated by stack
-*   eventParam  - the parameters related to the corresponding event
+*  uint8 event:       Event from the CYBLE component.
+*  void* eventParams: A structure instance for corresponding event type. The
+*                     list of event structure is described in the component
+*                     datasheet.
 *
 * Return:
-*   None.
+*  None
 *
 *******************************************************************************/
-void AppCallBack(uint32 event, void *eventParam)
+void AppCallBack(uint32 event, void* eventParam)
 {
-    CYBLE_GATTC_READ_BY_TYPE_RSP_PARAM_T    *readResponse;
-    CYBLE_GAPC_ADV_REPORT_T		            *advReport;
-    CYBLE_GATTC_FIND_BY_TYPE_RSP_PARAM_T    *findResponse;
-    CYBLE_GATTC_FIND_INFO_RSP_PARAM_T       *findInfoResponse;
-    
+    CYBLE_API_RESULT_T apiResult;
+    CYBLE_GATTS_WRITE_REQ_PARAM_T *wrReqParam;
+
     switch (event)
-    {
-        case CYBLE_EVT_STACK_ON:
-      
+	{
+        /**********************************************************
+        *                       General Events
+        ***********************************************************/
+		case CYBLE_EVT_STACK_ON: /* This event is received when component is Started */
+            /* Enter into discoverable mode so that remote can search it. */
+            apiResult = CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
+            if(apiResult != CYBLE_ERROR_OK)
+            {   
+                //ShowError();
+            }
+            printf("CYBLE_EVT_STACK_ON\n");
+            break;
+		case CYBLE_EVT_TIMEOUT:
+            printf("CYBLE_EVT_TIMEOUT\n");
+			break;
+		case CYBLE_EVT_HARDWARE_ERROR:  /* This event indicates that some internal HW error has occurred. */
+            //ShowError();
             break;
         
-        case CYBLE_EVT_GAPC_SCAN_PROGRESS_RESULT:
-            
-            advReport = (CYBLE_GAPC_ADV_REPORT_T *) eventParam;
-            
-            /* check if report has manfacturing data corresponding to the intended matching peer */
-            if((advReport->eventType == CYBLE_GAPC_SCAN_RSP) && (advReport->dataLen == 0x06) \
-                    && (advReport->data[1] == 0xff) && (advReport->data[2] == 0x31)  \
-                    && (advReport->data[3] == 0x01) && (advReport->data[4] == 0x3b) \
-                    && (advReport->data[5] == 0x04))
-            {
-                peerDeviceFound = true;
-                
-                memcpy(peerAddr.bdAddr, advReport->peerBdAddr, sizeof(peerAddr.bdAddr));
-                peerAddr.type = advReport->peerAddrType;
-                            }           
-            
-            break;    
-            
+        /**********************************************************
+        *                       GAP Events
+        ***********************************************************/
+        case CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP:
+            printf("CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP\n");
+            if(CYBLE_STATE_DISCONNECTED == CyBle_GetState())
+            {   
+                /* Fast and slow advertising period complete, go to low power  
+                 * mode (Hibernate mode) and wait for an external
+                 * user event to wake up the device again */
+//                Advertising_LED_Write(LED_OFF);
+//                Disconnect_LED_Write(LED_ON);
+//                SW2_ClearInterrupt();
+//                Wakeup_Interrupt_ClearPending();
+//                Wakeup_Interrupt_Start();
+                CySysPmHibernate();
+            }
+            break;
+        case CYBLE_EVT_GAP_DEVICE_CONNECTED:
+            printf("CYBLE_EVT_GAP_DEVICE_CONNECTED\n");
+//            Disconnect_LED_Write(LED_OFF);
+//            Advertising_LED_Write(LED_OFF);
+            break;
         case CYBLE_EVT_GAP_DEVICE_DISCONNECTED:
-            
-            /* RESET all flags */
-            peerDeviceFound         = false;
-            notificationEnabled     = false;
-            infoExchangeState       = INFO_EXCHANGE_START;
-            
+            /* Put the device to discoverable mode so that remote can search it. */
+            printf("CYBLE_EVT_GAP_DEVICE_DISCONNECTED\n");
+            apiResult = CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
+            if(apiResult != CYBLE_ERROR_OK)
+            {
+                //ShowError();
+            }
             break;
-        
-        case CYBLE_EVT_GATTC_READ_BY_TYPE_RSP:
-            
-            readResponse = (CYBLE_GATTC_READ_BY_TYPE_RSP_PARAM_T *) eventParam;
-            
-            if(0 == memcmp((uint8 *)&(readResponse->attrData.attrValue[5]), (uint8 *)uartTxAttrUuid, 16))
-            {
-                txCharHandle = readResponse->attrData.attrValue[3];
-                txCharHandle |= (readResponse->attrData.attrValue[4] << 8);
-                
-                infoExchangeState |= TX_ATTR_HANDLE_FOUND;
-            }
-            else if(0 == memcmp((uint8 *)&(readResponse->attrData.attrValue[5]), (uint8 *)uartRxAttrUuid, 16))
-            {
-                rxCharHandle = readResponse->attrData.attrValue[3];
-                rxCharHandle |= (readResponse->attrData.attrValue[4] << 8);
-                
-                infoExchangeState |= RX_ATTR_HANDLE_FOUND;
-               
-            }
-            
+        case CYBLE_EVT_GAPC_CONNECTION_UPDATE_COMPLETE:
             break;
-            
-        case CYBLE_EVT_GATTC_FIND_INFO_RSP:
-            
-            findInfoResponse = (CYBLE_GATTC_FIND_INFO_RSP_PARAM_T *) eventParam;
-            
-            if((0x29 == findInfoResponse->handleValueList.list[3]) && \
-                                (0x02 == findInfoResponse->handleValueList.list[2]))
-            {
-                txCharDescHandle = findInfoResponse->handleValueList.list[0];
-                txCharDescHandle |= findInfoResponse->handleValueList.list[1] << 8;
-            
-                infoExchangeState |= TX_CCCD_HANDLE_FOUND;
-            }
-           
-            break;
-            
-        case CYBLE_EVT_GATTC_XCHNG_MTU_RSP:   
-            
-            /*set the 'mtuSize' variable based on the minimum MTU supported by both devices */
-            if(CYBLE_GATT_MTU > ((CYBLE_GATT_XCHG_MTU_PARAM_T *)eventParam)->mtu)
-            {
-                mtuSize = ((CYBLE_GATT_XCHG_MTU_PARAM_T *)eventParam)->mtu;
-            }
-            else
-            {
-                mtuSize = CYBLE_GATT_MTU;
-            }
-            
-            infoExchangeState |= MTU_XCHNG_COMPLETE;
-            
-            break;
-            
-        case CYBLE_EVT_GATTC_HANDLE_VALUE_NTF:
-            
-            HandleUartRxTraffic((CYBLE_GATTC_HANDLE_VALUE_NTF_PARAM_T *)eventParam);
-			
-            break;
-        
-        case CYBLE_EVT_GATTC_FIND_BY_TYPE_VALUE_RSP:
-            
-            findResponse            = (CYBLE_GATTC_FIND_BY_TYPE_RSP_PARAM_T *) eventParam;
-            
-            bleUartServiceHandle    = findResponse->range->startHandle;
-            bleUartServiceEndHandle = findResponse->range->endHandle;
-            
-            infoExchangeState |= BLE_UART_SERVICE_HANDLE_FOUND;
-            
-            break;
-        
-        case CYBLE_EVT_GATTS_XCNHG_MTU_REQ:
-            
-            /*set the 'mtuSize' variable based on the minimum MTU supported by both devices */
-            if(CYBLE_GATT_MTU > ((CYBLE_GATT_XCHG_MTU_PARAM_T *)eventParam)->mtu)
-            {
-                mtuSize = ((CYBLE_GATT_XCHG_MTU_PARAM_T *)eventParam)->mtu;
-            }
-            else
-            {
-                mtuSize = CYBLE_GATT_MTU;
-            }
-            
-            break;    
-        
-        case CYBLE_EVT_GATTC_WRITE_RSP:
-            
-            notificationEnabled = true;
                        
-            break;
-        
+        /**********************************************************
+        *                       GATT Events
+        ***********************************************************/
         case CYBLE_EVT_GATT_CONNECT_IND:
-                        
+            printf("CYBLE_EVT_GATT_CONNECT_IND\n");
             break;
+        case CYBLE_EVT_GATT_DISCONNECT_IND:
+            printf("CYBLE_EVT_GATT_DISCONNECT_IND\n");
+            break;
+
+        case CYBLE_EVT_GATTS_WRITE_REQ:
+            printf("CYBLE_EVT_GATTS_WRITE_REQ\n");
+            wrReqParam = (CYBLE_GATTS_WRITE_REQ_PARAM_T *) eventParam;
+
+            /* request write the LED value */
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_TIME_CHAR_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+                {
+                    uint64_t datetime = wrReqParam->handleValPair.value.val[0];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[1];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[2];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[3];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[4];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[5];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[6];
+                    datetime <<= 8;
+                    datetime |= wrReqParam->handleValPair.value.val[7];
+                    printf("Date time EPOCH: %08x\n", (unsigned int)(datetime >> 32));
+                    printf("Date time EPOCH: %08x\n", (unsigned int)datetime);
+                    RTC_SetUnixTime(datetime);
+
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                }
+            }
             
-        default:            
-            break;
-    }
-}
+        /**********************************************************
+        *                       Other Events
+        ***********************************************************/
 
-
-/*******************************************************************************
-* Function Name: attrHandleInit
-********************************************************************************
-*
-* Summary:
-*  This function gathhers all the information like attribute handles and MTU size
-*  from the server.
-*
-* Parameters:
-*  None.
-*
-* Return:
-*   None.
-*
-*******************************************************************************/
-void attrHandleInit()
-{
-    switch(infoExchangeState)
-    {
-        case INFO_EXCHANGE_START:        
-            CyBle_GattcDiscoverPrimaryServiceByUuid(cyBle_connHandle, bleUartServiceUuidInfo);
-            break;
-        
-        case BLE_UART_SERVICE_HANDLE_FOUND:
-            attrHandleRange.startHandle    = bleUartServiceHandle;
-            attrHandleRange.endHandle      = bleUartServiceEndHandle;
-
-            CyBle_GattcDiscoverAllCharacteristics(cyBle_connHandle, attrHandleRange);
-            break;
-        
-        case (SERVICE_AND_CHAR_HANDLES_FOUND):
-            charDescHandleRange.startHandle = txCharHandle + 1;
-            charDescHandleRange.endHandle   = bleUartServiceEndHandle;
-
-            CyBle_GattcDiscoverAllCharacteristicDescriptors(cyBle_connHandle, &charDescHandleRange);
-            break;
-        
-        case (ALL_HANDLES_FOUND):
-            CyBle_GattcExchangeMtuReq(cyBle_connHandle, CYBLE_GATT_MTU);
-            break;    
-            
         default:
-            break;    
-    }
+            break;
+	}
     
-    CyBle_ProcessEvents();
+    if(eventParam != NULL)
+    {
+    }
 }
 
-/*******************************************************************************
-* Function Name: enableNotifications
-********************************************************************************
-*
-* Summary:
-*  This function enables notfications from servers. 
-*
-* Parameters:
-*  None.
-*
-* Return:
-*   None.
-*
-*******************************************************************************/
-void enableNotifications()
-{     
-    enableNotificationReqParam.attrHandle = txCharDescHandle;   
-    CyBle_GattcWriteCharacteristicDescriptors(cyBle_connHandle, (CYBLE_GATTC_WRITE_REQ_T *)(&enableNotificationReqParam));
+
+
+//void AppCallBack(uint32 event, void *eventParam)
+//{
+//    CYBLE_GATTS_WRITE_REQ_PARAM_T *wrReqParam;
+//    CYBLE_API_RESULT_T apiResult;
+//    CYBLE_GAP_BD_ADDR_T localAddr;
+//    CYBLE_GAP_CONN_UPDATE_PARAM_T connUpdateParam;
+//    uint32  i = 0u;
+//
+//    switch(event)
+//    {
+//        /**********************************************************
+//        *                       General Events
+//        ***********************************************************/
+//        /* if there is a disconnect or the stack just turned on from a reset then start the advertising and turn on the LED blinking */
+//        case CYBLE_EVT_STACK_ON:
+//            /* Enter into discoverable mode so that remote can search it. */
+//            apiResult = CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
+//            if(apiResult != CYBLE_ERROR_OK)
+//            {
+//                printf("StartAdvertisement API Error: %d \r\n", apiResult);
+//            }
+//            printf("Bluetooth On, StartAdvertisement with addr: ");
+//            localAddr.type = 0u;
+//            CyBle_GetDeviceAddress(&localAddr);
+//            for(i = CYBLE_GAP_BD_ADDR_SIZE; i > 0u; i--)
+//            {
+//                printf("%2.2x", localAddr.bdAddr[i-1]);
+//            }
+//            printf("\r\n");
+//            connected = 0;
+//        break;
+//
+//        case CYBLE_EVT_HARDWARE_ERROR:    /* This event indicates that some internal HW error has occurred. */
+//            printf("CYBLE_EVT_HARDWARE_ERROR\r\n");
+//            break;
+//
+//        /**********************************************************
+//        *                       GAP Events
+//        ***********************************************************/
+//        case CYBLE_EVT_GAP_AUTH_REQ:
+//            printf("EVT_AUTH_REQ: security=%x, bonding=%x, ekeySize=%x, err=%x \r\n",
+//                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).security,
+//                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).bonding,
+//                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).ekeySize,
+//                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).authErr);
+//            break;
+//        case CYBLE_EVT_GAP_KEYINFO_EXCHNGE_CMPLT:
+//            printf("EVT_GAP_KEYINFO_EXCHNGE_CMPLT \r\n");
+//            break;
+//        case CYBLE_EVT_GAP_AUTH_COMPLETE:
+//            printf("AUTH_COMPLETE\r\n");
+//            break;
+//        case CYBLE_EVT_GAP_AUTH_FAILED:
+//            printf("EVT_AUTH_zFAILED: %x \r\n", *(uint8 *)eventParam);
+//            break;
+//        case CYBLE_EVT_GAP_DEVICE_CONNECTED:
+//            //printf("EVT_GAP_DEVICE_CONNECTED: %d \r\n", connHandle.bdHandle);
+//            if (((*(CYBLE_GAP_CONN_PARAM_UPDATED_IN_CONTROLLER_T *)eventParam).connIntv > 0x0006u))
+//            {
+//                /* If connection settings do not match expected ones - request parameter update */
+//                connUpdateParam.connIntvMin   = 0x0006u;
+//                connUpdateParam.connIntvMax   = 0x0006u;
+//                connUpdateParam.connLatency   = 0x0000u;
+//                connUpdateParam.supervisionTO = 0x0064u;
+//                apiResult = CyBle_L2capLeConnectionParamUpdateRequest(cyBle_connHandle.bdHandle, &connUpdateParam);
+//                printf("CyBle_L2capLeConnectionParamUpdateRequest API: 0x%2.2x \r\n", apiResult);
+//            }
+//            break;
+//        case CYBLE_EVT_GAP_DEVICE_DISCONNECTED:
+//            connected = 0;
+//            printf("EVT_GAP_DEVICE_DISCONNECTED\r\n");
+//            apiResult = CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
+//            if(apiResult != CYBLE_ERROR_OK)
+//            {
+//                printf("StartAdvertisement API Error: %d \r\n", apiResult);
+//            }
+//            break;
+//
+//        case CYBLE_EVT_GAP_ENCRYPT_CHANGE:
+//            printf("EVT_GAP_ENCRYPT_CHANGE: %x \r\n", *(uint8 *)eventParam);
+//            break;
+//        case CYBLE_EVT_GAPC_CONNECTION_UPDATE_COMPLETE:
+//            printf("EVT_CONNECTION_UPDATE_COMPLETE: %x \r\n", *(uint8 *)eventParam);
+//            break;
+//
+//
+//        /**********************************************************
+//        *                       GATT Events
+//        ***********************************************************/
+//        /* when a connection is made, update the LED and Capsense states in the GATT database and stop blinking the LED */
+//        case CYBLE_EVT_GATT_CONNECT_IND:
+//            //connHandle = *(CYBLE_CONN_HANDLE_T *)eventParam;
+//            printf("Connected\r");
+//            connected = 1;
+//            updateSWVersion();
+//        break;
+//
+//        /* handle a write request */
+//        case CYBLE_EVT_GATTS_WRITE_REQ:
+//            wrReqParam = (CYBLE_GATTS_WRITE_REQ_PARAM_T *) eventParam;
+//
+//            /* request write the LED value */
+////            if(wrReqParam->handleValPair.attrHandle == CYBLE_DEBUG_SETTINGS_CHAR_HANDLE)
+////            {
+////                /* only update the value and write the response if the requested write is allowed */
+////                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+////                {
+////                    measurmentIntervalInSeconds = wrReqParam->handleValPair.value.val[0];
+////                    CyBle_GattsWriteRsp(cyBle_connHandle);
+////                    //blockageDetectSetOnThreshold(measurmentIntervalInSeconds);
+////                }
+////                printf("Updating the measurement time to %d seconds\r\n", (int)measurmentIntervalInSeconds);
+////            }
+////            if(wrReqParam->handleValPair.attrHandle == CYBLE_DEBUG_SIGMA_CHAR_HANDLE)
+////            {
+////                /* only update the value and write the response if the requested write is allowed */
+////                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+////                {
+////                    sigma = wrReqParam->handleValPair.value.val[0];
+////                    sigma |= wrReqParam->handleValPair.value.val[1] << 8;
+////                    sigma |= wrReqParam->handleValPair.value.val[2] << 16;
+////                    sigma |= wrReqParam->handleValPair.value.val[3] << 24;
+////                    CyBle_GattsWriteRsp(cyBle_connHandle);
+////                }
+////                printf("sigma = %d\n", (int)sigma);
+////            }
+////            if(wrReqParam->handleValPair.attrHandle == CYBLE_DEBUG_SIGNAL_CHAR_HANDLE)
+////            {
+////                /* only update the value and write the response if the requested write is allowed */
+////                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+////                {
+////                    signal = wrReqParam->handleValPair.value.val[0];
+////                    signal |= wrReqParam->handleValPair.value.val[1] << 8;
+////                    signal |= wrReqParam->handleValPair.value.val[2] << 16;
+////                    signal |= wrReqParam->handleValPair.value.val[3] << 24;
+////                    CyBle_GattsWriteRsp(cyBle_connHandle);
+////                }
+////                printf("signal= %d\n", (int)signal);
+////            }
+////            if(wrReqParam->handleValPair.attrHandle == CYBLE_DEBUG_XTALK_CHAR_HANDLE)
+////            {
+////                /* only update the value and write the response if the requested write is allowed */
+////                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+////                {
+////                    xtalk = wrReqParam->handleValPair.value.val[0];
+////                    xtalk |= wrReqParam->handleValPair.value.val[1] << 8;
+////                    xtalk |= wrReqParam->handleValPair.value.val[2] << 16;
+////                    xtalk |= wrReqParam->handleValPair.value.val[3] << 24;
+////                    CyBle_GattsWriteRsp(cyBle_connHandle);
+////                }
+////                printf("xtalk= %d\n", (int)xtalk);
+////            }
+//            break;
+//
+//        case CYBLE_EVT_GATTS_WRITE_CMD_REQ:
+//            printf("CYBLE_EVT_GATTS_WRITE_CMD_REQ\r\n");
+//            updateSWVersion();
+//            break;
+//        case CYBLE_EVT_GATTS_PREP_WRITE_REQ:
+//            (void)CyBle_GattsPrepWriteReqSupport(CYBLE_GATTS_PREP_WRITE_NOT_SUPPORT);
+//            printf("CYBLE_EVT_GATTS_PREP_WRITE_REQ\r\n");
+//            break;
+//        case CYBLE_EVT_HCI_STATUS:
+//            //printf("CYBLE_EVT_HCI_STATUS\r\n");
+//            break;
+//
+//        default:
+//            //printf("Unhandled event: %d\r\n", (int)event);
+//            break;
+//    }
+//}
+
+void bleAppInit(const uint8_t swVersion[3])
+{
+    memcpy(localSWVersion, swVersion, sizeof(localSWVersion));
+
+    /* Start BLE stack and register the callback function */
+    CyBle_Start(AppCallBack);
 }
+
+
 /* [] END OF FILE */

@@ -52,7 +52,7 @@
                                             }\
                                         } while (0)
 
-    #define DBG_PRINTF(...)          (printf(__VA_ARGS__))
+    #define printf(...)          (printf(__VA_ARGS__))
     
     #define DBG_NEW_PAGE             UART_PutChar(0x0C)
     
@@ -62,7 +62,7 @@
     #define DBG_PRINT_DEC(a)
     #define DBG_PRINT_HEX(a)
     #define DBG_PRINT_ARRAY(a,b)
-    #define DBG_PRINTF(...)
+    #define printf(...)
     #define DBG_NEW_PAGE             
 #endif /* (DEBUG_UART_ENABLED == YES) */
 

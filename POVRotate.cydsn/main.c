@@ -290,6 +290,7 @@ CY_ISR(ledUpdateISR)
 }
 
 static uint32_t _oneSecondCounter = 0;
+static uint8_t  _displayTime = 0;
 void sysTickCallback(void)
 {
     _oneSecondCounter++;
@@ -304,8 +305,21 @@ void sysTickCallback(void)
         }
 
         //RTC_Update();
-        uint32_t time = RTC_GetTime();
-        snprintf(printStr, 10, "%02d:%02d:%02d", (int)RTC_GetHours(time), (int)RTC_GetMinutes(time), (int)RTC_GetSecond(time));
+        if (_displayTime < 10)
+        {
+            uint32_t time = RTC_GetTime();
+            snprintf(printStr, 10, "%02d:%02d:%02d", (int)RTC_GetHours(time), (int)RTC_GetMinutes(time), (int)RTC_GetSecond(time));
+        }
+        else if (_displayTime < 20)
+        {
+            uint32_t date = RTC_GetDate();
+            snprintf(printStr, 10, "%02d/%02d/%02d", (int)RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(date) - 2000);
+        }
+        else
+        {
+            _displayTime = 0;
+        }
+        _displayTime++;
     }
 }
 
@@ -316,12 +330,8 @@ int main()
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Start UART and BLE component and display project information */
-    bleApiResult = CyBle_Start(AppCallBack);
-
-    if(bleApiResult != CYBLE_ERROR_OK)
-    {
-        StatusLEDError();
-    }
+    const uint8_t swVersion[3] = {1, 0, 0};
+    bleAppInit(swVersion);
 
     CyBle_ProcessEvents();
 
@@ -376,17 +386,16 @@ int main()
     {
         //printHello();
         HandleLeds();
-        HandleBleProcessing();
         CyBle_ProcessEvents();
 
-        if (_sendUpdate == 2)
-        {
-            _sendUpdate = 0;
-            printf("Main power %d mV\n", (int)_pwrMVolts);
-            _pwrMVolts = 0;
-            printf("Rotation rate %d in us\n", (int)_rotationRate * 10);
-            printf("Loop average %d in us\n", (int)_drawLoopAvg);
-        }
+//        if (_sendUpdate == 2)
+//        {
+//            _sendUpdate = 0;
+//            printf("Main power %d mV\n", (int)_pwrMVolts);
+//            _pwrMVolts = 0;
+//            printf("Rotation rate %d in us\n", (int)_rotationRate * 10);
+//            printf("Loop average %d in us\n", (int)_drawLoopAvg);
+//        }
     }
 }
 
