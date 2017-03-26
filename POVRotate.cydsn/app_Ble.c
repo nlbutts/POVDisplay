@@ -18,11 +18,14 @@
 /***************************************
 *        Global Variables
 ***************************************/
-CYBLE_CONN_HANDLE_T     connHandle;
-uint8                   rtcIntOccured = false;
-uint8                   buttonIsInUse = false;
-uint8_t                 localSWVersion[3];
-uint8_t                 connected;
+CYBLE_CONN_HANDLE_T     _connHandle;
+uint8                   _rtcIntOccured = false;
+uint8                   _buttonIsInUse = false;
+uint8_t                 _localSWVersion[3];
+uint8_t                 _connected;
+
+
+extern uint32_t         _rotationFilterGain;
 
 
 /***************************************************************
@@ -38,6 +41,25 @@ void updateSWVersion()
 //    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
 }
 
+void updateRotationRate(uint32_t rotationRate)
+{
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
+
+    tempHandle.attrHandle = CYBLE_POVDISPLAY_ROTATIONSPEED_CHAR_HANDLE;
+    tempHandle.value.val = (uint8_t*)&rotationRate;
+    tempHandle.value.len = 4;
+    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+}
+
+void updateDrawLoopAverage(uint32_t drawTime)
+{
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
+
+    tempHandle.attrHandle = CYBLE_POVDISPLAY_DRAWTIME_CHAR_HANDLE;
+    tempHandle.value.val = (uint8_t*)&drawTime;
+    tempHandle.value.len = 4;
+    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+}
 
 /*******************************************************************************
 * Function Name: AppCallBack
@@ -131,7 +153,7 @@ void AppCallBack(uint32 event, void* eventParam)
             printf("CYBLE_EVT_GATTS_WRITE_REQ\n");
             wrReqParam = (CYBLE_GATTS_WRITE_REQ_PARAM_T *) eventParam;
 
-            /* request write the LED value */
+            /* Write request for time/date */
             if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_TIME_CHAR_HANDLE)
             {
                 /* only update the value and write the response if the requested write is allowed */
@@ -144,14 +166,14 @@ void AppCallBack(uint32 event, void* eventParam)
                     datetime |= wrReqParam->handleValPair.value.val[2];
                     datetime <<= 8;
                     datetime |= wrReqParam->handleValPair.value.val[3];
-                    datetime <<= 8;
-                    datetime |= wrReqParam->handleValPair.value.val[4];
-                    datetime <<= 8;
-                    datetime |= wrReqParam->handleValPair.value.val[5];
-                    datetime <<= 8;
-                    datetime |= wrReqParam->handleValPair.value.val[6];
-                    datetime <<= 8;
-                    datetime |= wrReqParam->handleValPair.value.val[7];
+//                    datetime <<= 8;
+//                    datetime |= wrReqParam->handleValPair.value.val[4];
+//                    datetime <<= 8;
+//                    datetime |= wrReqParam->handleValPair.value.val[5];
+//                    datetime <<= 8;
+//                    datetime |= wrReqParam->handleValPair.value.val[6];
+//                    datetime <<= 8;
+//                    datetime |= wrReqParam->handleValPair.value.val[7];
                     printf("Date time EPOCH: %08x\n", (unsigned int)(datetime >> 32));
                     printf("Date time EPOCH: %08x\n", (unsigned int)datetime);
                     RTC_SetUnixTime(datetime);
@@ -159,7 +181,23 @@ void AppCallBack(uint32 event, void* eventParam)
                     CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
             }
-            
+            /* Write request for time/date */
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_FILTERGAIN_CHAR_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+                {
+                    _rotationFilterGain = wrReqParam->handleValPair.value.val[0];
+                    _rotationFilterGain <<= 8;
+                    _rotationFilterGain |= wrReqParam->handleValPair.value.val[1];
+                    _rotationFilterGain <<= 8;
+                    _rotationFilterGain |= wrReqParam->handleValPair.value.val[2];
+                    _rotationFilterGain <<= 8;
+                    _rotationFilterGain |= wrReqParam->handleValPair.value.val[3];
+
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                }
+            }
         /**********************************************************
         *                       Other Events
         ***********************************************************/
@@ -349,7 +387,7 @@ void AppCallBack(uint32 event, void* eventParam)
 
 void bleAppInit(const uint8_t swVersion[3])
 {
-    memcpy(localSWVersion, swVersion, sizeof(localSWVersion));
+    memcpy(_localSWVersion, swVersion, sizeof(_localSWVersion));
 
     /* Start BLE stack and register the callback function */
     CyBle_Start(AppCallBack);

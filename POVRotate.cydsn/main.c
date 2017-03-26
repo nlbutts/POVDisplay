@@ -31,8 +31,8 @@ static uint32_t _pwrMVolts;
 static uint16_t _previousCapture = 0;
 
 /* The output of the filtered rotation value */
-#define ROTATION_FILTER_GAIN    (0.1 * 256)
-static int32_t _rotationRate = 0;
+uint32_t _rotationFilterGain = 0.1 * 256;
+int32_t _rotationRate = 0;
 
 /* LED State of the 4 quad display */
 static uint8_t  _ledState = 0;
@@ -239,7 +239,7 @@ void generateClock()
 
 int32_t filter(int32_t x, int32_t y, int32_t k)
 {
-    y = y + (((x - y) * k) >> 8);
+    y = y + ((((x - y) * k) + (1 << 4)) >> 8);
     return y;
 }
 
@@ -256,7 +256,8 @@ CY_ISR(alignmentISR)
     uint16_t capture = TimerAlignment_ReadCapture();
     uint16_t diffTime = capture - _previousCapture;
     _previousCapture = capture;
-    _rotationRate = filter(diffTime, _rotationRate, ROTATION_FILTER_GAIN);
+    _rotationRate = filter(diffTime, _rotationRate, _rotationFilterGain);
+    updateRotationRate(_rotationRate);
     if (_rotationRate < MINIMUM_ROTATION_RATE)
     {
         TimerLED_Stop();
@@ -287,6 +288,7 @@ CY_ISR(ledUpdateISR)
 
     uint16_t stop = TimeSpan_ReadCounter();
     _drawLoopAvg = filter(stop - start, _drawLoopAvg, UPDATE_FILTER_GAIN);
+    //updateDrawLoopAverage(_drawLoopAvg);
 }
 
 static uint32_t _oneSecondCounter = 0;
@@ -313,7 +315,7 @@ void sysTickCallback(void)
         else if (_displayTime < 20)
         {
             uint32_t date = RTC_GetDate();
-            snprintf(printStr, 10, "%02d/%02d/%02d", (int)RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(date) - 2000);
+            snprintf(printStr, 10, "%02d/%02d/%02d", (int)RTC_GetMonth(date), (int)RTC_GetDay(date), (int)RTC_GetYear(date) - 2000);
         }
         else
         {
@@ -325,8 +327,6 @@ void sysTickCallback(void)
 
 int main()
 {
-    CYBLE_API_RESULT_T      bleApiResult;
-
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Start UART and BLE component and display project information */

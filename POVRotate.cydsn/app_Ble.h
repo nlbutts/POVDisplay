@@ -19,6 +19,8 @@
     #include <project.h>
 
     void bleAppInit(const uint8_t swVersion[3]);
+    void updateRotationRate(uint32_t rotationRate);
+    void updateDrawLoopAverage(uint32_t drawTime);
 
 #endif
 
