@@ -21,6 +21,9 @@
     void bleAppInit(const uint8_t swVersion[3]);
     void updateRotationRate(uint32_t rotationRate);
     void updateDrawLoopAverage(uint32_t drawTime);
+    void updateVoltage(uint16_t voltageInMv);
+    void DisUpdateFirmWareRevision(void);
+    void DisUpdateSoftWareRevision(uint32_t majorVersion, uint32_t minorVersion, uint32_t patch, uint32_t buildNumber);
 
 #endif
 

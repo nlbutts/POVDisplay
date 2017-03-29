@@ -24,21 +24,47 @@ uint8                   _buttonIsInUse = false;
 uint8_t                 _localSWVersion[3];
 uint8_t                 _connected;
 
-
 extern uint32_t         _rotationFilterGain;
+extern uint16_t         _drawOffset;
 
 
 /***************************************************************
  * Function to update the SW Version string
  **************************************************************/
-void updateSWVersion()
+void DisUpdateFirmWareRevision(void)
 {
-    CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
+    CYBLE_STACK_LIB_VERSION_T stackVersion;
+    uint8 fwRev[9u] = "0.0.0.000";
+    
+    if(CyBle_GetStackLibraryVersion(&stackVersion) == CYBLE_ERROR_OK)
+    {
+        /* Transform numbers to ASCII string */
+        fwRev[0u] = stackVersion.majorVersion + '0'; 
+        fwRev[2u] = stackVersion.minorVersion + '0';
+        fwRev[4u] = stackVersion.patch + '0';
+        fwRev[6u] = (stackVersion.buildNumber / 100u) + '0';
+        stackVersion.buildNumber %= 100u; 
+        fwRev[7u] = (stackVersion.buildNumber / 10u) + '0';
+        fwRev[8u] = (stackVersion.buildNumber % 10u) + '0';
+    }
+    
+    CyBle_DissSetCharacteristicValue(CYBLE_DIS_FIRMWARE_REV, sizeof(fwRev), fwRev);   
+}
 
-//    tempHandle.attrHandle = CYBLE_POVINFO_FIRMWARE_REVISION_STRING_CHAR_HANDLE;
-//    tempHandle.value.val = (uint8_t*)localSWVersion;
-//    tempHandle.value.len = 3;
-//    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+void DisUpdateSoftWareRevision(uint32_t majorVersion, uint32_t minorVersion, uint32_t patch, uint32_t buildNumber)
+{
+    uint8 fwRev[9u] = "0.0.0.000";
+    
+    /* Transform numbers to ASCII string */
+    fwRev[0u] = majorVersion + '0'; 
+    fwRev[2u] = minorVersion + '0';
+    fwRev[4u] = patch + '0';
+    fwRev[6u] = (buildNumber / 100u) + '0';
+    buildNumber %= 100u; 
+    fwRev[7u] = (buildNumber / 10u) + '0';
+    fwRev[8u] = (buildNumber % 10u) + '0';
+    
+    CyBle_DissSetCharacteristicValue(CYBLE_DIS_SOFTWARE_REV, sizeof(fwRev), fwRev);   
 }
 
 void updateRotationRate(uint32_t rotationRate)
@@ -58,6 +84,16 @@ void updateDrawLoopAverage(uint32_t drawTime)
     tempHandle.attrHandle = CYBLE_POVDISPLAY_DRAWTIME_CHAR_HANDLE;
     tempHandle.value.val = (uint8_t*)&drawTime;
     tempHandle.value.len = 4;
+    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+}
+
+void updateVoltage(uint16_t voltageInMv)
+{
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
+
+    tempHandle.attrHandle = CYBLE_POVDISPLAY_VOLTAGE_CHAR_HANDLE;
+    tempHandle.value.val = (uint8_t*)&voltageInMv;
+    tempHandle.value.len = 2;
     CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
 }
 
@@ -198,6 +234,20 @@ void AppCallBack(uint32 event, void* eventParam)
                     CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
             }
+            
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_DRAWOFFSET_CHAR_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(CYBLE_GATT_ERR_NONE == CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED))
+                {
+                    _drawOffset = wrReqParam->handleValPair.value.val[0];
+                    _drawOffset <<= 8;
+                    _rotationFilterGain |= wrReqParam->handleValPair.value.val[1];
+
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                }
+            }
+
         /**********************************************************
         *                       Other Events
         ***********************************************************/

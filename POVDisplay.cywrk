@@ -10,7 +10,7 @@
 <v>.\POVRotate.cydsn\POVRotate.cyprj</v>
 <v>.\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj</v>
 <v>.\st_eeprom.cylib\st_eeprom.cyprj</v>
-<v>.\BLE_Device_Information_Service01.cydsn\BLE_Device_Information_Service01.cyprj</v>
+<v>.\BLE_Temperature_Measurement01.cydsn\BLE_Temperature_Measurement01.cyprj</v>
 </projects>
 <workspace_id v="1be81ebb-8ddb-4949-ac76-fcfd36b8e892" />
 <WriteAppVersionLastSavedWith v="4.0.0.432" />

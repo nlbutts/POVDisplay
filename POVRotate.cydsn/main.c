@@ -52,6 +52,9 @@ static uint32_t _ledUpdateIntCount = 0;
 static int32_t _drawLoopAvg = 0;
 #define UPDATE_FILTER_GAIN      (0.1 * 256)
 
+/* Used to hold a user settable draw offset in the degrees */
+uint16_t _drawOffset;
+
 uint8_t _sendUpdate = 0;
 
 char printStr[10];
@@ -76,7 +79,7 @@ char printStr[10];
 
 uint32_t getAngle()
 {
-    return _angle;
+    return _angle % 360;
 }
 
 void generateQuadPattern()
@@ -269,7 +272,7 @@ CY_ISR(alignmentISR)
         TimerLED_WriteCounter(0);
     }
     _ledState = 0;
-    _angle = 0;
+    _angle = _drawOffset;
     _alignmentIntCount++;
 }
 
@@ -279,16 +282,13 @@ CY_ISR(ledUpdateISR)
     TimerLED_ClearInterrupt(TimerLED_INTR_MASK_CC_MATCH | TimerLED_INTR_MASK_TC);
 
     _angle += 360 / UPDATES_PER_ROTATION;
-
-    //generateQuadPattern();
-    //generateClock();
+    
     printText();
 
     led_pushLEDs(_leds);
 
     uint16_t stop = TimeSpan_ReadCounter();
     _drawLoopAvg = filter(stop - start, _drawLoopAvg, UPDATE_FILTER_GAIN);
-    //updateDrawLoopAverage(_drawLoopAvg);
 }
 
 static uint32_t _oneSecondCounter = 0;
@@ -322,6 +322,12 @@ void sysTickCallback(void)
             _displayTime = 0;
         }
         _displayTime++;
+        
+        updateVoltage(_pwrMVolts);
+        updateDrawLoopAverage(_drawLoopAvg);
+        DisUpdateFirmWareRevision();
+        DisUpdateSoftWareRevision(1, 0, 0, 123);
+
     }
 }
 
@@ -387,7 +393,7 @@ int main()
         //printHello();
         HandleLeds();
         CyBle_ProcessEvents();
-
+        
 //        if (_sendUpdate == 2)
 //        {
 //            _sendUpdate = 0;
