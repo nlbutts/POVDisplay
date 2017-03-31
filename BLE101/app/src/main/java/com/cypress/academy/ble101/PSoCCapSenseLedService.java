@@ -55,7 +55,10 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -85,10 +88,8 @@ public class PSoCCapSenseLedService extends Service {
     private static BluetoothGattCharacteristic mVoltageCharacterisitc;
 
     private static int mTime;
-    private static int mFilterGain;
-    private static int mRotationSpeed;
+    private static double mRotationSpeed;
     private static int mDrawTime;
-    private static int mDrawOffset;
     private static int mVoltage;
 
     // UUIDs for the service and characteristics that the custom CapSenseLED service uses
@@ -278,8 +279,36 @@ public class PSoCCapSenseLedService extends Service {
         // Get the current time and write the characteristic
          long now = System.currentTimeMillis();
          now /= 1000;
-         //mBluetoothGatt.writeCharacteristic(mTimeCharacterisitc);
+         // This is an ugly hack to get time into CDT
+         now -= 5 * 3600;
+         byte[] timeVal = new byte[4];
+         timeVal[0] = (byte)((now >> 24) & 0xFF);
+         timeVal[1] = (byte)((now >> 16) & 0xFF);
+         timeVal[2] = (byte)((now >>  8) & 0xFF);
+         timeVal[3] = (byte)((now      ) & 0xFF);
+         mTimeCharacterisitc.setValue(timeVal);
+         mBluetoothGatt.writeCharacteristic(mTimeCharacterisitc);
      }
+
+     public void writeDisplayOffset(int offset)
+     {
+         byte [] offsetBytes = new byte[2];
+         offsetBytes[0] = (byte)((offset >> 8) & 0xFF);
+         offsetBytes[1] = (byte)((offset     ) & 0xFF);
+         mDrawOffsetCharacterisitc.setValue(offsetBytes);
+         mBluetoothGatt.writeCharacteristic(mDrawOffsetCharacterisitc);
+     }
+
+    public void writeFilterGain(int gain)
+    {
+        byte [] gainBytes = new byte[4];
+        gainBytes[0] = (byte)((gain >> 24) & 0xFF);
+        gainBytes[1] = (byte)((gain >> 16) & 0xFF);
+        gainBytes[2] = (byte)((gain >>  8) & 0xFF);
+        gainBytes[3] = (byte)((gain      ) & 0xFF);
+        mFilterGainCharacterisitc.setValue(gainBytes);
+        mBluetoothGatt.writeCharacteristic(mFilterGainCharacterisitc);
+    }
 
     /**
      * This method is used to turn the LED on or off
@@ -341,7 +370,9 @@ public class PSoCCapSenseLedService extends Service {
         return mCapSenseValue;
     }
 
-    public int getRotationRate() {return mRotationSpeed;}
+    public double getRotationRate() {return mRotationSpeed;}
+    public int getVoltage()         {return mVoltage;}
+    public int getDrawTime()        {return mDrawTime;}
 
     /**
      * Implements the callback for when scanning for devices has found a device with
@@ -418,8 +449,11 @@ public class PSoCCapSenseLedService extends Service {
             /* Get the CapSense CCCD */
             //mCapSenseCccd = mCapsenseCharacteristic.getDescriptor(UUID.fromString(CccdUUID));
 
+            //syncTime();
+
             // Read the current state of the LED from the device
             readAllCharacteristic();
+
 
             // Broadcast that service/characteristic/descriptor discovery is done
             broadcastUpdate(ACTION_SERVICES_DISCOVERED);
@@ -446,14 +480,37 @@ public class PSoCCapSenseLedService extends Service {
                 if(uuid.equals(rotationSpeedUUID)) {
                     final byte[] data = characteristic.getValue();
                     // Set the LED switch state variable based on the characteristic value ttat was read
-                    mRotationSpeed = data[3];
-                    mRotationSpeed <<= 8;
-                    mRotationSpeed = data[2];
-                    mRotationSpeed <<= 8;
-                    mRotationSpeed = data[1];
-                    mRotationSpeed <<= 8;
-                    mRotationSpeed = data[0];
-                    mRotationSpeed <<= 8;
+                    int temp = 0;
+                    temp = data[3];
+                    temp <<= 8;
+                    temp |= data[2];
+                    temp <<= 8;
+                    temp |= data[1];
+                    temp <<= 8;
+                    temp |= data[0];
+                    mRotationSpeed = temp;
+                    mRotationSpeed /= 100000;
+                    mRotationSpeed = 1/mRotationSpeed;
+                    mBluetoothGatt.readCharacteristic(mDrawTimeCharacterisitc);
+                }
+
+                if (uuid.equals(drawTimeUUID)) {
+                    final byte[] data = characteristic.getValue();
+                    mDrawTime |= data[3];
+                    mDrawTime <<= 8;
+                    mDrawTime |= data[2];
+                    mDrawTime <<= 8;
+                    mDrawTime |= data[1];
+                    mDrawTime <<= 8;
+                    mDrawTime |= data[0];
+                    mBluetoothGatt.readCharacteristic(mVoltageCharacterisitc);
+                }
+
+                if (uuid.equals(voltageUUID)) {
+                    final byte[] data = characteristic.getValue();
+                    mVoltage = data[1];
+                    mVoltage <<= 8;
+                    mVoltage |= data[0];
                 }
                 // Notify the main activity that new data is available
                 broadcastUpdate(ACTION_DATA_RECEIVED);

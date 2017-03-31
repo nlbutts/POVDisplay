@@ -53,8 +53,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,14 +62,19 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
 
     // Variables to access objects from the layout such as buttons, switches, values
-    private static TextView mRotationValue;
     private static Button start_button;
     private static Button search_button;
     private static Button connect_button;
     private static Button discover_button;
     private static Button disconnect_button;
-    private static Switch led_switch;
-    private static Switch cap_switch;
+    private static Button write_offset_button;
+    private static Button write_filter_gain_button;
+    private static EditText draw_offset_textview;
+    private static EditText filter_gain_textview;
+    private static TextView rotation_textview;
+    private static TextView voltage_textview;
+    private static TextView drawtime_textview;
+
 
     // Variables to manage BLE connection
     private static boolean mConnectState;
@@ -128,18 +132,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set up a variable to point to the CapSense value on the display
-        //mCapsenseValue = (TextView) findViewById(R.id.capsense_value);
-        mRotationValue = (TextView) findViewById(R.id.rotation_value);
-
-        // Set up variables for accessing buttons and slide switches
         start_button = (Button) findViewById(R.id.start_button);
         search_button = (Button) findViewById(R.id.search_button);
         connect_button = (Button) findViewById(R.id.connect_button);
         discover_button = (Button) findViewById(R.id.discoverSvc_button);
         disconnect_button = (Button) findViewById(R.id.disconnect_button);
-        //led_switch = (Switch) findViewById(R.id.led_switch);
-        //cap_switch = (Switch) findViewById(R.id.capsense_switch);
+        write_offset_button = (Button) findViewById(R.id.writeDisplaybutton);
+        write_filter_gain_button = (Button) findViewById(R.id.writeFilterGainButton);
+        draw_offset_textview = (EditText) findViewById(R.id.Display_Offset);
+        filter_gain_textview = (EditText) findViewById(R.id.Filter_gain);
+        draw_offset_textview.setEnabled(true);
+        filter_gain_textview.setEnabled(true);
+
+        rotation_textview = (TextView) findViewById(R.id.RotationValue);
+        voltage_textview = (TextView) findViewById(R.id.VoltageValue);
+        drawtime_textview = (TextView) findViewById(R.id.DisplayTime);
 
         // Initialize service and connection state variable
         mServiceConnected = false;
@@ -332,6 +339,16 @@ public class MainActivity extends AppCompatActivity {
         /* That event broadcasts a message which is picked up by the mGattUpdateReceiver */
     }
 
+    public void writeDisplayOffset(View view) {
+        int offset = Integer.parseInt(draw_offset_textview.getText().toString());
+        mPSoCCapSenseLedService.writeDisplayOffset(offset);
+    }
+
+    public void writeFilterGain(View view) {
+        int filterGain = Integer.parseInt(filter_gain_textview.getText().toString());
+        mPSoCCapSenseLedService.writeFilterGain(filterGain);
+    }
+
     /**
      * Listener for BLE event broadcasts
      */
@@ -363,11 +380,8 @@ public class MainActivity extends AppCompatActivity {
                     disconnect_button.setEnabled(false);
                     discover_button.setEnabled(false);
                     search_button.setEnabled(true);
-                    // Turn off and disable the LED and CapSense switches
-                    led_switch.setChecked(false);
-                    led_switch.setEnabled(false);
-                    cap_switch.setChecked(false);
-                    cap_switch.setEnabled(false);
+                    write_filter_gain_button.setEnabled(true);
+                    write_offset_button.setEnabled(true);
                     mConnectState = false;
                     Log.d(TAG, "Disconnected");
                     break;
@@ -375,15 +389,22 @@ public class MainActivity extends AppCompatActivity {
                     // Disable the discover services button
                     discover_button.setEnabled(false);
                     // Enable the LED and CapSense switches
-                    //led_switch.setEnabled(true);
-                    //cap_switch.setEnabled(true);
+                    write_filter_gain_button.setEnabled(true);
+                    write_offset_button.setEnabled(true);
                      Log.d(TAG, "Services Discovered");
                     break;
                 case PSoCCapSenseLedService.ACTION_DATA_RECEIVED:
                     // This is called after a notify or a read completes
                     // Check LED switch Setting
-                    int rotationRate = mPSoCCapSenseLedService.getRotationRate();
-                    mRotationValue.setText(String.valueOf(rotationRate));
+                    double rotationRate = mPSoCCapSenseLedService.getRotationRate();
+                    rotation_textview.setText(String.valueOf((int)rotationRate));
+
+                    int v = mPSoCCapSenseLedService.getVoltage();
+                    voltage_textview.setText(String.valueOf(v));
+
+                    int drawTime = mPSoCCapSenseLedService.getDrawTime();
+                    drawtime_textview.setText(String.valueOf(drawTime));
+
 /*
                     if(mPSoCCapSenseLedService.getLedSwitchState()){
                         led_switch.setChecked(true);

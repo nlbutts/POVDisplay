@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BLE101</string>
+    <string name="app_name">POVDisplay Manager</string>
 
     <string name="Start">Start Bluetooth</string>
     <string name="Search">Search for Device</string>
@@ -13,5 +13,9 @@
     <string name="NotifyOff">"Notify Off"</string>
     <string name="Notify">Notify</string>
     <string name="Sync">Sync</string>
-    <string name="RotationRate">RotationRate</string>
+    <string name="RotationRate">RotationRate (RPS)</string>
+    <string name="DisplayOffset">DisplayOffset</string>
+    <string name="VoltageInMV">Voltage (mv)</string>
+    <string name="DisplayTime">Display Time(us)</string>
+    <string name="FilterGain">Filter gain</string>
 </resources>
