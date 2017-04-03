@@ -27,6 +27,18 @@ uint8_t                 _connected;
 extern uint32_t         _rotationFilterGain;
 extern uint16_t         _drawOffset;
 
+//uint8_t                 _sendVoltageNotifications = false;
+uint8                   _rotationCCCDValue[2] = {0};
+CYBLE_GATT_HANDLE_VALUE_PAIR_T  _rotationNotificationCCCDHandle;
+
+uint8_t                 _voltageCCCDValue[2] = {0};
+CYBLE_GATT_HANDLE_VALUE_PAIR_T  _voltageNotificationCCCDHandle;
+
+
+uint8                   _drawCCCDValue[2] = {0};
+CYBLE_GATT_HANDLE_VALUE_PAIR_T _drawNotificationCCCDHandle;
+
+uint8_t                 _busyStatus = 0;
 
 /***************************************************************
  * Function to update the SW Version string
@@ -35,66 +47,93 @@ void DisUpdateFirmWareRevision(void)
 {
     CYBLE_STACK_LIB_VERSION_T stackVersion;
     uint8 fwRev[9u] = "0.0.0.000";
-    
+
     if(CyBle_GetStackLibraryVersion(&stackVersion) == CYBLE_ERROR_OK)
     {
         /* Transform numbers to ASCII string */
-        fwRev[0u] = stackVersion.majorVersion + '0'; 
+        fwRev[0u] = stackVersion.majorVersion + '0';
         fwRev[2u] = stackVersion.minorVersion + '0';
         fwRev[4u] = stackVersion.patch + '0';
         fwRev[6u] = (stackVersion.buildNumber / 100u) + '0';
-        stackVersion.buildNumber %= 100u; 
+        stackVersion.buildNumber %= 100u;
         fwRev[7u] = (stackVersion.buildNumber / 10u) + '0';
         fwRev[8u] = (stackVersion.buildNumber % 10u) + '0';
     }
-    
-    CyBle_DissSetCharacteristicValue(CYBLE_DIS_FIRMWARE_REV, sizeof(fwRev), fwRev);   
+
+    CyBle_DissSetCharacteristicValue(CYBLE_DIS_FIRMWARE_REV, sizeof(fwRev), fwRev);
 }
 
 void DisUpdateSoftWareRevision(uint32_t majorVersion, uint32_t minorVersion, uint32_t patch, uint32_t buildNumber)
 {
     uint8 fwRev[9u] = "0.0.0.000";
-    
+
     /* Transform numbers to ASCII string */
-    fwRev[0u] = majorVersion + '0'; 
+    fwRev[0u] = majorVersion + '0';
     fwRev[2u] = minorVersion + '0';
     fwRev[4u] = patch + '0';
     fwRev[6u] = (buildNumber / 100u) + '0';
-    buildNumber %= 100u; 
+    buildNumber %= 100u;
     fwRev[7u] = (buildNumber / 10u) + '0';
     fwRev[8u] = (buildNumber % 10u) + '0';
-    
-    CyBle_DissSetCharacteristicValue(CYBLE_DIS_SOFTWARE_REV, sizeof(fwRev), fwRev);   
+
+    CyBle_DissSetCharacteristicValue(CYBLE_DIS_SOFTWARE_REV, sizeof(fwRev), fwRev);
 }
 
 void updateRotationRate(uint32_t rotationRate)
 {
     CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
 
-    tempHandle.attrHandle = CYBLE_POVDISPLAY_ROTATIONSPEED_CHAR_HANDLE;
-    tempHandle.value.val = (uint8_t*)&rotationRate;
-    tempHandle.value.len = 4;
-    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+    	/* If stack is not busy, then send the notification */
+	if(_busyStatus == CYBLE_STACK_STATE_FREE)
+	{
+		/* Update notification data*/
+        tempHandle.attrHandle = CYBLE_POVDISPLAY_ROTATIONSPEED_CHAR_HANDLE;
+        tempHandle.value.val = (uint8_t*)&rotationRate;
+        tempHandle.value.len = 4;
+		/* Send the updated handle as part of attribute for notifications */
+        CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+        if (_rotationCCCDValue[0])
+        {
+		    CyBle_GattsNotification(cyBle_connHandle,&tempHandle);
+        }
+	}
+
 }
 
 void updateDrawLoopAverage(uint32_t drawTime)
 {
     CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
 
-    tempHandle.attrHandle = CYBLE_POVDISPLAY_DRAWTIME_CHAR_HANDLE;
-    tempHandle.value.val = (uint8_t*)&drawTime;
-    tempHandle.value.len = 4;
-    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+ 	/* If stack is not busy, then send the notification */
+	if(_busyStatus == CYBLE_STACK_STATE_FREE)
+	{
+        tempHandle.attrHandle = CYBLE_POVDISPLAY_DRAWTIME_CHAR_HANDLE;
+        tempHandle.value.val = (uint8_t*)&drawTime;
+        tempHandle.value.len = 4;
+        CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+        if (_drawCCCDValue[0])
+        {
+		    CyBle_GattsNotification(cyBle_connHandle,&tempHandle);
+        }
+    }
 }
 
 void updateVoltage(uint16_t voltageInMv)
 {
     CYBLE_GATTS_HANDLE_VALUE_NTF_T  tempHandle;
 
-    tempHandle.attrHandle = CYBLE_POVDISPLAY_VOLTAGE_CHAR_HANDLE;
-    tempHandle.value.val = (uint8_t*)&voltageInMv;
-    tempHandle.value.len = 2;
-    CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+ 	/* If stack is not busy, then send the notification */
+	if(_busyStatus == CYBLE_STACK_STATE_FREE)
+    {
+        tempHandle.attrHandle = CYBLE_POVDISPLAY_VOLTAGE_CHAR_HANDLE;
+        tempHandle.value.val = (uint8_t*)&voltageInMv;
+        tempHandle.value.len = 2;
+        CyBle_GattsWriteAttributeValue(&tempHandle,0,&cyBle_connHandle,CYBLE_GATT_DB_LOCALLY_INITIATED );
+        if (_voltageCCCDValue[0])
+        {
+		    CyBle_GattsNotification(cyBle_connHandle,&tempHandle);
+        }
+    }
 }
 
 /*******************************************************************************
@@ -128,7 +167,7 @@ void AppCallBack(uint32 event, void* eventParam)
             /* Enter into discoverable mode so that remote can search it. */
             apiResult = CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
             if(apiResult != CYBLE_ERROR_OK)
-            {   
+            {
                 //ShowError();
             }
             printf("CYBLE_EVT_STACK_ON\n");
@@ -139,15 +178,15 @@ void AppCallBack(uint32 event, void* eventParam)
 		case CYBLE_EVT_HARDWARE_ERROR:  /* This event indicates that some internal HW error has occurred. */
             //ShowError();
             break;
-        
+
         /**********************************************************
         *                       GAP Events
         ***********************************************************/
         case CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP:
             printf("CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP\n");
             if(CYBLE_STATE_DISCONNECTED == CyBle_GetState())
-            {   
-                /* Fast and slow advertising period complete, go to low power  
+            {
+                /* Fast and slow advertising period complete, go to low power
                  * mode (Hibernate mode) and wait for an external
                  * user event to wake up the device again */
 //                Advertising_LED_Write(LED_OFF);
@@ -174,7 +213,7 @@ void AppCallBack(uint32 event, void* eventParam)
             break;
         case CYBLE_EVT_GAPC_CONNECTION_UPDATE_COMPLETE:
             break;
-                       
+
         /**********************************************************
         *                       GATT Events
         ***********************************************************/
@@ -183,6 +222,11 @@ void AppCallBack(uint32 event, void* eventParam)
             break;
         case CYBLE_EVT_GATT_DISCONNECT_IND:
             printf("CYBLE_EVT_GATT_DISCONNECT_IND\n");
+
+            // Reset the rotation notification
+            _rotationCCCDValue[0]   = 0;
+            _voltageCCCDValue[0]    = 0;
+            _drawCCCDValue[0]       = 0;
             break;
 
         case CYBLE_EVT_GATTS_WRITE_REQ:
@@ -202,19 +246,9 @@ void AppCallBack(uint32 event, void* eventParam)
                     datetime |= wrReqParam->handleValPair.value.val[2];
                     datetime <<= 8;
                     datetime |= wrReqParam->handleValPair.value.val[3];
-//                    datetime <<= 8;
-//                    datetime |= wrReqParam->handleValPair.value.val[4];
-//                    datetime <<= 8;
-//                    datetime |= wrReqParam->handleValPair.value.val[5];
-//                    datetime <<= 8;
-//                    datetime |= wrReqParam->handleValPair.value.val[6];
-//                    datetime <<= 8;
-//                    datetime |= wrReqParam->handleValPair.value.val[7];
                     printf("Date time EPOCH: %08x\n", (unsigned int)(datetime >> 32));
                     printf("Date time EPOCH: %08x\n", (unsigned int)datetime);
                     RTC_SetUnixTime(datetime);
-
-                    CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
             }
             /* Write request for time/date */
@@ -230,11 +264,9 @@ void AppCallBack(uint32 event, void* eventParam)
                     _rotationFilterGain |= wrReqParam->handleValPair.value.val[2];
                     _rotationFilterGain <<= 8;
                     _rotationFilterGain |= wrReqParam->handleValPair.value.val[3];
-
-                    CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
             }
-            
+
             if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_DRAWOFFSET_CHAR_HANDLE)
             {
                 /* only update the value and write the response if the requested write is allowed */
@@ -243,19 +275,91 @@ void AppCallBack(uint32 event, void* eventParam)
                     _drawOffset = wrReqParam->handleValPair.value.val[0];
                     _drawOffset <<= 8;
                     _rotationFilterGain |= wrReqParam->handleValPair.value.val[1];
-
-                    CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
             }
+
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_ROTATIONSPEED_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(wrReqParam->handleValPair.value.val[CYBLE_POVDISPLAY_ROTATIONSPEED_CHARACTERISTIC_USER_DESCRIPTION_DESC_INDEX] == 1)
+                {
+                    _rotationCCCDValue[0]  = 1;
+                }
+                else
+                {
+                    _rotationCCCDValue[0]  = 0;
+                }
+
+        		/* Update CCCD handle with notification status data*/
+        		_rotationNotificationCCCDHandle.attrHandle = CYBLE_POVDISPLAY_ROTATIONSPEED_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE;
+        		_rotationNotificationCCCDHandle.value.val  = _rotationCCCDValue;
+        		_rotationNotificationCCCDHandle.value.len  = 2;
+
+        		/* Report data to BLE component for sending data when read by Central device */
+        		CyBle_GattsWriteAttributeValue(&_rotationNotificationCCCDHandle, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+            }
+
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_VOLTAGE_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(wrReqParam->handleValPair.value.val[CYBLE_POVDISPLAY_VOLTAGE_CHARACTERISTIC_USER_DESCRIPTION_DESC_INDEX] == 1)
+                {
+                    _voltageCCCDValue[0]  = 1;
+                }
+                else
+                {
+                    _voltageCCCDValue[0]  = 0;
+                }
+
+        		/* Update CCCD handle with notification status data*/
+        		_voltageNotificationCCCDHandle.attrHandle = CYBLE_POVDISPLAY_VOLTAGE_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE;
+        		_voltageNotificationCCCDHandle.value.val  = _voltageCCCDValue;
+        		_voltageNotificationCCCDHandle.value.len  = 2;
+
+        		/* Report data to BLE component for sending data when read by Central device */
+        		CyBle_GattsWriteAttributeValue(&_voltageNotificationCCCDHandle, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+            }
+
+            if(wrReqParam->handleValPair.attrHandle == CYBLE_POVDISPLAY_DRAWTIME_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE)
+            {
+                /* only update the value and write the response if the requested write is allowed */
+                if(wrReqParam->handleValPair.value.val[CYBLE_POVDISPLAY_DRAWTIME_CHARACTERISTIC_USER_DESCRIPTION_DESC_INDEX] == 1)
+                {
+                    _drawCCCDValue[0]  = 1;
+                }
+                else
+                {
+                    _drawCCCDValue[0]  = 0;
+                }
+
+        		/* Update CCCD handle with notification status data*/
+        		_drawNotificationCCCDHandle.attrHandle = CYBLE_POVDISPLAY_DRAWTIME_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE;
+        		_drawNotificationCCCDHandle.value.val  = _drawCCCDValue;
+        		_drawNotificationCCCDHandle.value.len  = 2;
+
+        		/* Report data to BLE component for sending data when read by Central device */
+        		CyBle_GattsWriteAttributeValue(&_drawNotificationCCCDHandle, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+            }
+            CyBle_GattsWriteRsp(cyBle_connHandle);
+            break;
 
         /**********************************************************
         *                       Other Events
         ***********************************************************/
+		case CYBLE_EVT_STACK_BUSY_STATUS:
+			/* This event is generated when the internal stack buffer is full and no more
+			* data can be accepted or the stack has buffer available and can accept data.
+			* This event is used by application to prevent pushing lot of data to stack. */
+
+			/* Extract the present stack status */
+            _busyStatus = * (uint8*)eventParam;
+            break;
+
 
         default:
             break;
 	}
-    
+
     if(eventParam != NULL)
     {
     }

@@ -260,7 +260,6 @@ CY_ISR(alignmentISR)
     uint16_t diffTime = capture - _previousCapture;
     _previousCapture = capture;
     _rotationRate = filter(diffTime, _rotationRate, _rotationFilterGain);
-    updateRotationRate(_rotationRate);
     if (_rotationRate < MINIMUM_ROTATION_RATE)
     {
         TimerLED_Stop();
@@ -323,11 +322,11 @@ void sysTickCallback(void)
         }
         _displayTime++;
         
+        updateRotationRate(_rotationRate);
         updateVoltage(_pwrMVolts);
         updateDrawLoopAverage(_drawLoopAvg);
         DisUpdateFirmWareRevision();
-        DisUpdateSoftWareRevision(1, 0, 0, 123);
-
+        DisUpdateSoftWareRevision(1, 1, 0, 123);
     }
 }
 

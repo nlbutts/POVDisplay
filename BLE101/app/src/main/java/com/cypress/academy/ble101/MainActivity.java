@@ -286,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
         start_button.setEnabled(false);
         search_button.setEnabled(true);
         Log.d(TAG, "Bluetooth is Enabled");
+
+        searchBluetooth(view);
     }
 
     /**

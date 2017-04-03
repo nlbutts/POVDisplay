@@ -11,6 +11,7 @@
 <v>.\POVBaseHBridge.cydsn\POVBaseHBridge.cyprj</v>
 <v>.\st_eeprom.cylib\st_eeprom.cyprj</v>
 <v>.\BLE_Temperature_Measurement01.cydsn\BLE_Temperature_Measurement01.cyprj</v>
+<v>.\PRoC_BLE_CapSense_Slider_LED\PRoC_BLE_CapSense_Slider_LED.cydsn\PRoC_BLE_CapSense_Slider_LED.cyprj</v>
 </projects>
 <workspace_id v="1be81ebb-8ddb-4949-ac76-fcfd36b8e892" />
 <WriteAppVersionLastSavedWith v="4.0.0.432" />

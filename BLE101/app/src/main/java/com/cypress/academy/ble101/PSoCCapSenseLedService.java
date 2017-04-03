@@ -56,6 +56,7 @@ import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -79,7 +80,6 @@ public class PSoCCapSenseLedService extends Service {
     // Bluetooth characteristics that we need to read/write
     //private static BluetoothGattCharacteristic mLedCharacterisitc;
     //private static BluetoothGattCharacteristic mCapsenseCharacteristic;
-    //private static BluetoothGattDescriptor mCapSenseCccd;
     private static BluetoothGattCharacteristic mTimeCharacterisitc;
     private static BluetoothGattCharacteristic mFilterGainCharacterisitc;
     private static BluetoothGattCharacteristic mRotationSpeedCharacterisitc;
@@ -88,9 +88,9 @@ public class PSoCCapSenseLedService extends Service {
     private static BluetoothGattCharacteristic mVoltageCharacterisitc;
 
     private static int mTime;
-    private static double mRotationSpeed;
-    private static int mDrawTime;
-    private static int mVoltage;
+    private static double mRotationSpeed = 0;
+    private static int mDrawTime = 0;
+    private static int mVoltage = 0;
 
     // UUIDs for the service and characteristics that the custom CapSenseLED service uses
     //private final static String baseUUID =                   "149F44D4-3340-4673-BE98-4F25C7DB6764";
@@ -106,6 +106,9 @@ public class PSoCCapSenseLedService extends Service {
     private final static String drawTimeUUID                =  "00953ce7-afc0-415d-82a5-a883fc562f6a";
     private final static String drawOffsetUUID              =  "e10f502d-1a04-4ff2-93d6-c50d60f96eed";
     private final static String voltageUUID                 =  "05192317-f383-4cf8-99ef-41400f603f4a";
+
+    private final static String CccdUUID            =  "00002902-0000-1000-8000-00805f9b34fb";
+    private static int CccdCounter = 0;
 
      // Variables to keep track of the LED switch state and CapSense Value
     private static boolean mLedSwitchState = false;
@@ -335,10 +338,10 @@ public class PSoCCapSenseLedService extends Service {
      *
      * @param value Turns notifications on (1) or off (0)
      */
-    public void writeCapSenseNotification(boolean value) {
+    public void writeNotification(BluetoothGattCharacteristic characteristic, boolean value) {
         // Set notifications locally in the CCCD
-/*
-        mBluetoothGatt.setCharacteristicNotification(mCapsenseCharacteristic, value);
+
+        mBluetoothGatt.setCharacteristicNotification(characteristic, value);
         byte[] byteVal = new byte[1];
         if (value) {
             byteVal[0] = 1;
@@ -347,9 +350,10 @@ public class PSoCCapSenseLedService extends Service {
         }
         // Write Notification value to the device
         Log.i(TAG, "CapSense Notification " + value);
-        mCapSenseCccd.setValue(byteVal);
-        mBluetoothGatt.writeDescriptor(mCapSenseCccd);
-*/
+
+        BluetoothGattDescriptor Cccd = characteristic.getDescriptor(UUID.fromString(CccdUUID));
+        Cccd.setValue(byteVal);
+        mBluetoothGatt.writeDescriptor(Cccd);
     }
 
     /**
@@ -448,11 +452,12 @@ public class PSoCCapSenseLedService extends Service {
             //mCapsenseCharacteristic = mService.getCharacteristic(UUID.fromString(capsenseCharacteristicUUID));
             /* Get the CapSense CCCD */
             //mCapSenseCccd = mCapsenseCharacteristic.getDescriptor(UUID.fromString(CccdUUID));
+            //mRotationCccd = mRotationSpeedCharacterisitc.getDescriptor(UUID.fromString(rotationCccdUUID));
 
-            //syncTime();
+            syncTime();
 
             // Read the current state of the LED from the device
-            readAllCharacteristic();
+            //readAllCharacteristic();
 
 
             // Broadcast that service/characteristic/descriptor discovery is done
@@ -480,14 +485,7 @@ public class PSoCCapSenseLedService extends Service {
                 if(uuid.equals(rotationSpeedUUID)) {
                     final byte[] data = characteristic.getValue();
                     // Set the LED switch state variable based on the characteristic value ttat was read
-                    int temp = 0;
-                    temp = data[3];
-                    temp <<= 8;
-                    temp |= data[2];
-                    temp <<= 8;
-                    temp |= data[1];
-                    temp <<= 8;
-                    temp |= data[0];
+                    int temp = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     mRotationSpeed = temp;
                     mRotationSpeed /= 100000;
                     mRotationSpeed = 1/mRotationSpeed;
@@ -496,26 +494,67 @@ public class PSoCCapSenseLedService extends Service {
 
                 if (uuid.equals(drawTimeUUID)) {
                     final byte[] data = characteristic.getValue();
-                    mDrawTime |= data[3];
-                    mDrawTime <<= 8;
-                    mDrawTime |= data[2];
-                    mDrawTime <<= 8;
-                    mDrawTime |= data[1];
-                    mDrawTime <<= 8;
-                    mDrawTime |= data[0];
+                    mDrawTime = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     mBluetoothGatt.readCharacteristic(mVoltageCharacterisitc);
                 }
 
                 if (uuid.equals(voltageUUID)) {
                     final byte[] data = characteristic.getValue();
-                    mVoltage = data[1];
-                    mVoltage <<= 8;
-                    mVoltage |= data[0];
+                    mVoltage = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort();
                 }
                 // Notify the main activity that new data is available
                 broadcastUpdate(ACTION_DATA_RECEIVED);
             }
         }
+
+        /**
+         * This is called when a write completes
+         *
+         * @param gatt the GATT database object
+         * @param characteristic the GATT characteristic that was read
+         * @param status the status of the transaction
+         */
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                         BluetoothGattCharacteristic characteristic,
+                                         int status) {
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                // Verify that the read was the LED state
+                String uuid = characteristic.getUuid().toString();
+                if(uuid.equals(timeUUID)) {
+                    CccdCounter++;
+                    writeNotification(mRotationSpeedCharacterisitc, true);
+                }
+            }
+        }
+
+        /**
+         * This is called when a write completes
+         *
+         * @param gatt the GATT database object
+         * @param descriptor the GATT characteristic that was read
+         * @param status the status of the transaction
+         */
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt,
+                                          BluetoothGattDescriptor descriptor,
+                                          int status) {
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                String uuid = descriptor.getUuid().toString();
+                if(CccdCounter == 1) {
+                    CccdCounter++;
+                    writeNotification(mDrawTimeCharacterisitc, true);
+                }
+                else if(CccdCounter == 2) {
+                    CccdCounter++;
+                    writeNotification(mVoltageCharacterisitc, true);
+                }
+
+            }
+        }
+
 
         /**
          * This is called when a characteristic with notify set changes.
@@ -530,12 +569,29 @@ public class PSoCCapSenseLedService extends Service {
 
             String uuid = characteristic.getUuid().toString();
 
-            // In this case, the only notification the apps gets is the CapSense value.
-            // If the application had additional notifications we could
+            // In this case, the only read the app does is the LED state.
+            // If the application had additional characteristics to read we could
             // use a switch statement here to operate on each one separately.
-            //if(uuid.equals(capsenseCharacteristicUUID)) {
-            //    mCapSenseValue = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16,0).toString();
-            //}
+            if(uuid.equals(rotationSpeedUUID)) {
+                final byte[] data = characteristic.getValue();
+                // Set the LED switch state variable based on the characteristic value ttat was read
+                int temp = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                mRotationSpeed = temp;
+                mRotationSpeed /= 100000;
+                mRotationSpeed = 1/mRotationSpeed;
+                //mBluetoothGatt.readCharacteristic(mDrawTimeCharacterisitc);
+            }
+
+            if (uuid.equals(drawTimeUUID)) {
+                final byte[] data = characteristic.getValue();
+                mDrawTime = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                //mBluetoothGatt.readCharacteristic(mVoltageCharacterisitc);
+            }
+
+            if (uuid.equals(voltageUUID)) {
+                final byte[] data = characteristic.getValue();
+                mDrawTime = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort();
+            }
 
             // Notify the main activity that new data is available
             broadcastUpdate(ACTION_DATA_RECEIVED);
