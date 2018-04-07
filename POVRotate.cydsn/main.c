@@ -22,7 +22,6 @@
 
 #define UPDATES_PER_ROTATION    120
 #define SECONDS_TO_UPDATES(x)   ((x * UPDATES_PER_ROTATION) / 60)
-#define UPDATES_TO_
 
 /* Holds the input power in millivolts */
 static uint32_t _pwrMVolts;
@@ -31,7 +30,7 @@ static uint32_t _pwrMVolts;
 static uint16_t _previousCapture = 0;
 
 /* The output of the filtered rotation value */
-uint32_t _rotationFilterGain = 0.1 * 256;
+uint32_t _rotationFilterGain = 0.2 * 256;
 int32_t _rotationRate = 0;
 
 /* LED State of the 4 quad display */
@@ -47,6 +46,9 @@ uint32_t _timeInSeconds = 0;
 /* Debug variables for counting interrupts */
 static uint32_t _alignmentIntCount = 0;
 static uint32_t _ledUpdateIntCount = 0;
+static uint8_t  _hoursInClockPos;
+static uint8_t  _minutesInClockPos;
+
 
 /* Holds the filter for the task time */
 static int32_t _drawLoopAvg = 0;
@@ -182,16 +184,23 @@ void generateClock()
     else if ((temp > 0) && (temp <= 4))
     {
         // Draw green
-        _leds[0] = 0;
-        _leds[1] = 0xFF;
+        _leds[0] = 0x3F;
+        _leds[1] = 0;
         _leds[2] = 0;
     }
     else if ((temp > 0) && (temp <= 6))
     {
         // Draw green
-        _leds[0] = 0;
+        _leds[0] = 0x0F;
         _leds[1] = 0;
-        _leds[2] = 0xFF;
+        _leds[2] = 0;
+    }
+    else if ((temp > 0) && (temp <= 8))
+    {
+        // Draw green
+        _leds[0] = 0x03;
+        _leds[1] = 0;
+        _leds[2] = 0;
     }
     else
     {
@@ -209,6 +218,20 @@ void generateClock()
         _leds[0] |= 0x01;
         _leds[1] |= 0x01;
         _leds[2] |= 0x01;
+    }
+    
+    if (SECONDS_TO_UPDATES(_hoursInClockPos) == _ledState)
+    {
+        _leds[0] |= 0;
+        _leds[1] |= 0xFF;
+        _leds[2] |= 0;        
+    }
+
+    if (SECONDS_TO_UPDATES(_minutesInClockPos) == _ledState)
+    {
+        _leds[0] |= 0;
+        _leds[1] |= 0;
+        _leds[2] |= 0xFF;        
     }
 
     // // Draw the quad pattern
@@ -282,7 +305,8 @@ CY_ISR(ledUpdateISR)
 
     _angle += 360 / UPDATES_PER_ROTATION;
     
-    printText();
+    //printText();
+    generateClock();
 
     led_pushLEDs(_leds);
 
@@ -309,12 +333,19 @@ void sysTickCallback(void)
         if (_displayTime < 10)
         {
             uint32_t time = RTC_GetTime();
-            snprintf(printStr, 10, "%02d:%02d:%02d", (int)RTC_GetHours(time), (int)RTC_GetMinutes(time), (int)RTC_GetSecond(time));
+            //snprintf(printStr, 10, "%02d:%02d:%02d", (int)RTC_GetHours(time), (int)RTC_GetMinutes(time), (int)RTC_GetSecond(time));
+            _hoursInClockPos    = RTC_GetHours(time);
+            if (_hoursInClockPos > 12)
+            {
+                _hoursInClockPos -= 12;
+            }
+            _hoursInClockPos *= 5;
+            _minutesInClockPos  = RTC_GetMinutes(time);
         }
         else if (_displayTime < 20)
         {
             uint32_t date = RTC_GetDate();
-            snprintf(printStr, 10, "%02d/%02d/%02d", (int)RTC_GetMonth(date), (int)RTC_GetDay(date), (int)RTC_GetYear(date) - 2000);
+            //snprintf(printStr, 10, "%02d/%02d/%02d", (int)RTC_GetMonth(date), (int)RTC_GetDay(date), (int)RTC_GetYear(date) - 2000);
         }
         else
         {
@@ -325,8 +356,6 @@ void sysTickCallback(void)
         updateRotationRate(_rotationRate);
         updateVoltage(_pwrMVolts);
         updateDrawLoopAverage(_drawLoopAvg);
-        DisUpdateFirmWareRevision();
-        DisUpdateSoftWareRevision(1, 1, 0, 123);
     }
 }
 
@@ -386,6 +415,9 @@ int main()
     RTC_SetDateAndTime(time, date);
 
     WP_Write(0);
+
+    DisUpdateFirmWareRevision();
+    DisUpdateSoftWareRevision(1, 1, 0, 123);
 
     for(;;)
     {
