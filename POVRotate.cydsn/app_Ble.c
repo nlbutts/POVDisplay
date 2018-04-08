@@ -274,7 +274,7 @@ void AppCallBack(uint32 event, void* eventParam)
                 {
                     _drawOffset = wrReqParam->handleValPair.value.val[0];
                     _drawOffset <<= 8;
-                    _rotationFilterGain |= wrReqParam->handleValPair.value.val[1];
+                    _drawOffset |= wrReqParam->handleValPair.value.val[1];
                 }
             }
 

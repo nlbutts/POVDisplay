@@ -30,7 +30,7 @@ static uint32_t _pwrMVolts;
 static uint16_t _previousCapture = 0;
 
 /* The output of the filtered rotation value */
-uint32_t _rotationFilterGain = 0.2 * 256;
+uint32_t _rotationFilterGain = 0.1 * 256;
 int32_t _rotationRate = 0;
 
 /* LED State of the 4 quad display */
@@ -60,24 +60,6 @@ uint16_t _drawOffset;
 uint8_t _sendUpdate = 0;
 
 char printStr[10];
-
-// void testEEPROM(uint8_t xor)
-// {
-//     const uint8_t testLen = 32;
-//     volatile uint8_t rdData[testLen];
-//     volatile uint8_t wrData[testLen];
-//     volatile uint8_t status;
-
-//     status = EEPROM_read(0, rdData, testLen);
-//     for (uint8_t i = 0; i < testLen; i++)
-//     {
-//         wrData[i] = i & xor;
-//     }
-//     status = EEPROM_write(0, wrData, testLen);
-//     CyDelay(100);
-//     status = EEPROM_read(0, rdData, testLen);
-//     rdData[0]++;
-// }
 
 uint32_t getAngle()
 {
@@ -123,6 +105,10 @@ void generateQuadPattern()
     }
     _ledUpdateIntCount++;
     _ledState++;
+    if (_ledState >= UPDATES_PER_ROTATION)
+    {
+        _ledState = 0;
+    }
 }
 
 void printText()
@@ -223,7 +209,7 @@ void generateClock()
     if (SECONDS_TO_UPDATES(_hoursInClockPos) == _ledState)
     {
         _leds[0] |= 0;
-        _leds[1] |= 0xFF;
+        _leds[1] |= 0xFC;
         _leds[2] |= 0;        
     }
 
@@ -234,33 +220,11 @@ void generateClock()
         _leds[2] |= 0xFF;        
     }
 
-    // // Draw the quad pattern
-    // if (_ledState < 15)
-    // {
-    //     _leds[0] |= 0xC0;
-    //     _leds[1] |= 0x30;
-    //     _leds[2] |= 0x0C;
-    // }
-    // else if (_ledState < 30)
-    // {
-    //     _leds[0] |= 0x30;
-    //     _leds[1] |= 0x0C;
-    //     _leds[2] |= 0xC0;
-    // }
-    // else if (_ledState < 45)
-    // {
-    //     _leds[0] |= 0x0C;
-    //     _leds[1] |= 0xC0;
-    //     _leds[2] |= 0x30;
-    // }
-    // else if (_ledState < 60)
-    // {
-    //     _leds[0] |= 0xFC;
-    //     _leds[1] |= 0xFC;
-    //     _leds[2] |= 0xFC;
-    // }
-
     _ledState++;
+    if (_ledState >= UPDATES_PER_ROTATION)
+    {
+        _ledState = 0;
+    }    
 }
 
 int32_t filter(int32_t x, int32_t y, int32_t k)
@@ -293,7 +257,7 @@ CY_ISR(alignmentISR)
         TimerLED_WritePeriod(_rotationRate/UPDATES_PER_ROTATION);
         TimerLED_WriteCounter(0);
     }
-    _ledState = 0;
+    _ledState = _drawOffset;
     _angle = _drawOffset;
     _alignmentIntCount++;
 }
