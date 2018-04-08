@@ -19,6 +19,16 @@
 <file name=".\EEProm.h" />
 </CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021>
 </dependency_info>
+<dependency_info name="c9323d49-d323-40b8-9b59-cc008d68a989@Release@CortexM0" xml_contents_version="2">
+<CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021 type_name="CyDesigner.Common.Base.CyFileDeps" version="1">
+<file name=".\CortexM0\ARM_GCC_541\Release\EEProm.o">
+<dep name=".\EEProm.c" />
+<dep name=".\EEProm.h" />
+</file>
+<file name=".\EEProm.c" />
+<file name=".\EEProm.h" />
+</CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021>
+</dependency_info>
 </CyGuid_f44455c5-3770-4452-b988-0a7a7ff46256>
 </name>
 <name v="lbry_deps">
@@ -27,6 +37,13 @@
 <CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021 type_name="CyDesigner.Common.Base.CyFileDeps" version="1">
 <file name=".\CortexM0\ARM_GCC_493\Debug\st_eeprom.a">
 <dep name=".\CortexM0\ARM_GCC_493\Debug\EEProm.o" />
+</file>
+</CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021>
+</dependency_info>
+<dependency_info name="c9323d49-d323-40b8-9b59-cc008d68a989@Release@CortexM0" xml_contents_version="2">
+<CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021 type_name="CyDesigner.Common.Base.CyFileDeps" version="1">
+<file name=".\CortexM0\ARM_GCC_541\Release\st_eeprom.a">
+<dep name=".\CortexM0\ARM_GCC_541\Release\EEProm.o" />
 </file>
 </CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021>
 </dependency_info>
@@ -40,6 +57,10 @@
 <name v="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM0">
 <name_val_pair name="EEProm.c" v="-mcpu=cortex-m0 -mthumb -I. -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -Og -ffat-lto-objects -std=c11" />
 <name_val_pair name="C:\projects\POVDisplay\st_eeprom.cylib\CortexM0\ARM_GCC_493\Debug\st_eeprom.a" v="-rs .\CortexM0\ARM_GCC_493\Debug\st_eeprom.a C:\projects\POVDisplay\st_eeprom.cylib\CortexM0\ARM_GCC_493\Debug\EEProm.o" />
+</name>
+<name v="c9323d49-d323-40b8-9b59-cc008d68a989@Release@CortexM0">
+<name_val_pair name="EEProm.c" v="-mcpu=cortex-m0 -mthumb -I. -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D NDEBUG -Wall -ffunction-sections -ffat-lto-objects -Os -std=c11" />
+<name_val_pair name="C:\projects\POVDisplay\st_eeprom.cylib\CortexM0\ARM_GCC_541\Release\st_eeprom.a" v="-rs .\CortexM0\ARM_GCC_541\Release\st_eeprom.a C:\projects\POVDisplay\st_eeprom.cylib\CortexM0\ARM_GCC_541\Release\EEProm.o" />
 </name>
 </genericCmdLineData>
 <codeGenCmdLineTag v="" />

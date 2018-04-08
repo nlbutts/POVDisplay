@@ -6,13 +6,8 @@
     <Toolchain Name="ARM GCC Generic" Selected="True">
       <Tool Name="prebuild" Command="" Options="" />
       <Tool Name="assembler" Command="arm-none-eabi-as.exe" Options="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -alh=${OutputDir}/${CompileFile}.lst -g -W" />
-<<<<<<< HEAD
-      <Tool Name="compiler" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -I..\st_eeprom.cylib -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -Og -ffat-lto-objects" />
-      <Tool Name="linker" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -g -ffunction-sections -Og -ffat-lto-objects -L Generated_Source\PSoC4 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T C:\projects\POVDisplay\POVRotate.cydsn\Generated_Source\PSoC4\cm0gcc.ld -specs=nano.specs -Wl,--gc-sections" />
-=======
       <Tool Name="compiler" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -I..\st_eeprom.cylib -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D NDEBUG -Wall -ffunction-sections -ffat-lto-objects -Os -std=gnu11" />
       <Tool Name="linker" Command="arm-none-eabi-gcc.exe" Options="-mcpu=cortex-m0 -mthumb -L Generated_Source\PSoC4 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T Generated_Source\PSoC4\cm0gcc.ld -specs=nano.specs -Wl,--gc-sections -g -ffunction-sections -Os -ffat-lto-objects" />
->>>>>>> RevB
       <Tool Name="postbuild" Command="" Options="" />
     </Toolchain>
     <Toolchain Name="ARM MDK Generic" Selected="False">
@@ -193,8 +188,6 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cycodeshareimport.scat</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\SPI_LED_SCB_IRQ.h</File>
-<<<<<<< HEAD
-=======
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\DG_aliases.h</File>
@@ -207,7 +200,6 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_aliases.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\OE_PM.c</File>
->>>>>>> RevB
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_gatt.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE.c</File>
@@ -226,16 +218,6 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_StackGattClient.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_Stack.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_eventHandler.h</File>
-<<<<<<< HEAD
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_ans.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_ans.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_bless_isr.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LED.c</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LED.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LED_aliases.h</File>
-          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\LED_PM.c</File>
-=======
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_custom.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\BLE_dis.c</File>
@@ -263,46 +245,19 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Clock_3.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cy_em_eeprom.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\cy_em_eeprom.h</File>
->>>>>>> RevB
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic">
         <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
           <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\st_eeprom.a</File>
-<<<<<<< HEAD
-          <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\CyComponentLibrary.a</File>
-        </Files>
-      </Folder>
-      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic\BLE_v3_20">
-        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
-          <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\BLE_v3_20\gccCyBLEStack_BLE_SOC_CENTRAL.a</File>
-        </Files>
-      </Folder>
-      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_MDK_Generic\BLE_v3_20">
-        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
-          <File BuildType="BUILD" Toolchain="ARM MDK Generic">.\Export\ARM_MDK_Generic\BLE_v3_20\mdkCyBLEStack_BLE_SOC_CENTRAL.a</File>
-        </Files>
-      </Folder>
-      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_MDK_Generic">
-=======
         </Files>
       </Folder>
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_GCC_Generic\BLE_v3_51">
->>>>>>> RevB
         <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
           <File BuildType="BUILD" Toolchain="ARM GCC Generic">.\Export\ARM_GCC_Generic\BLE_v3_51\gccCyBLEStack_BLE_SOC_PERIPHERAL.a</File>
         </Files>
       </Folder>
-<<<<<<< HEAD
-      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_IAR_Generic\BLE_v3_20">
-        <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
-          <File BuildType="BUILD" Toolchain="ARM IAR Generic">.\Export\ARM_IAR_Generic\BLE_v3_20\mdkCyBLEStack_BLE_SOC_CENTRAL.a</File>
-        </Files>
-      </Folder>
-      <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_IAR_Generic">
-=======
       <Folder BuildType="STRICT" Path="C:\projects\POVDisplay\POVRotate.cydsn\Export\ARM_MDK_Generic\BLE_v3_51">
->>>>>>> RevB
         <Files Root="C:\projects\POVDisplay\POVRotate.cydsn">
           <File BuildType="BUILD" Toolchain="ARM MDK Generic">.\Export\ARM_MDK_Generic\BLE_v3_51\mdkCyBLEStack_BLE_SOC_PERIPHERAL.a</File>
         </Files>
