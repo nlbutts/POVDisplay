@@ -1,0 +1,980 @@
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"cymetadata.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	cy_metadata
+  19              		.global	cy_meta_flashprotect
+  20              		.global	cy_meta_wonvl
+  21              		.global	cy_meta_custnvl
+  22              		.global	cy_meta_configecc
+  23              		.section	.cyconfigecc,"a",%progbits
+  24              		.align	2
+  25              		.type	cy_meta_configecc, %object
+  26              		.size	cy_meta_configecc, 464
+  27              	cy_meta_configecc:
+  28 0000 01       		.byte	1
+  29 0001 52       		.byte	82
+  30 0002 00       		.byte	0
+  31 0003 40       		.byte	64
+  32 0004 01       		.byte	1
+  33 0005 65       		.byte	101
+  34 0006 00       		.byte	0
+  35 0007 40       		.byte	64
+  36 0008 01       		.byte	1
+  37 0009 05       		.byte	5
+  38 000a 01       		.byte	1
+  39 000b 40       		.byte	64
+  40 000c 01       		.byte	1
+  41 000d 0B       		.byte	11
+  42 000e 01       		.byte	1
+  43 000f 40       		.byte	64
+  44 0010 38       		.byte	56
+  45 0011 14       		.byte	20
+  46 0012 01       		.byte	1
+  47 0013 40       		.byte	64
+  48 0014 1A       		.byte	26
+  49 0015 15       		.byte	21
+  50 0016 01       		.byte	1
+  51 0017 40       		.byte	64
+  52 0018 33       		.byte	51
+  53 0019 16       		.byte	22
+  54 001a 01       		.byte	1
+  55 001b 40       		.byte	64
+  56 001c 1E       		.byte	30
+  57 001d 17       		.byte	23
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 2
+
+
+  58 001e 01       		.byte	1
+  59 001f 40       		.byte	64
+  60 0020 02       		.byte	2
+  61 0021 40       		.byte	64
+  62 0022 01       		.byte	1
+  63 0023 40       		.byte	64
+  64 0024 01       		.byte	1
+  65 0025 41       		.byte	65
+  66 0026 01       		.byte	1
+  67 0027 40       		.byte	64
+  68 0028 02       		.byte	2
+  69 0029 42       		.byte	66
+  70 002a 01       		.byte	1
+  71 002b 40       		.byte	64
+  72 002c 02       		.byte	2
+  73 002d 45       		.byte	69
+  74 002e 01       		.byte	1
+  75 002f 40       		.byte	64
+  76 0030 01       		.byte	1
+  77 0031 46       		.byte	70
+  78 0032 01       		.byte	1
+  79 0033 40       		.byte	64
+  80 0034 07       		.byte	7
+  81 0035 49       		.byte	73
+  82 0036 01       		.byte	1
+  83 0037 40       		.byte	64
+  84 0038 02       		.byte	2
+  85 0039 50       		.byte	80
+  86 003a 01       		.byte	1
+  87 003b 40       		.byte	64
+  88 003c 01       		.byte	1
+  89 003d 51       		.byte	81
+  90 003e 01       		.byte	1
+  91 003f 40       		.byte	64
+  92 0040 18       		.byte	24
+  93 0041 01       		.byte	1
+  94 0042 85       		.byte	-123
+  95 0043 0D       		.byte	13
+  96 0044 EE       		.byte	-18
+  97 0045 01       		.byte	1
+  98 0046 EE       		.byte	-18
+  99 0047 01       		.byte	1
+ 100 0048 40       		.byte	64
+ 101 0049 30       		.byte	48
+ 102 004a 41       		.byte	65
+ 103 004b 02       		.byte	2
+ 104 004c 49       		.byte	73
+ 105 004d FF       		.byte	-1
+ 106 004e 4A       		.byte	74
+ 107 004f FF       		.byte	-1
+ 108 0050 4B       		.byte	75
+ 109 0051 FF       		.byte	-1
+ 110 0052 4D       		.byte	77
+ 111 0053 A0       		.byte	-96
+ 112 0054 4F       		.byte	79
+ 113 0055 04       		.byte	4
+ 114 0056 50       		.byte	80
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 3
+
+
+ 115 0057 18       		.byte	24
+ 116 0058 5A       		.byte	90
+ 117 0059 04       		.byte	4
+ 118 005a 5F       		.byte	95
+ 119 005b 01       		.byte	1
+ 120 005c 60       		.byte	96
+ 121 005d 40       		.byte	64
+ 122 005e 62       		.byte	98
+ 123 005f C0       		.byte	-64
+ 124 0060 64       		.byte	100
+ 125 0061 40       		.byte	64
+ 126 0062 65       		.byte	101
+ 127 0063 40       		.byte	64
+ 128 0064 66       		.byte	102
+ 129 0065 C0       		.byte	-64
+ 130 0066 68       		.byte	104
+ 131 0067 C0       		.byte	-64
+ 132 0068 6A       		.byte	106
+ 133 0069 C0       		.byte	-64
+ 134 006a 6C       		.byte	108
+ 135 006b C0       		.byte	-64
+ 136 006c 6E       		.byte	110
+ 137 006d C0       		.byte	-64
+ 138 006e 82       		.byte	-126
+ 139 006f 0E       		.byte	14
+ 140 0070 86       		.byte	-122
+ 141 0071 02       		.byte	2
+ 142 0072 8A       		.byte	-118
+ 143 0073 03       		.byte	3
+ 144 0074 94       		.byte	-108
+ 145 0075 08       		.byte	8
+ 146 0076 9A       		.byte	-102
+ 147 0077 01       		.byte	1
+ 148 0078 A4       		.byte	-92
+ 149 0079 02       		.byte	2
+ 150 007a B0       		.byte	-80
+ 151 007b 08       		.byte	8
+ 152 007c B2       		.byte	-78
+ 153 007d 04       		.byte	4
+ 154 007e B4       		.byte	-76
+ 155 007f 01       		.byte	1
+ 156 0080 B6       		.byte	-74
+ 157 0081 02       		.byte	2
+ 158 0082 BE       		.byte	-66
+ 159 0083 10       		.byte	16
+ 160 0084 C0       		.byte	-64
+ 161 0085 30       		.byte	48
+ 162 0086 C1       		.byte	-63
+ 163 0087 02       		.byte	2
+ 164 0088 C5       		.byte	-59
+ 165 0089 D0       		.byte	-48
+ 166 008a C6       		.byte	-58
+ 167 008b 21       		.byte	33
+ 168 008c C8       		.byte	-56
+ 169 008d 0E       		.byte	14
+ 170 008e C9       		.byte	-55
+ 171 008f FF       		.byte	-1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 4
+
+
+ 172 0090 CA       		.byte	-54
+ 173 0091 FF       		.byte	-1
+ 174 0092 CB       		.byte	-53
+ 175 0093 FF       		.byte	-1
+ 176 0094 CD       		.byte	-51
+ 177 0095 AF       		.byte	-81
+ 178 0096 CE       		.byte	-50
+ 179 0097 0F       		.byte	15
+ 180 0098 CF       		.byte	-49
+ 181 0099 04       		.byte	4
+ 182 009a D0       		.byte	-48
+ 183 009b 18       		.byte	24
+ 184 009c D4       		.byte	-44
+ 185 009d 05       		.byte	5
+ 186 009e D8       		.byte	-40
+ 187 009f 04       		.byte	4
+ 188 00a0 DA       		.byte	-38
+ 189 00a1 04       		.byte	4
+ 190 00a2 DB       		.byte	-37
+ 191 00a3 04       		.byte	4
+ 192 00a4 DF       		.byte	-33
+ 193 00a5 01       		.byte	1
+ 194 00a6 E0       		.byte	-32
+ 195 00a7 40       		.byte	64
+ 196 00a8 E2       		.byte	-30
+ 197 00a9 C0       		.byte	-64
+ 198 00aa E4       		.byte	-28
+ 199 00ab 40       		.byte	64
+ 200 00ac E5       		.byte	-27
+ 201 00ad 40       		.byte	64
+ 202 00ae E6       		.byte	-26
+ 203 00af C0       		.byte	-64
+ 204 00b0 E8       		.byte	-24
+ 205 00b1 C0       		.byte	-64
+ 206 00b2 EA       		.byte	-22
+ 207 00b3 C0       		.byte	-64
+ 208 00b4 EC       		.byte	-20
+ 209 00b5 C0       		.byte	-64
+ 210 00b6 EE       		.byte	-18
+ 211 00b7 C0       		.byte	-64
+ 212 00b8 04       		.byte	4
+ 213 00b9 14       		.byte	20
+ 214 00ba 06       		.byte	6
+ 215 00bb 80       		.byte	-128
+ 216 00bc 0D       		.byte	13
+ 217 00bd 20       		.byte	32
+ 218 00be 0E       		.byte	14
+ 219 00bf 20       		.byte	32
+ 220 00c0 17       		.byte	23
+ 221 00c1 08       		.byte	8
+ 222 00c2 1E       		.byte	30
+ 223 00c3 69       		.byte	105
+ 224 00c4 40       		.byte	64
+ 225 00c5 10       		.byte	16
+ 226 00c6 41       		.byte	65
+ 227 00c7 20       		.byte	32
+ 228 00c8 45       		.byte	69
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 5
+
+
+ 229 00c9 28       		.byte	40
+ 230 00ca 4F       		.byte	79
+ 231 00cb 01       		.byte	1
+ 232 00cc 55       		.byte	85
+ 233 00cd 20       		.byte	32
+ 234 00ce 56       		.byte	86
+ 235 00cf 80       		.byte	-128
+ 236 00d0 5E       		.byte	94
+ 237 00d1 48       		.byte	72
+ 238 00d2 5F       		.byte	95
+ 239 00d3 01       		.byte	1
+ 240 00d4 86       		.byte	-122
+ 241 00d5 01       		.byte	1
+ 242 00d6 90       		.byte	-112
+ 243 00d7 14       		.byte	20
+ 244 00d8 9B       		.byte	-101
+ 245 00d9 08       		.byte	8
+ 246 00da 9E       		.byte	-98
+ 247 00db 80       		.byte	-128
+ 248 00dc A1       		.byte	-95
+ 249 00dd 08       		.byte	8
+ 250 00de B5       		.byte	-75
+ 251 00df 01       		.byte	1
+ 252 00e0 C0       		.byte	-64
+ 253 00e1 70       		.byte	112
+ 254 00e2 C2       		.byte	-62
+ 255 00e3 60       		.byte	96
+ 256 00e4 C4       		.byte	-60
+ 257 00e5 20       		.byte	32
+ 258 00e6 D0       		.byte	-48
+ 259 00e7 66       		.byte	102
+ 260 00e8 D6       		.byte	-42
+ 261 00e9 D0       		.byte	-48
+ 262 00ea EE       		.byte	-18
+ 263 00eb 40       		.byte	64
+ 264 00ec 00       		.byte	0
+ 265 00ed 88       		.byte	-120
+ 266 00ee 02       		.byte	2
+ 267 00ef 24       		.byte	36
+ 268 00f0 04       		.byte	4
+ 269 00f1 CE       		.byte	-50
+ 270 00f2 07       		.byte	7
+ 271 00f3 0A       		.byte	10
+ 272 00f4 08       		.byte	8
+ 273 00f5 CA       		.byte	-54
+ 274 00f6 0A       		.byte	10
+ 275 00f7 04       		.byte	4
+ 276 00f8 0D       		.byte	13
+ 277 00f9 88       		.byte	-120
+ 278 00fa 14       		.byte	20
+ 279 00fb 42       		.byte	66
+ 280 00fc 16       		.byte	22
+ 281 00fd 24       		.byte	36
+ 282 00fe 17       		.byte	23
+ 283 00ff D0       		.byte	-48
+ 284 0100 19       		.byte	25
+ 285 0101 11       		.byte	17
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 6
+
+
+ 286 0102 1A       		.byte	26
+ 287 0103 10       		.byte	16
+ 288 0104 1B       		.byte	27
+ 289 0105 22       		.byte	34
+ 290 0106 22       		.byte	34
+ 291 0107 01       		.byte	1
+ 292 0108 24       		.byte	36
+ 293 0109 0E       		.byte	14
+ 294 010a 25       		.byte	37
+ 295 010b 22       		.byte	34
+ 296 010c 27       		.byte	39
+ 297 010d 55       		.byte	85
+ 298 010e 2D       		.byte	45
+ 299 010f 44       		.byte	68
+ 300 0110 2F       		.byte	47
+ 301 0111 22       		.byte	34
+ 302 0112 30       		.byte	48
+ 303 0113 C0       		.byte	-64
+ 304 0114 32       		.byte	50
+ 305 0115 01       		.byte	1
+ 306 0116 33       		.byte	51
+ 307 0117 0F       		.byte	15
+ 308 0118 34       		.byte	52
+ 309 0119 20       		.byte	32
+ 310 011a 35       		.byte	53
+ 311 011b F0       		.byte	-16
+ 312 011c 36       		.byte	54
+ 313 011d 1E       		.byte	30
+ 314 011e 38       		.byte	56
+ 315 011f 80       		.byte	-128
+ 316 0120 3E       		.byte	62
+ 317 0121 40       		.byte	64
+ 318 0122 40       		.byte	64
+ 319 0123 01       		.byte	1
+ 320 0124 45       		.byte	69
+ 321 0125 02       		.byte	2
+ 322 0126 46       		.byte	70
+ 323 0127 02       		.byte	2
+ 324 0128 48       		.byte	72
+ 325 0129 05       		.byte	5
+ 326 012a 49       		.byte	73
+ 327 012b FF       		.byte	-1
+ 328 012c 4A       		.byte	74
+ 329 012d FF       		.byte	-1
+ 330 012e 4B       		.byte	75
+ 331 012f FF       		.byte	-1
+ 332 0130 4D       		.byte	77
+ 333 0131 A0       		.byte	-96
+ 334 0132 50       		.byte	80
+ 335 0133 08       		.byte	8
+ 336 0134 52       		.byte	82
+ 337 0135 80       		.byte	-128
+ 338 0136 58       		.byte	88
+ 339 0137 04       		.byte	4
+ 340 0138 59       		.byte	89
+ 341 0139 04       		.byte	4
+ 342 013a 5A       		.byte	90
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 7
+
+
+ 343 013b 04       		.byte	4
+ 344 013c 5B       		.byte	91
+ 345 013d 04       		.byte	4
+ 346 013e 5F       		.byte	95
+ 347 013f 01       		.byte	1
+ 348 0140 60       		.byte	96
+ 349 0141 80       		.byte	-128
+ 350 0142 62       		.byte	98
+ 351 0143 40       		.byte	64
+ 352 0144 63       		.byte	99
+ 353 0145 40       		.byte	64
+ 354 0146 64       		.byte	100
+ 355 0147 40       		.byte	64
+ 356 0148 66       		.byte	102
+ 357 0149 40       		.byte	64
+ 358 014a 68       		.byte	104
+ 359 014b 40       		.byte	64
+ 360 014c 6A       		.byte	106
+ 361 014d 40       		.byte	64
+ 362 014e 6C       		.byte	108
+ 363 014f 40       		.byte	64
+ 364 0150 6E       		.byte	110
+ 365 0151 40       		.byte	64
+ 366 0152 05       		.byte	5
+ 367 0153 10       		.byte	16
+ 368 0154 06       		.byte	6
+ 369 0155 80       		.byte	-128
+ 370 0156 07       		.byte	7
+ 371 0157 20       		.byte	32
+ 372 0158 0E       		.byte	14
+ 373 0159 20       		.byte	32
+ 374 015a 0F       		.byte	15
+ 375 015b 08       		.byte	8
+ 376 015c 16       		.byte	22
+ 377 015d 40       		.byte	64
+ 378 015e 17       		.byte	23
+ 379 015f 08       		.byte	8
+ 380 0160 1C       		.byte	28
+ 381 0161 14       		.byte	20
+ 382 0162 1D       		.byte	29
+ 383 0163 99       		.byte	-103
+ 384 0164 1E       		.byte	30
+ 385 0165 20       		.byte	32
+ 386 0166 1F       		.byte	31
+ 387 0167 20       		.byte	32
+ 388 0168 25       		.byte	37
+ 389 0169 04       		.byte	4
+ 390 016a 27       		.byte	39
+ 391 016b 28       		.byte	40
+ 392 016c 2E       		.byte	46
+ 393 016d 80       		.byte	-128
+ 394 016e 2F       		.byte	47
+ 395 016f 20       		.byte	32
+ 396 0170 36       		.byte	54
+ 397 0171 10       		.byte	16
+ 398 0172 37       		.byte	55
+ 399 0173 08       		.byte	8
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 8
+
+
+ 400 0174 3D       		.byte	61
+ 401 0175 08       		.byte	8
+ 402 0176 3F       		.byte	63
+ 403 0177 80       		.byte	-128
+ 404 0178 45       		.byte	69
+ 405 0179 80       		.byte	-128
+ 406 017a 4F       		.byte	79
+ 407 017b 08       		.byte	8
+ 408 017c 57       		.byte	87
+ 409 017d 40       		.byte	64
+ 410 017e 76       		.byte	118
+ 411 017f 40       		.byte	64
+ 412 0180 C0       		.byte	-64
+ 413 0181 70       		.byte	112
+ 414 0182 C2       		.byte	-62
+ 415 0183 60       		.byte	96
+ 416 0184 C4       		.byte	-60
+ 417 0185 30       		.byte	48
+ 418 0186 CA       		.byte	-54
+ 419 0187 50       		.byte	80
+ 420 0188 CC       		.byte	-52
+ 421 0189 60       		.byte	96
+ 422 018a CE       		.byte	-50
+ 423 018b 50       		.byte	80
+ 424 018c D0       		.byte	-48
+ 425 018d 10       		.byte	16
+ 426 018e 32       		.byte	50
+ 427 018f 40       		.byte	64
+ 428 0190 CC       		.byte	-52
+ 429 0191 10       		.byte	16
+ 430 0192 96       		.byte	-106
+ 431 0193 80       		.byte	-128
+ 432 0194 AA       		.byte	-86
+ 433 0195 40       		.byte	64
+ 434 0196 EE       		.byte	-18
+ 435 0197 80       		.byte	-128
+ 436 0198 03       		.byte	3
+ 437 0199 08       		.byte	8
+ 438 019a C0       		.byte	-64
+ 439 019b 02       		.byte	2
+ 440 019c AB       		.byte	-85
+ 441 019d 08       		.byte	8
+ 442 019e 50       		.byte	80
+ 443 019f 10       		.byte	16
+ 444 01a0 56       		.byte	86
+ 445 01a1 40       		.byte	64
+ 446 01a2 86       		.byte	-122
+ 447 01a3 40       		.byte	64
+ 448 01a4 90       		.byte	-112
+ 449 01a5 20       		.byte	32
+ 450 01a6 B4       		.byte	-76
+ 451 01a7 10       		.byte	16
+ 452 01a8 D4       		.byte	-44
+ 453 01a9 60       		.byte	96
+ 454 01aa E2       		.byte	-30
+ 455 01ab 10       		.byte	16
+ 456 01ac 10       		.byte	16
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 9
+
+
+ 457 01ad 01       		.byte	1
+ 458 01ae 1A       		.byte	26
+ 459 01af 01       		.byte	1
+ 460 01b0 00       		.byte	0
+ 461 01b1 03       		.byte	3
+ 462 01b2 00       		.byte	0
+ 463 01b3 00       		.byte	0
+ 464 01b4 00       		.byte	0
+ 465 01b5 0B       		.byte	11
+ 466 01b6 0B       		.byte	11
+ 467 01b7 00       		.byte	0
+ 468 01b8 00       		.byte	0
+ 469 01b9 00       		.byte	0
+ 470 01ba 00       		.byte	0
+ 471 01bb 00       		.byte	0
+ 472 01bc 04       		.byte	4
+ 473 01bd 00       		.byte	0
+ 474 01be 00       		.byte	0
+ 475 01bf 06       		.byte	6
+ 476 01c0 02       		.byte	2
+ 477 01c1 00       		.byte	0
+ 478 01c2 00       		.byte	0
+ 479 01c3 00       		.byte	0
+ 480 01c4 00       		.byte	0
+ 481 01c5 00       		.byte	0
+ 482 01c6 00       		.byte	0
+ 483 01c7 00       		.byte	0
+ 484 01c8 00       		.byte	0
+ 485 01c9 03       		.byte	3
+ 486 01ca 03       		.byte	3
+ 487 01cb 00       		.byte	0
+ 488 01cc 03       		.byte	3
+ 489 01cd 00       		.byte	0
+ 490 01ce 00       		.byte	0
+ 491 01cf 00       		.byte	0
+ 492              		.section	.cywolatch,"a",%progbits
+ 493              		.align	2
+ 494              		.type	cy_meta_wonvl, %object
+ 495              		.size	cy_meta_wonvl, 4
+ 496              	cy_meta_wonvl:
+ 497 0000 BC       		.byte	-68
+ 498 0001 90       		.byte	-112
+ 499 0002 AC       		.byte	-84
+ 500 0003 AF       		.byte	-81
+ 501              		.section	.cycustnvl,"a",%progbits
+ 502              		.align	2
+ 503              		.type	cy_meta_custnvl, %object
+ 504              		.size	cy_meta_custnvl, 4
+ 505              	cy_meta_custnvl:
+ 506 0000 00       		.byte	0
+ 507 0001 00       		.byte	0
+ 508 0002 40       		.byte	64
+ 509 0003 05       		.byte	5
+ 510              		.section	.cymeta,"a",%progbits
+ 511              		.align	2
+ 512              		.type	cy_metadata, %object
+ 513              		.size	cy_metadata, 12
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 10
+
+
+ 514              	cy_metadata:
+ 515 0000 00       		.byte	0
+ 516 0001 01       		.byte	1
+ 517 0002 2E       		.byte	46
+ 518 0003 16       		.byte	22
+ 519 0004 10       		.byte	16
+ 520 0005 69       		.byte	105
+ 521 0006 00       		.byte	0
+ 522 0007 01       		.byte	1
+ 523 0008 00       		.byte	0
+ 524 0009 00       		.byte	0
+ 525 000a 00       		.byte	0
+ 526 000b 00       		.byte	0
+ 527              		.section	.cyflashprotect,"a",%progbits
+ 528              		.align	2
+ 529              		.type	cy_meta_flashprotect, %object
+ 530              		.size	cy_meta_flashprotect, 256
+ 531              	cy_meta_flashprotect:
+ 532 0000 00000000 		.space	256
+ 532      00000000 
+ 532      00000000 
+ 532      00000000 
+ 532      00000000 
+ 533              		.text
+ 534              	.Letext0:
+ 535              		.file 1 "Generated_Source\\PSoC5\\cymetadata.c"
+ 536              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 537              		.section	.debug_info,"",%progbits
+ 538              	.Ldebug_info0:
+ 539 0000 37010000 		.4byte	0x137
+ 540 0004 0400     		.2byte	0x4
+ 541 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 542 000a 04       		.byte	0x4
+ 543 000b 01       		.uleb128 0x1
+ 544 000c 9A000000 		.4byte	.LASF18
+ 545 0010 01       		.byte	0x1
+ 546 0011 B0010000 		.4byte	.LASF19
+ 547 0015 00000000 		.4byte	.LASF20
+ 548 0019 00000000 		.4byte	.Ldebug_line0
+ 549 001d 02       		.uleb128 0x2
+ 550 001e 01       		.byte	0x1
+ 551 001f 06       		.byte	0x6
+ 552 0020 A4010000 		.4byte	.LASF0
+ 553 0024 02       		.uleb128 0x2
+ 554 0025 01       		.byte	0x1
+ 555 0026 08       		.byte	0x8
+ 556 0027 3E000000 		.4byte	.LASF1
+ 557 002b 02       		.uleb128 0x2
+ 558 002c 02       		.byte	0x2
+ 559 002d 05       		.byte	0x5
+ 560 002e 8B010000 		.4byte	.LASF2
+ 561 0032 02       		.uleb128 0x2
+ 562 0033 02       		.byte	0x2
+ 563 0034 07       		.byte	0x7
+ 564 0035 5E000000 		.4byte	.LASF3
+ 565 0039 02       		.uleb128 0x2
+ 566 003a 04       		.byte	0x4
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 11
+
+
+ 567 003b 05       		.byte	0x5
+ 568 003c 9B010000 		.4byte	.LASF4
+ 569 0040 02       		.uleb128 0x2
+ 570 0041 04       		.byte	0x4
+ 571 0042 07       		.byte	0x7
+ 572 0043 4C000000 		.4byte	.LASF5
+ 573 0047 02       		.uleb128 0x2
+ 574 0048 08       		.byte	0x8
+ 575 0049 05       		.byte	0x5
+ 576 004a 78010000 		.4byte	.LASF6
+ 577 004e 02       		.uleb128 0x2
+ 578 004f 08       		.byte	0x8
+ 579 0050 07       		.byte	0x7
+ 580 0051 35010000 		.4byte	.LASF7
+ 581 0055 03       		.uleb128 0x3
+ 582 0056 04       		.byte	0x4
+ 583 0057 05       		.byte	0x5
+ 584 0058 696E7400 		.ascii	"int\000"
+ 585 005c 02       		.uleb128 0x2
+ 586 005d 04       		.byte	0x4
+ 587 005e 07       		.byte	0x7
+ 588 005f 28010000 		.4byte	.LASF8
+ 589 0063 04       		.uleb128 0x4
+ 590 0064 95010000 		.4byte	.LASF21
+ 591 0068 02       		.byte	0x2
+ 592 0069 9201     		.2byte	0x192
+ 593 006b 24000000 		.4byte	0x24
+ 594 006f 02       		.uleb128 0x2
+ 595 0070 04       		.byte	0x4
+ 596 0071 04       		.byte	0x4
+ 597 0072 38000000 		.4byte	.LASF9
+ 598 0076 02       		.uleb128 0x2
+ 599 0077 08       		.byte	0x8
+ 600 0078 04       		.byte	0x4
+ 601 0079 71000000 		.4byte	.LASF10
+ 602 007d 02       		.uleb128 0x2
+ 603 007e 01       		.byte	0x1
+ 604 007f 08       		.byte	0x8
+ 605 0080 86010000 		.4byte	.LASF11
+ 606 0084 05       		.uleb128 0x5
+ 607 0085 63000000 		.4byte	0x63
+ 608 0089 95000000 		.4byte	0x95
+ 609 008d 06       		.uleb128 0x6
+ 610 008e 95000000 		.4byte	0x95
+ 611 0092 CF01     		.2byte	0x1cf
+ 612 0094 00       		.byte	0
+ 613 0095 02       		.uleb128 0x2
+ 614 0096 04       		.byte	0x4
+ 615 0097 07       		.byte	0x7
+ 616 0098 6F010000 		.4byte	.LASF12
+ 617 009c 07       		.uleb128 0x7
+ 618 009d 88000000 		.4byte	.LASF13
+ 619 00a1 01       		.byte	0x1
+ 620 00a2 1F       		.byte	0x1f
+ 621 00a3 AD000000 		.4byte	0xad
+ 622 00a7 05       		.uleb128 0x5
+ 623 00a8 03       		.byte	0x3
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 12
+
+
+ 624 00a9 00000000 		.4byte	cy_meta_configecc
+ 625 00ad 08       		.uleb128 0x8
+ 626 00ae 84000000 		.4byte	0x84
+ 627 00b2 05       		.uleb128 0x5
+ 628 00b3 63000000 		.4byte	0x63
+ 629 00b7 C2000000 		.4byte	0xc2
+ 630 00bb 09       		.uleb128 0x9
+ 631 00bc 95000000 		.4byte	0x95
+ 632 00c0 03       		.byte	0x3
+ 633 00c1 00       		.byte	0
+ 634 00c2 07       		.uleb128 0x7
+ 635 00c3 78000000 		.4byte	.LASF14
+ 636 00c7 01       		.byte	0x1
+ 637 00c8 66       		.byte	0x66
+ 638 00c9 D3000000 		.4byte	0xd3
+ 639 00cd 05       		.uleb128 0x5
+ 640 00ce 03       		.byte	0x3
+ 641 00cf 00000000 		.4byte	cy_meta_custnvl
+ 642 00d3 08       		.uleb128 0x8
+ 643 00d4 B2000000 		.4byte	0xb2
+ 644 00d8 07       		.uleb128 0x7
+ 645 00d9 61010000 		.4byte	.LASF15
+ 646 00dd 01       		.byte	0x1
+ 647 00de 74       		.byte	0x74
+ 648 00df E9000000 		.4byte	0xe9
+ 649 00e3 05       		.uleb128 0x5
+ 650 00e4 03       		.byte	0x3
+ 651 00e5 00000000 		.4byte	cy_meta_wonvl
+ 652 00e9 08       		.uleb128 0x8
+ 653 00ea B2000000 		.4byte	0xb2
+ 654 00ee 05       		.uleb128 0x5
+ 655 00ef 63000000 		.4byte	0x63
+ 656 00f3 FE000000 		.4byte	0xfe
+ 657 00f7 09       		.uleb128 0x9
+ 658 00f8 95000000 		.4byte	0x95
+ 659 00fc FF       		.byte	0xff
+ 660 00fd 00       		.byte	0
+ 661 00fe 07       		.uleb128 0x7
+ 662 00ff 4C010000 		.4byte	.LASF16
+ 663 0103 01       		.byte	0x1
+ 664 0104 82       		.byte	0x82
+ 665 0105 0F010000 		.4byte	0x10f
+ 666 0109 05       		.uleb128 0x5
+ 667 010a 03       		.byte	0x3
+ 668 010b 00000000 		.4byte	cy_meta_flashprotect
+ 669 010f 08       		.uleb128 0x8
+ 670 0110 EE000000 		.4byte	0xee
+ 671 0114 05       		.uleb128 0x5
+ 672 0115 63000000 		.4byte	0x63
+ 673 0119 24010000 		.4byte	0x124
+ 674 011d 09       		.uleb128 0x9
+ 675 011e 95000000 		.4byte	0x95
+ 676 0122 0B       		.byte	0xb
+ 677 0123 00       		.byte	0
+ 678 0124 07       		.uleb128 0x7
+ 679 0125 2C000000 		.4byte	.LASF17
+ 680 0129 01       		.byte	0x1
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 13
+
+
+ 681 012a AF       		.byte	0xaf
+ 682 012b 35010000 		.4byte	0x135
+ 683 012f 05       		.uleb128 0x5
+ 684 0130 03       		.byte	0x3
+ 685 0131 00000000 		.4byte	cy_metadata
+ 686 0135 08       		.uleb128 0x8
+ 687 0136 14010000 		.4byte	0x114
+ 688 013a 00       		.byte	0
+ 689              		.section	.debug_abbrev,"",%progbits
+ 690              	.Ldebug_abbrev0:
+ 691 0000 01       		.uleb128 0x1
+ 692 0001 11       		.uleb128 0x11
+ 693 0002 01       		.byte	0x1
+ 694 0003 25       		.uleb128 0x25
+ 695 0004 0E       		.uleb128 0xe
+ 696 0005 13       		.uleb128 0x13
+ 697 0006 0B       		.uleb128 0xb
+ 698 0007 03       		.uleb128 0x3
+ 699 0008 0E       		.uleb128 0xe
+ 700 0009 1B       		.uleb128 0x1b
+ 701 000a 0E       		.uleb128 0xe
+ 702 000b 10       		.uleb128 0x10
+ 703 000c 17       		.uleb128 0x17
+ 704 000d 00       		.byte	0
+ 705 000e 00       		.byte	0
+ 706 000f 02       		.uleb128 0x2
+ 707 0010 24       		.uleb128 0x24
+ 708 0011 00       		.byte	0
+ 709 0012 0B       		.uleb128 0xb
+ 710 0013 0B       		.uleb128 0xb
+ 711 0014 3E       		.uleb128 0x3e
+ 712 0015 0B       		.uleb128 0xb
+ 713 0016 03       		.uleb128 0x3
+ 714 0017 0E       		.uleb128 0xe
+ 715 0018 00       		.byte	0
+ 716 0019 00       		.byte	0
+ 717 001a 03       		.uleb128 0x3
+ 718 001b 24       		.uleb128 0x24
+ 719 001c 00       		.byte	0
+ 720 001d 0B       		.uleb128 0xb
+ 721 001e 0B       		.uleb128 0xb
+ 722 001f 3E       		.uleb128 0x3e
+ 723 0020 0B       		.uleb128 0xb
+ 724 0021 03       		.uleb128 0x3
+ 725 0022 08       		.uleb128 0x8
+ 726 0023 00       		.byte	0
+ 727 0024 00       		.byte	0
+ 728 0025 04       		.uleb128 0x4
+ 729 0026 16       		.uleb128 0x16
+ 730 0027 00       		.byte	0
+ 731 0028 03       		.uleb128 0x3
+ 732 0029 0E       		.uleb128 0xe
+ 733 002a 3A       		.uleb128 0x3a
+ 734 002b 0B       		.uleb128 0xb
+ 735 002c 3B       		.uleb128 0x3b
+ 736 002d 05       		.uleb128 0x5
+ 737 002e 49       		.uleb128 0x49
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 14
+
+
+ 738 002f 13       		.uleb128 0x13
+ 739 0030 00       		.byte	0
+ 740 0031 00       		.byte	0
+ 741 0032 05       		.uleb128 0x5
+ 742 0033 01       		.uleb128 0x1
+ 743 0034 01       		.byte	0x1
+ 744 0035 49       		.uleb128 0x49
+ 745 0036 13       		.uleb128 0x13
+ 746 0037 01       		.uleb128 0x1
+ 747 0038 13       		.uleb128 0x13
+ 748 0039 00       		.byte	0
+ 749 003a 00       		.byte	0
+ 750 003b 06       		.uleb128 0x6
+ 751 003c 21       		.uleb128 0x21
+ 752 003d 00       		.byte	0
+ 753 003e 49       		.uleb128 0x49
+ 754 003f 13       		.uleb128 0x13
+ 755 0040 2F       		.uleb128 0x2f
+ 756 0041 05       		.uleb128 0x5
+ 757 0042 00       		.byte	0
+ 758 0043 00       		.byte	0
+ 759 0044 07       		.uleb128 0x7
+ 760 0045 34       		.uleb128 0x34
+ 761 0046 00       		.byte	0
+ 762 0047 03       		.uleb128 0x3
+ 763 0048 0E       		.uleb128 0xe
+ 764 0049 3A       		.uleb128 0x3a
+ 765 004a 0B       		.uleb128 0xb
+ 766 004b 3B       		.uleb128 0x3b
+ 767 004c 0B       		.uleb128 0xb
+ 768 004d 49       		.uleb128 0x49
+ 769 004e 13       		.uleb128 0x13
+ 770 004f 3F       		.uleb128 0x3f
+ 771 0050 19       		.uleb128 0x19
+ 772 0051 02       		.uleb128 0x2
+ 773 0052 18       		.uleb128 0x18
+ 774 0053 00       		.byte	0
+ 775 0054 00       		.byte	0
+ 776 0055 08       		.uleb128 0x8
+ 777 0056 26       		.uleb128 0x26
+ 778 0057 00       		.byte	0
+ 779 0058 49       		.uleb128 0x49
+ 780 0059 13       		.uleb128 0x13
+ 781 005a 00       		.byte	0
+ 782 005b 00       		.byte	0
+ 783 005c 09       		.uleb128 0x9
+ 784 005d 21       		.uleb128 0x21
+ 785 005e 00       		.byte	0
+ 786 005f 49       		.uleb128 0x49
+ 787 0060 13       		.uleb128 0x13
+ 788 0061 2F       		.uleb128 0x2f
+ 789 0062 0B       		.uleb128 0xb
+ 790 0063 00       		.byte	0
+ 791 0064 00       		.byte	0
+ 792 0065 00       		.byte	0
+ 793              		.section	.debug_aranges,"",%progbits
+ 794 0000 14000000 		.4byte	0x14
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 15
+
+
+ 795 0004 0200     		.2byte	0x2
+ 796 0006 00000000 		.4byte	.Ldebug_info0
+ 797 000a 04       		.byte	0x4
+ 798 000b 00       		.byte	0
+ 799 000c 0000     		.2byte	0
+ 800 000e 0000     		.2byte	0
+ 801 0010 00000000 		.4byte	0
+ 802 0014 00000000 		.4byte	0
+ 803              		.section	.debug_line,"",%progbits
+ 804              	.Ldebug_line0:
+ 805 0000 4D000000 		.section	.debug_str,"MS",%progbits,1
+ 805      02004700 
+ 805      00000201 
+ 805      FB0E0D00 
+ 805      01010101 
+ 806              	.LASF20:
+ 807 0000 433A5C70 		.ascii	"C:\\projects\\POVDisplay\\POVBaseHBridge.cydsn\000"
+ 807      726F6A65 
+ 807      6374735C 
+ 807      504F5644 
+ 807      6973706C 
+ 808              	.LASF17:
+ 809 002c 63795F6D 		.ascii	"cy_metadata\000"
+ 809      65746164 
+ 809      61746100 
+ 810              	.LASF9:
+ 811 0038 666C6F61 		.ascii	"float\000"
+ 811      7400
+ 812              	.LASF1:
+ 813 003e 756E7369 		.ascii	"unsigned char\000"
+ 813      676E6564 
+ 813      20636861 
+ 813      7200
+ 814              	.LASF5:
+ 815 004c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 815      20756E73 
+ 815      69676E65 
+ 815      6420696E 
+ 815      7400
+ 816              	.LASF3:
+ 817 005e 73686F72 		.ascii	"short unsigned int\000"
+ 817      7420756E 
+ 817      7369676E 
+ 817      65642069 
+ 817      6E7400
+ 818              	.LASF10:
+ 819 0071 646F7562 		.ascii	"double\000"
+ 819      6C6500
+ 820              	.LASF14:
+ 821 0078 63795F6D 		.ascii	"cy_meta_custnvl\000"
+ 821      6574615F 
+ 821      63757374 
+ 821      6E766C00 
+ 822              	.LASF13:
+ 823 0088 63795F6D 		.ascii	"cy_meta_configecc\000"
+ 823      6574615F 
+ 823      636F6E66 
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 16
+
+
+ 823      69676563 
+ 823      6300
+ 824              	.LASF18:
+ 825 009a 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 825      4320342E 
+ 825      392E3320 
+ 825      32303135 
+ 825      30333033 
+ 826 00cd 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 826      20726576 
+ 826      6973696F 
+ 826      6E203232 
+ 826      31323230 
+ 827 0100 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 827      66756E63 
+ 827      74696F6E 
+ 827      2D736563 
+ 827      74696F6E 
+ 828              	.LASF8:
+ 829 0128 756E7369 		.ascii	"unsigned int\000"
+ 829      676E6564 
+ 829      20696E74 
+ 829      00
+ 830              	.LASF7:
+ 831 0135 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 831      206C6F6E 
+ 831      6720756E 
+ 831      7369676E 
+ 831      65642069 
+ 832              	.LASF16:
+ 833 014c 63795F6D 		.ascii	"cy_meta_flashprotect\000"
+ 833      6574615F 
+ 833      666C6173 
+ 833      6870726F 
+ 833      74656374 
+ 834              	.LASF15:
+ 835 0161 63795F6D 		.ascii	"cy_meta_wonvl\000"
+ 835      6574615F 
+ 835      776F6E76 
+ 835      6C00
+ 836              	.LASF12:
+ 837 016f 73697A65 		.ascii	"sizetype\000"
+ 837      74797065 
+ 837      00
+ 838              	.LASF6:
+ 839 0178 6C6F6E67 		.ascii	"long long int\000"
+ 839      206C6F6E 
+ 839      6720696E 
+ 839      7400
+ 840              	.LASF11:
+ 841 0186 63686172 		.ascii	"char\000"
+ 841      00
+ 842              	.LASF2:
+ 843 018b 73686F72 		.ascii	"short int\000"
+ 843      7420696E 
+ 843      7400
+ 844              	.LASF21:
+ARM GAS  C:\Users\NICKBU~1\AppData\Local\Temp\ccVMSYHh.s 			page 17
+
+
+ 845 0195 75696E74 		.ascii	"uint8\000"
+ 845      3800
+ 846              	.LASF4:
+ 847 019b 6C6F6E67 		.ascii	"long int\000"
+ 847      20696E74 
+ 847      00
+ 848              	.LASF0:
+ 849 01a4 7369676E 		.ascii	"signed char\000"
+ 849      65642063 
+ 849      68617200 
+ 850              	.LASF19:
+ 851 01b0 47656E65 		.ascii	"Generated_Source\\PSoC5\\cymetadata.c\000"
+ 851      72617465 
+ 851      645F536F 
+ 851      75726365 
+ 851      5C50536F 
+ 852              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

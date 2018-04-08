@@ -32,9 +32,15 @@
 #define EEP_INITIALIZED_MASK            0x01
 #define EEP_INITIALIZED_AS_SPI_MASK     0x02
 
+<<<<<<< HEAD
 struct SPIInterface _spi;
 struct I2CInterface _i2c;
 uint8_t _initialized = 0;
+=======
+static struct SPIInterface _spi;
+static struct I2CInterface _i2c;
+static uint8_t _initialized = 0;
+>>>>>>> RevB
 
 static void waitForIdle()
 {

@@ -1,4 +1,4 @@
-update=10/19/2016 12:05:12 PM
+update=2/25/2017 3:45:11 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=../../kicad_lib/kicad-library/library
+LibDir=
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -58,8 +58,7 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=C:/Program Files/KiCad/share/kicad/library/microchip_pic12mcu
-LibName31=library/mylib
+LibName30=C:/projects/KicadLib/General
 [schematic_editor]
 version=1
 PageLayoutDescrFile=

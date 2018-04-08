@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 --------------- Build Started: 12/04/2016 16:31:30 Project: st_eeprom, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
 The compile step is up to date, no work needs to be done.
 The library generation step is up to date, no work needs to be done.
 --------------- Build Succeeded: 12/04/2016 16:31:30 ---------------
+=======
+--------------- Build Started: 03/11/2017 07:45:49 Project: st_eeprom, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
+The compile step is up to date, no work needs to be done.
+The library generation step is up to date, no work needs to be done.
+--------------- Build Succeeded: 03/11/2017 07:45:49 ---------------
+>>>>>>> RevB
