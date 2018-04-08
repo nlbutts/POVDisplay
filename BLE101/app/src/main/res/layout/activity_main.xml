@@ -209,7 +209,7 @@ http://www.cypress.com/products/bluetooth-low-energy-ble
 
         <TextView
             android:id="@+id/VoltageValue"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/RotationValue"
             android:layout_alignStart="@+id/RotationValue"

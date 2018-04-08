@@ -236,6 +236,7 @@ int32_t filter(int32_t x, int32_t y, int32_t k)
 CY_ISR(adcISR)
 {
     uint16_t result = ADC_SAR_Seq_GetResult16(1);
+    _pwrMVolts = result;
     _pwrMVolts = ADC_SAR_Seq_CountsTo_mVolts(1, result);
     _pwrMVolts *= 11;
 }

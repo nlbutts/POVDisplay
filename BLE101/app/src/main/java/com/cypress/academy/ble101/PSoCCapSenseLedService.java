@@ -576,9 +576,9 @@ public class PSoCCapSenseLedService extends Service {
                 final byte[] data = characteristic.getValue();
                 // Set the LED switch state variable based on the characteristic value ttat was read
                 int temp = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                mRotationSpeed = temp;
-                mRotationSpeed /= 100000;
-                mRotationSpeed = 1/mRotationSpeed;
+                float tempf = temp;
+                tempf /= 1e6;
+                mRotationSpeed = 1/tempf;
                 //mBluetoothGatt.readCharacteristic(mDrawTimeCharacterisitc);
             }
 
@@ -590,7 +590,8 @@ public class PSoCCapSenseLedService extends Service {
 
             if (uuid.equals(voltageUUID)) {
                 final byte[] data = characteristic.getValue();
-                mDrawTime = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort();
+                mVoltage = java.nio.ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort();
+
             }
 
             // Notify the main activity that new data is available

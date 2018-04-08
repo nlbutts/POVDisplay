@@ -3152,7 +3152,7 @@
     <Group key="1e3c308b-0d4f-4b33-aa61-8250d54f1151">
       <Group key="CortexM0">
         <Data key="Assigned" value="True" />
-        <Data key="Priority" value="1" />
+        <Data key="Priority" value="3" />
         <Data key="Vector" value="-1" />
       </Group>
     </Group>
